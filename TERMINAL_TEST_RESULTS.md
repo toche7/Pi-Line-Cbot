@@ -2,6 +2,40 @@
 
 วันที่: 23 ตุลาคม 2026
 
+## อัปเดต: bug แชตหลาย turn และผลจริงที่ต้องแยก
+
+ผล 2-turn ด้านล่างเป็นผลทดสอบเดิม ไม่ได้ครอบคลุม small talk หรือรับรองแชตยาว ผู้ใช้พบปัญหาเพิ่ม จึงทดสอบ PTY หลายรอบต่อเนื่อง โดยมีทั้งรอบเกิน 10 turn และรอบที่ไปถึงขีดจำกัด 20 turn
+
+### สิ่งที่ reproduce ได้ก่อนแก้
+
+- “ทำไรอยู่”, “กินอะไร”, “เหรอ”, คำหยาบ, “ข้อมูลสาธารณะคืออะไร”, คำติชม และ follow-up ที่ไม่มีคำหลัก FAQ ถูกปัดไป not_found ซ้ำ ขณะโปรเซสยังรับข้อความได้: เป็น routing/ขอบเขตคำตอบ ไม่ใช่ process crash
+- หลักฐานจาก Terminal ผู้ใช้ระบุว่าโมเดลแต่ง CBTU เป็น The Bootcamp และ domain ผิด ตัวตน/URL จึงไม่ควรให้โมเดลเขียนเองโดยไม่มี host guard
+- ที่ turn 21 ถูก session cap แล้วไม่มีคำสั่งเริ่มใหม่ ต้องรอ idle หรือเปิดโปรแกรมใหม่
+- เมื่อยิงบทสนทนา LLM เร็วหลาย turn ได้ HTTP 429 จริง แม้ FAQ ยังตอบได้ ไม่ใช่ readline หยุดทำงาน
+- ระหว่างแก้พบตัวกรอง chat กว้างเกินไป: กล่าวถึง “รายละเอียดหลักสูตร” เป็นตัวอย่างข้อมูลสาธารณะก็ถูกแทนด้วย not_found และพบ structured reply ผิดรูปแบบหนึ่งครั้ง
+
+### สิ่งที่แก้
+
+ใช้ Pi เป็น dialogue layer สำหรับข้อความที่ไม่ใช่ FAQ ที่ทราบ คืน typed intent (chat/identity/knowledge/unknown/clarify) ให้ host render facts จาก snapshot; core เก็บหัวข้อ FAQ ล่าสุดเพื่อ resolve คำอ้างทันที ตัวตนและเว็บไซต์ใช้ค่าที่กำหนด ตรวจ institution/domain ที่ผิด ไม่ให้คำอธิบายทั่วไปถูกปัดเป็น FAQ fallback เพียงเพราะมีคำว่า “หลักสูตร”
+
+ลด system context และข้อความตอบซ้ำใน history ปิด tools ระหว่าง dialogue เลือก intent และเปิดคืนเมื่อจบ สำหรับ Groq เปิด JSON object mode เพื่อช่วยให้ผลเป็น JSON แล้ว validate schema ฝั่ง host ต่อ (JSON mode ไม่รับรองความถูกต้องเชิงความหมาย) ใช้คำอธิบาย not_found เป็น intent แยกและไม่ส่ง raw plan ให้ผู้ใช้
+
+เพิ่ม cooldown ตามเวลาที่ parse ได้จาก 429 (fallback 10 วินาที, สูงสุด 120 วินาที) ไม่ส่งซ้ำในช่วงพัก FAQ ยังใช้ได้ ไม่ auto-retry หรืออ้างว่าตอบสำเร็จเมื่อ provider ล้มเหลว คำขอล้มเหลวไม่เพิ่ม successful-turn count เพิ่ม /reset ให้ล้าง session โดยไม่ปิดโปรแกรม และเปลี่ยน cumulative token threshold จาก 20000 เป็น 100000 สำหรับบทสนทนายาวขึ้น โดยยังมี 20 คำตอบสำเร็จ/session และขีดจำกัดต่อ request เดิม
+
+### การตรวจหลังแก้
+
+- Build และ tests 14 รายการผ่าน รวม grounded follow-up, customer isolation, reset หลัง cap, malformed/truncated reply และซ่อมหนึ่งครั้ง, deadline รวม/abort, institutional/domain guard และ 429→FAQ ใช้ต่อ→คุยต่อเมื่อ cooldown จบ
+- PTY รอบยาวระหว่างแก้: small talk/อาหาร/คำหยาบตอบได้, identity ไทย/อังกฤษถูก, บอกและจำชื่อได้แม้สลับ FAQ, unknown ไม่แต่งข้อมูล, FAQ conflict/certificate ยังทำงาน; มี 429 บางคำถาม และ re-ask หลังพักกลับมาตอบได้
+- /reset ผ่าน Terminal จริง: หลังล้างแล้วถามชื่อเดิม โมเดลบอกว่ายังไม่มีใครบอกชื่อในแชตใหม่นี้; /exit ออกด้วย code 0
+- รอบ JSON mode ล่าสุด 13 turn ในโปรเซสเดียว: activity, public-information explanation, feedback, บอกชื่อ, สมัคร, follow-up, identity อังกฤษ/ไทย, certificate, payment conflict, จำชื่อหลัง FAQ, unknown และอธิบาย unknown ตอบได้ตามที่ตรวจใน PTY ไม่พบ raw JSON, error รูปแบบ หรือ 429 ในรอบนี้ จากนั้น /reset → สวัสดี → /exit ออกด้วย code 0 (food/คำหยาบตรวจในรอบยาวก่อนหน้านี้)
+- หลังแยก bounded repair เป็น `src/dialogue.ts` และเพิ่ม tests แล้ว ตรวจ `npm start -- "ทำอะไรอยู่"` ด้วยโค้ดสุดท้าย: ตอบ “อยู่ตรงนี้คุยกับคุณอยู่เลย …” ใน 389 ms, exit code 0 การทดสอบ PTY 13 turn ข้างต้นเป็นก่อนแยก helper แต่ใช้ JSON mode/routing เดียวกัน ไม่ได้ยิง live 13 turn ซ้ำหลัง refactor เพราะมีหลักฐาน provider quota จำกัดอยู่แล้ว
+
+**ยังไม่ถือว่าผ่านแบบไร้ข้อจำกัด:** Groq 429 ยังเกิดได้ตาม quota ของบัญชีและความเร็วส่งข้อความ ตัวบอตแจ้งช่วงพักและยังตอบ FAQ ได้ โค้ดนี้ไม่ได้เพิ่ม quota หรือรับประกันทุกบทสนทนา คุณภาพถ้อยคำไทยยังมีโอกาสไม่เรียบร้อย และ intent classifier ยังอาจเลือกผิดได้ ต้องประเมินเพิ่ม ไม่มีการแตะ credentials หรือ LINE ในรอบนี้ การซ่อมรูปแบบเพิ่มได้สูงสุดหนึ่ง model request ไม่ retry provider 429/network/auth เอง และไม่เพิ่ม deadline
+
+เอกสาร provider ที่ตรวจ: [Groq JSON Object Mode](https://console.groq.com/docs/structured-outputs) รองรับ JSON syntax แต่ไม่เท่ากับ schema/semantic correctness
+
+## ผลเดิม: FAQ และความจำ 2 turn
+
 ทดสอบโค้ดรุ่น CBTU หลัง commit `a62cae1` โดยรัน `npm run build` และ `npm run chat` ผ่าน PTY จริง ใช้โปรเซสเดียวตลอด 7 ข้อความและออกด้วย `/exit` ไม่ใช่เพียงเรียก core จาก unit tests ไม่มีการแก้ config LINE, เรียก LINE API หรือแก้ credentials ในรอบนี้
 
 | รายการ | ข้อความทดสอบ | ผลที่เห็นจาก Terminal | ผล |

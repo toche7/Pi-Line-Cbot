@@ -1,5 +1,9 @@
 // Return fixed messages only. Never echo raw provider errors, headers or credentials.
 export class DemoFailure extends Error {}
+export function rateLimitWaitMs(raw: string): number {
+  const wait = raw.match(/try again in\s*(?:(\d+)m)?\s*(\d+(?:\.\d+)?)s/i);
+  return wait ? Math.max(1000, Math.min(120000, Math.ceil((Number(wait[1] || 0) * 60 + Number(wait[2])) * 1000))) : 10000;
+}
 export function describeFailure(raw: string, timedOut: boolean, timeoutMs: number): string {
   if (timedOut) return `Model request timed out after ${timeoutMs} ms.`;
   if (/call budget/i.test(raw)) return 'Model/tool call budget reached.';

@@ -23,13 +23,21 @@ export async function runChat(
   };
   rl.on('SIGINT', interrupt);
   process.on('SIGINT', interrupt);
-  output.write('แชตพร้อมแล้ว จำบทสนทนาในโปรเซสนี้ | /exit หรือ /quit เพื่อออก | Ctrl-C เพื่อยกเลิกและออก | Ctrl-D/EOF เพื่อจบ\n');
+  output.write('แชตพร้อมแล้ว | /reset เริ่มใหม่และล้างประวัติ | /exit หรือ /quit ออก | Ctrl-C ยกเลิกและออก | Ctrl-D/EOF จบ\n');
   if (terminal) rl.prompt();
   try {
     for await (const line of rl) {
       if (interrupted) break;
       const prompt = line.trim();
       if (prompt === '/exit' || prompt === '/quit') break;
+      if (prompt === '/reset') {
+        if ('reset' in session && session.reset) {
+          await session.reset();
+          output.write('[เริ่มแชตใหม่แล้ว ประวัติเดิมถูกล้าง]\n');
+        } else output.write('[โหมดนี้ไม่มี /reset กรุณาเปิดโปรแกรมใหม่]\n');
+        if (terminal) rl.prompt();
+        continue;
+      }
       if (prompt) {
         if (!terminal) output.write(`คุณ > ${prompt}\n`);
         output.write('ผู้ช่วย > ');

@@ -1,18 +1,19 @@
 import { randomUUID } from 'node:crypto';
 import type { AgentSession } from '@earendil-works/pi-coding-agent';
 import { createDemo, orderTool } from './agent.js';
-import { publicAnswer } from './knowledge.js';
-import { runConversation } from './conversation.js';
-import { DemoFailure } from './diagnostics.js';
+import { publicAnswer, isTopicFollowup, renderKnowledge, topicForAnswer } from './knowledge.js';
+import { runDialogue } from './dialogue.js';
+import { DemoFailure, rateLimitWaitMs } from './diagnostics.js';
 
 export type Output = { text: (value: string) => void; status: (value: string) => void };
 export type Identity = { channel: 'terminal' | 'line'; scope: string; user: string };
-export type ChatClient = { send: (prompt: string, output: Output) => Promise<void>; abort: () => Promise<void> };
-type Entry = { session: Promise<AgentSession>; tail: Promise<void>; pending: number; turns: number; touched: number };
+export type ChatClient = { send: (prompt: string, output: Output) => Promise<void>; abort: () => Promise<void>; reset?: () => Promise<void> };
+type Entry = { session: Promise<AgentSession>; tail: Promise<void>; pending: number; turns: number; touched: number; lastTopic?: string };
 
 export class CustomerCore {
   private entries = new Map<string, Entry>();
   private closed = false;
+  private modelCooldownUntil = 0;
   constructor(
     private factory: () => Promise<AgentSession> = async () => (await createDemo()).session,
     private timeoutMs = 30000,
@@ -45,25 +46,43 @@ export class CustomerCore {
           const requestId = randomUUID();
           let outcome = 'ok';
           try {
-            if (current.turns >= 20) throw new DemoFailure('ครบขีดจำกัด 20 ข้อความใน session กรุณารอ session หมดอายุ');
-            current.turns++;
+            if (current.turns >= 20) throw new DemoFailure('ครบขีดจำกัด 20 ข้อความใน session ใช้ /reset หรือเปิดแชตใหม่เพื่อเริ่มอีกครั้ง (ประวัติเดิมจะหาย)');
             const session = await current.session;
             const tokenTotal = session.messages.reduce((n, m) => n + (m.role === 'assistant' ? m.usage.totalTokens : 0), 0);
-            if (tokenTotal >= 20000) throw new DemoFailure('Session token budget reached.');
+            if (tokenTotal >= 100000) throw new DemoFailure('Session token budget reached. ใช้ /reset หรือเปิดแชตใหม่ (ประวัติเดิมจะหาย)');
             const orderId = prompt.match(/\bDEMO-[0-9]+\b/i)?.[0].toUpperCase();
             let answer: string | undefined;
             if (orderId) {
               const result = await orderTool.execute('core-mock', { orderId });
               answer = `${result.details.found ? `ออเดอร์จำลอง ${orderId}: shipped / DEMO-TRACK-001` : 'ไม่พบออเดอร์จำลองนี้'}\nเป็นข้อมูลสมมติ ไม่ใช่ข้อมูลผู้เรียน CBTU`;
             } else answer = publicAnswer(prompt);
+            if (answer === undefined && current.lastTopic && isTopicFollowup(prompt)) answer = renderKnowledge(current.lastTopic);
             if (answer !== undefined) {
               // Store host-grounded turns through Pi's supported history API for later conversational context.
               await session.sendCustomMessage({ customType: 'grounded-turn', content: `ข้อความผู้ใช้: ${prompt}\nคำตอบที่ระบบตรวจจากแหล่งสาธารณะ: ${answer}`, display: false });
               output.status(orderId ? '[ข้อมูลสมมติสำหรับทดสอบ]' : '[ตอบจากข้อมูลสาธารณะที่กำหนด]');
               output.text(answer + '\n');
+              current.lastTopic = topicForAnswer(answer);
             } else {
-              await runConversation(session, prompt, this.timeoutMs, output);
+              if (this.now() < this.modelCooldownUntil) {
+                throw new DemoFailure(`โมเดลถูกจำกัดการใช้งาน (429) รออีก ${Math.ceil((this.modelCooldownUntil - this.now()) / 1000)} วินาทีแล้วลองใหม่ ระหว่างนี้ FAQ ยังใช้ได้`);
+              }
+              let reply: string;
+              try {
+                reply = await runDialogue(session, prompt, this.timeoutMs, output);
+              } catch (error) {
+                if (error instanceof DemoFailure && /429/.test(error.message)) {
+                  const last = [...session.messages].reverse().find(m => m.role === 'assistant');
+                  const wait = rateLimitWaitMs(last?.errorMessage || '');
+                  this.modelCooldownUntil = this.now() + wait;
+                  throw new DemoFailure(`โมเดลถูกจำกัดการใช้งาน (429) รอประมาณ ${Math.ceil(wait / 1000)} วินาทีแล้วลองใหม่ ระหว่างนี้ FAQ ยังใช้ได้`);
+                }
+                throw error;
+              }
+              output.text(reply + '\n');
+              current.lastTopic = topicForAnswer(reply);
             }
+            current.turns++;
           } catch (error) { outcome = 'error'; throw error; }
           finally {
             current.touched = this.now();
@@ -74,6 +93,13 @@ export class CustomerCore {
         try { await job; } finally { current.pending--; }
       },
       abort: async () => { const entry = this.entries.get(key); if (entry) await (await entry.session).abort(); },
+      reset: async () => {
+        const entry = this.entries.get(key);
+        if (!entry) return;
+        if (entry.pending) throw new DemoFailure('กรุณารอข้อความก่อนหน้าจบก่อน /reset');
+        this.entries.delete(key);
+        (await entry.session).dispose();
+      },
     };
   }
 

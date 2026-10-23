@@ -29,9 +29,11 @@ npm start -- "ดาวน์โหลด certificate"
 npm start -- "ตรวจ DEMO-1001"
 ```
 
-`/exit`, `/quit`, Ctrl-C ออกจากแชต; EOF จบการรับข้อความ ประวัติอยู่ใน memory ของโปรเซส Terminal ถือเป็นผู้ทดสอบ local หนึ่งคน ส่วน LINE แยก session ตาม OA และ user ID ฝั่ง adapter
+`/exit`, `/quit`, Ctrl-C ออกจากแชต; `/reset` เริ่ม session ใหม่และล้างประวัติ; EOF จบการรับข้อความ ประวัติอยู่ใน memory ของโปรเซส Terminal ถือเป็นผู้ทดสอบ local หนึ่งคน ส่วน LINE แยก session ตาม OA และ user ID ฝั่ง adapter
 
-FAQ ตอบด้วยกติกาค้นข้อความจาก snapshot พร้อม URL/เวลาเก็บ เพื่อไม่ให้โมเดลเลือกข้อมูลขัดกันเอง ไม่ใช่ live crawler หรือ semantic search บทสนทนาเรื่องชื่อ/ความจำใช้ Pi กับ Groq Qwen ที่ผู้ใช้ตั้งใน .env คำถามที่ไม่รองรับตอบไม่ทราบ ไม่ตีความว่า tool สมมติเป็นข้อมูลผู้เรียนจริง
+FAQ ที่ระบุหัวข้อตอบจาก snapshot พร้อม URL/เวลาเก็บ ส่วนข้อความอื่นเข้า Pi dialogue layer ให้ตีความบทสนทนา/ความจำ/follow-up เป็น structured intent ไม่ใช้ whitelist คำ small talk ที่เหลือถูกปัดเป็น FAQ ไม่พบอีกแล้ว Core จำหัวข้อ FAQ ล่าสุดสำหรับคำอ้างทันที และ render ข้อมูล CBTU/ตัวตน/ลิงก์จากข้อมูลที่กำหนด ตรวจ domain/ชื่อสถาบันที่โมเดลพยายามแต่งเอง คำถามข้อเท็จจริงที่ไม่รองรับตอบไม่ทราบ ไม่ตีความ mock order เป็นข้อมูลผู้เรียนจริง
+
+หาก Groq จำกัดการใช้งาน (HTTP 429) จะแจ้งเวลาพักและไม่ยิงซ้ำระหว่าง cooldown FAQ ที่ตอบจาก snapshot ยังใช้ได้ ให้รอตามข้อความแล้วพิมพ์คำถามใหม่ ไม่มีการรับรองว่าจะคุยกับโมเดลต่อเนื่องไม่จำกัด Session จำกัด 20 คำตอบสำเร็จและ threshold 100000 tokens สะสม; เมื่อครบใช้ `/reset` ได้ คำขอที่ล้มเหลวไม่กินโควตา turn
 
 คีย์โมเดลตั้งใน `.env` บนเครื่อง ปัจจุบันใช้ `PI_PROVIDER=groq`, `PI_MODEL=qwen/qwen3.8-27b` และ `GROQ_API_KEY` หากเริ่มใหม่ให้ใช้ .env.example เป็นตัวอย่าง ห้ามคัดลอกทับ .env ที่มีค่าแล้ว ไม่ค้น/อ่าน Pi auth เก่า และไม่ต้องส่ง secrets ในแชต
 
@@ -53,9 +55,9 @@ npm run server
 - `src/chat.ts`, `src/main.ts`: Terminal adapters; `src/conversation.ts`: model streaming/progress/timeout/call limits
 - `src/line.ts`, `src/server.ts`: raw-body signature verification, async queue, dedupe, allowlist, bounded reply client และ safe operational logs
 
-Build และ tests ล่าสุด 10 รายการผ่าน รวม Pi tool allowlist/denial, conversation memory, session isolation, FIFO, FAQ grounding/unknown/conflict, idle expiry/limits, Ctrl-C, signature invalid/valid, raw-body integrity, webhook duplicate, dry run และ mocked reply API tests ไม่เรียก LINE จริง
+Build และ tests ล่าสุด 14 รายการผ่าน รวม Pi tool allowlist/denial, dialogue rendering/ผิดสถาบัน/ผิด domain, error/429 recovery, session isolation/FIFO, grounded topic follow-up, reset/limits, FAQ grounding/conflict และ tests LINE จำลองเดิม หาก dialogue ผิดรูปแบบ/ถูกตัด/ว่าง จะขอซ่อมได้หนึ่งครั้งภายใน deadline เดิม แยกจาก provider/network errors ที่ไม่ retry อัตโนมัติ Tests ไม่เรียก LINE จริง
 
-รุ่น CBTU ทดสอบ `npm run chat` ผ่าน PTY จริงแล้ว: FAQ 5 หมวดผ่าน, ความจำ 2 turn ผ่านโมเดลจริงด้วย .env ปัจจุบันผ่าน (476/441 ms), /exit จบโปรเซสด้วย code 0 ดูรายละเอียดใน TERMINAL_TEST_RESULTS.md ก่อนปรับเป็น CBTU เคยทดสอบ live mock tool calling แล้วด้วย ยังไม่ได้ทดสอบ LINE OA/HTTPS จริง
+ทดสอบ `npm run chat` ผ่าน PTY จริงหลายรอบและหลาย turn แบบผสมแล้ว พบและแก้ routing ที่วน FAQ fallback และการแต่งตัวตน/เว็บ ไม่พบ process crash ในรอบที่ reproduce แต่พบ provider 429 จริงด้วย จึงแยกผล functional กับข้อจำกัด provider ไว้ใน TERMINAL_TEST_RESULTS.md การทดสอบ 2 turn เดิมไม่เพียงพอยืนยัน small talk หรือความเสถียรแชตยาว ยังไม่ได้ทดสอบ LINE OA/HTTPS จริง
 
 สำหรับบริการจริงยังต้องเพิ่ม durable queue/dedupe, persistent store ตาม retention ที่ตกลง, customer verification ก่อนข้อมูลจริง, การประเมินคำตอบกว้างขึ้น และ cost monitoring แบบเงิน อ่านข้อจำกัดในคู่มือก่อนเปิดให้กลุ่มทดสอบ ไม่มีการส่งต่อเจ้าหน้าที่หรือ action เปลี่ยนข้อมูลในรุ่นนี้
 

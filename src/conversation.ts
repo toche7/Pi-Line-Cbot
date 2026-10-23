@@ -47,6 +47,7 @@ export async function runConversation(
     if (!last || last.stopReason === 'error' || last.stopReason === 'aborted') {
       throw new DemoFailure(describeFailure(last?.errorMessage || '', timedOut, timeoutMs));
     }
+    if (last.stopReason === 'length') throw new DemoFailure('Model response exceeded output token budget.');
     const finalText = last.content.filter(part => part.type === 'text').map(part => part.text).join('');
     if (!finalText.trim()) {
       throw new DemoFailure('Model returned no answer text (empty or reasoning-only response). Please try again.');
