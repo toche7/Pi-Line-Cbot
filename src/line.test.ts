@@ -4,12 +4,48 @@ import { createHmac } from 'node:crypto';
 import { Readable } from 'node:stream';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { LineAdapter, lineReply, validSignature, webhookHandler } from './line.js';
+import { DemoFailure } from './diagnostics.js';
 
 const secret = 'test-only-channel-placeholder';
 const sign = (body: Buffer) => createHmac('sha256', secret).update(body).digest('base64');
 const event = (id = 'event-1', user = 'allowed') => ({
   type: 'message', webhookEventId: id, replyToken: 'test-reply-placeholder',
   source: { type: 'user', userId: user }, message: { type: 'text', text: 'ขอใบเสร็จ' },
+});
+
+test('LINE distinguishes rate-limited fallback from successful FAQ without exposing errors', async () => {
+  const replies: string[] = [];
+  const logs: object[] = [];
+  const adapter = new LineAdapter({ secret, account: 'test', dryRun: false, allowedUsers: new Set(['allowed']),
+    core: { client: () => ({ send: async (prompt, out) => {
+      if (prompt === 'สมัครสมาชิกอย่างไร') { out.text('FAQ สมัครสมาชิก'); return; }
+      throw new DemoFailure('429 private-provider-fixture authorization-placeholder');
+    }, abort: async () => {} }) },
+    reply: async (_token, text) => { replies.push(text); }, log: value => logs.push(value),
+  });
+  for (const [id, text] of [['rate-limit', 'คุยกัน'], ['faq', 'สมัครสมาชิกอย่างไร']]) {
+    const raw = Buffer.from(JSON.stringify({ events: [{ ...event(id), message: { type: 'text', text } }] }));
+    assert.equal(adapter.accept(raw, sign(raw)), 200); await adapter.drain();
+  }
+  assert.match(replies[0], /โควตา.*FAQ/);
+  assert.equal(replies[1], 'FAQ สมัครสมาชิก');
+  assert.deepEqual(logs.map(r => (r as { outcome: string }).outcome), ['core_failed', 'replied_fallback', 'replied']);
+  assert.match(JSON.stringify(logs), /model_rate_limit/);
+  assert.doesNotMatch(JSON.stringify({ logs, replies }), /private-provider|authorization-placeholder|test-reply/);
+});
+
+test('LINE hides unknown exception details and identifies timeout fallback', async () => {
+  for (const error of [new Error('https://private.invalid/token-secret'), new DemoFailure('Model request timed out after 25000 ms.')]) {
+    let reply = ''; const logs: object[] = [];
+    const adapter = new LineAdapter({ secret, account: 'test', dryRun: false, allowedUsers: new Set(['allowed']),
+      core: { client: () => ({ send: async () => { throw error; }, abort: async () => {} }) },
+      reply: async (_token, text) => { reply = text; }, log: value => logs.push(value),
+    });
+    const raw = Buffer.from(JSON.stringify({ events: [event()] }));
+    adapter.accept(raw, sign(raw)); await adapter.drain();
+    assert.doesNotMatch(JSON.stringify({ reply, logs }), /private.invalid|token-secret/);
+    assert.match(reply, error instanceof DemoFailure ? /นานเกินไป/ : /ยังตอบไม่ได้/);
+  }
 });
 
 test('LINE verifies raw bytes before parsing; mock reply, dedupe and user isolation', async () => {

@@ -74,3 +74,6 @@ Build และ tests ล่าสุด 18 รายการผ่าน ร�
 - [LINE webhook signature](https://developers.line.biz/en/docs/messaging-api/verify-webhook-signature/)
 
 Git local baseline เริ่มจาก `31365a3`; .env/secrets/runtime data ไม่ถูก track ไม่มี remote หรือ push
+
+
+ผลแก้ LINE fallback ล่าสุด: ทำซ้ำพบ Groq HTTP429 ขณะที่ FAQ ยังตอบได้ จึงแยกข้อความแจ้งโควตา/timeoutและlog `model_rate_limit`, `replied_fallback` ออกจากคำตอบปกติ ไม่แสดงraw error ผู้ใช้ยืนยันรับFAQหลังrestartแล้ว Build/tests20รายการและHTTP/public/LINE Verifyผ่าน โควตาโมเดลยังเป็นข้อจำกัดของprovider รายละเอียดและโหมดรันปัจจุบันใน LINE_SETUP.md

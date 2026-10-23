@@ -1,5 +1,24 @@
 // Return fixed messages only. Never echo raw provider errors, headers or credentials.
 export class DemoFailure extends Error {}
+// Categories are fixed metadata, never raw error text or customer content.
+export function failureCategory(error: unknown): string {
+  if (!(error instanceof DemoFailure)) return 'internal';
+  const message = error.message;
+  if (/429/.test(message)) return 'model_rate_limit';
+  if (/timed out|timeout/i.test(message)) return 'model_timeout';
+  if (/401|403/.test(message)) return 'model_auth';
+  if (/network connection/.test(message)) return 'model_network';
+  if (/รูปแบบ|no answer text|output token budget/.test(message)) return 'model_format';
+  return 'core_failure';
+}
+
+export function lineFailureReply(error: unknown): string {
+  if (failureCategory(error) === 'model_rate_limit') {
+    return 'ขณะนี้โมเดลสนทนาถูกจำกัดโควตาชั่วคราว กรุณารอสักครู่แล้วลองใหม่ ระหว่างนี้ยังถาม FAQ ได้ เช่น “สมัครสมาชิกอย่างไร” หรือดู https://cbtumu.net/faq/';
+  }
+  if (failureCategory(error) === 'model_timeout') return 'โมเดลใช้เวลาตอบนานเกินไป กรุณาลองใหม่ ระหว่างนี้ยังถาม FAQ ได้ เช่น “สมัครสมาชิกอย่างไร” หรือดู https://cbtumu.net/faq/';
+  return 'ขณะนี้ซีบอตยังตอบไม่ได้ กรุณาลองใหม่ภายหลัง หรือติดต่อเจ้าหน้าที่ผ่าน https://cbtumu.net/faq/';
+}
 export function rateLimitWaitMs(raw: string): number {
   const wait = raw.match(/try again in\s*(?:(\d+)m)?\s*(\d+(?:\.\d+)?)s/i);
   return wait ? Math.max(1000, Math.min(120000, Math.ceil((Number(wait[1] || 0) * 60 + Number(wait[2])) * 1000))) : 10000;

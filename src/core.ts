@@ -3,7 +3,7 @@ import { type AgentSession, type SessionManager } from '@earendil-works/pi-codin
 import { createDemo, orderTool } from './agent.js';
 import { publicAnswer, isTopicFollowup, renderKnowledge, topicForAnswer } from './knowledge.js';
 import { runDialogue } from './dialogue.js';
-import { DemoFailure, rateLimitWaitMs } from './diagnostics.js';
+import { DemoFailure, rateLimitWaitMs, failureCategory } from './diagnostics.js';
 import { type Memory, type MemoryStore, type Summarizer, emptyMemory, memoryManager, learnProfile, safeText, compactMemory } from './memory.js';
 
 export type Output = { text: (value: string) => void; status: (value: string) => void };
@@ -58,6 +58,7 @@ export class CustomerCore {
           const started = this.now();
           const requestId = randomUUID();
           let outcome = 'ok';
+          let category: string | undefined;
           try {
             let session = await current.session;
             if (learnProfile(current.memory, prompt)) {
@@ -116,10 +117,10 @@ export class CustomerCore {
             current.memory.updatedAt = this.now();
             if (Buffer.byteLength(JSON.stringify(current.memory)) > 60000) current.memory = compactMemory(current.memory, this.summarizer);
             this.store?.save(key, current.memory);
-          } catch (error) { outcome = 'error'; throw error; }
+          } catch (error) { outcome = 'error'; category = failureCategory(error); throw error; }
           finally {
             current.touched = this.now();
-            this.log({ requestId, channel: identity.channel, outcome, elapsedMs: this.now() - started });
+            this.log({ requestId, channel: identity.channel, outcome, ...(category ? { category } : {}), elapsedMs: this.now() - started });
           }
         });
         current.tail = job.catch(() => {});

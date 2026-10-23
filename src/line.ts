@@ -1,6 +1,7 @@
 import { createHmac, timingSafeEqual, randomUUID } from 'node:crypto';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { CustomerCore } from './core.js';
+import { failureCategory, lineFailureReply } from './diagnostics.js';
 
 export function validSignature(raw: Buffer, signature: string | undefined, secret: string): boolean {
   if (!secret || !signature || !/^[A-Za-z0-9+/]{43}=$/.test(signature)) return false;
@@ -60,18 +61,23 @@ export class LineAdapter {
       const task = this.tail.then(async () => {
         if (this.closed) return;
         const requestId = randomUUID();
-        const record = (outcome: string) => this.options.log?.({ requestId, channel: 'line', outcome });
+        const record = (outcome: string, category?: string) => this.options.log?.({ requestId, channel: 'line', outcome, ...(category ? { category } : {}) });
         if (Date.now() - receivedAt > 20000) { record('queue_expired'); return; }
         let text = '';
+        let fallback = false;
         try {
           const client = this.options.core.client({ channel: 'line', scope: `${this.options.account}:direct`, user: event.source.userId });
           await client.send(event.message.text, { text: value => { text += value; }, status: () => {} });
-        } catch { text = 'ขณะนี้ซีบอตยังตอบไม่ได้ กรุณาลองใหม่ภายหลัง หรือติดต่อเจ้าหน้าที่ผ่าน https://cbtumu.net/faq/'; }
+        } catch (error) {
+          fallback = true;
+          record('core_failed', failureCategory(error));
+          text = lineFailureReply(error);
+        }
         if (!text.trim()) text = 'ยังไม่พบคำตอบที่ยืนยันได้ กรุณาดู https://cbtumu.net/faq/';
         if (this.closed) return;
         if (Date.now() - receivedAt > 50000) { record('reply_expired'); return; }
         if (this.options.dryRun) { record('dry_run_no_send'); return; }
-        try { await this.options.reply(event.replyToken, text); record('replied'); }
+        try { await this.options.reply(event.replyToken, text); record(fallback ? 'replied_fallback' : 'replied'); }
         catch { record('reply_failed_no_retry'); }
       });
       this.tail = task.catch(() => {});

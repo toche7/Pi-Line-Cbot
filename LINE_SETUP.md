@@ -4,6 +4,18 @@
 
 ## ผล readiness ล่าสุด
 
+### แก้ fallback จาก model rate limit (ผลล่าสุด)
+
+ผู้ใช้พบข้อความ “ขณะนี้ซีบอตยังตอบไม่ได้…” ทั้งที่ webhook/reply ทำงาน ตรวจ core เดียวกับ LINE ด้วย config เดิม (Groq qwen/qwen3.8-27b, timeout25s, identity allowlistเดิมแต่ sessionทดสอบชั่วคราว ไม่แตะ Terminal store) พบ model turn สำเร็จหนึ่งครั้ง แล้ว follow-up ได้ HTTP429; FAQ สำเร็จทันที ทดสอบซ้ำพบ429อีกครั้ง ไม่เปลี่ยนcredentialsหรือmodel และไม่retryreplytokenเดิม
+
+สาเหตุที่ทำซ้ำได้คือ provider rate limit; adapterเดิมจับทุกข้อผิดพลาดแล้วส่งข้อความรวมและlogเพียงreplied ทำให้แยกคำตอบปกติกับfallbackไม่ได้ จึงเพิ่มcategoryแบบค่าคงที่ในcore/adapter โดยไม่logข้อความerrorดิบ เปลี่ยน429เป็นข้อความไทยแจ้งโควตาชั่วคราวและบอกว่าFAQยังใช้ได้ พร้อมoutcome `core_failed` / `replied_fallback` ต่างจาก `replied` ปกติ timeoutมีข้อความเฉพาะ ส่วนerrorไม่ทราบชนิดยังซ่อนรายละเอียด
+
+หลังbuildและrestartจริง logรับinboundยืนยัน `model_rate_limit` → `core_failed` → `replied_fallback`; ถัดมาFAQ `ok` 2ms → `replied` ผู้ใช้ยืนยันว่าได้รับคำตอบFAQแล้ว นี่เป็นหลักฐานการตอบจริงหลังแก้ ส่วนบทสนทนาที่เรียกโมเดลยังอาจติด429จนproviderปลดข้อจำกัด ไม่มีการรับรองว่าquotaถูกแก้แล้ว
+
+Build/tests20รายการผ่าน รวม429fallback/FAQถัดไป/timeout/ซ่อนunknownerror และTerminal persistenceเดิม Local HTTP smokeผ่านhealth200/invalid401/signed200/dedupeหนึ่งmockreply; public checksและLINE Verifyหลังrestartผ่าน endpointตรงและactive=true
+
+ตอนตรวจรอบนี้ `.env` มี LINE_DRY_RUN=true แต่โปรเซสเดิมทำงานfalseอยู่ จึงคงไฟล์เดิมและเริ่มโปรเซสใหม่ด้วย `LINE_DRY_RUN=false npm run server` เพื่อคงการทดสอบreplyเฉพาะallowlistตามที่อนุญาต หากเริ่มด้วย `npm run server` ธรรมดาจะใช้ค่าใน.env และไม่ส่งreply; ต้องเลือกโหมดให้ตรงเจตนา LINE sessionถูกล้างตามปกติเมื่อrestartเพราะยังephemeral Terminal memoryไม่เปลี่ยน
+
 ### HTTPS tunnel และการเปลี่ยน webhook (ล่าสุด)
 
 เจ้าของอนุญาต tunnel ชั่วคราวและเปลี่ยน webhook โดยตรงแล้ว ใช้ ngrok ที่มี config อยู่ อัปเดตจาก 3.6.0 เป็น 3.39.12 เพราะบริการปฏิเสธเวอร์ชันเก่า เปิดเฉพาะ upstream `http://127.0.0.1:3000` และปิด request inspector (`--inspect=false`) ไม่ได้เปิดบริการอื่น
