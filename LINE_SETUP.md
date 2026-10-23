@@ -1,0 +1,78 @@
+# ตั้งค่าซีบอต CBTU สำหรับ LINE กลุ่มทดสอบ
+
+สถานะ 23 ตุลาคม 2026: มี local adapter และ tests แบบ mock แล้ว ยังไม่ได้ส่ง LINE จริง, ตั้ง tunnel หรือ deploy ชื่อใช้ภาษาไทย “ซีบอต” จนกว่าจะยืนยัน spelling อังกฤษ
+
+## ทดลอง Terminal ก่อน
+
+```sh
+cd /Users/taweesaksamanchuen/Dev/codexOnPC/pi-sdk-demo
+npm run build
+npm test
+npm run chat
+```
+
+ลอง “สมัครสมาชิกอย่างไร”, “จ่ายแล้วเข้าเรียนทันทีไหม”, “ดาวน์โหลด certificate”, “ติดต่อเจ้าหน้าที่”, “ตรวจ DEMO-1001” และคำถามที่ไม่มีในแหล่งข้อมูล
+
+FAQ ตอบจาก snapshot ที่คัดจากเว็บสาธารณะ พร้อม URL และเวลาเก็บ ไม่ใช้ Notion ภายใน ไม่เรียกโมเดลเพื่อแต่งข้อเท็จจริงเพิ่ม บทสนทนาเกี่ยวกับชื่อ/ความจำใช้ Pi และ provider ที่ตั้งใน .env Tool ออเดอร์เป็นของจำลองเดิม ไม่ใช่สถานะผู้เรียนจริง
+
+## เติมค่าบนเครื่อง
+
+เปิด `.env` แล้วเติมค่าด้วยตนเอง ไม่ต้องส่ง secrets ในแชต `.env.example` เป็นตัวอย่างเท่านั้น อย่าคัดลอกทับ `.env` ที่มีคีย์แล้ว รอบนี้เพิ่มเฉพาะชื่อ keys ที่ขาด โดยคงค่าที่มีอยู่ทั้งหมด
+
+| Key | ใช้ทำอะไร / หาได้จากที่ใด |
+|---|---|
+| GROQ_API_KEY / PI_PROVIDER / PI_MODEL | ค่าโมเดลของผู้ใช้ที่ตั้งไว้เดิม ไม่มีการเปลี่ยนคีย์ |
+| LINE_CHANNEL_ID | Channel ID ของ Messaging API channel ใน LINE Developers Console > Basic settings ใช้แยก scope ของ OA |
+| LINE_CHANNEL_SECRET | Channel secret ใน Basic settings ใช้ตรวจ signature ห้ามเผยแพร่หรือใช้ค่าทดสอบกับ OA จริง |
+| LINE_CHANNEL_ACCESS_TOKEN | Channel access token จาก Messaging API tab ของ channel ชนิดที่เลือกใช้งานและมีสิทธิ์ reply เก็บเฉพาะฝั่ง server |
+| LINE_ALLOWED_USER_IDS | LINE user IDs ของผู้ทดสอบ คั่นด้วย comma เริ่มทดสอบกับ own user ID ใน Console ได้; ว่างหมายถึงไม่ตอบใคร ไม่ใช้ชื่อ display name และไม่ใช่สิทธิ์เข้าข้อมูลผู้เรียน |
+| LINE_DRY_RUN | `true` เป็นค่าเริ่มต้น: ตรวจ webhook/ประมวลผลแต่ไม่ส่ง LINE; ตั้ง `false` เองเมื่อพร้อมทดสอบ reply จริงแล้ว |
+| HOST | `127.0.0.1` ค่าเริ่มต้นสำหรับ local; หาก deploy ใน container ค่อยกำหนด interface ให้เหมาะสม เช่น 0.0.0.0 และจำกัด network access |
+| PORT | `3000` ค่าเริ่มต้น |
+| PUBLIC_BASE_URL | เว้นว่างจนมี HTTPS hosting ของตนเอง เช่น `https://bot.example.org` เป็นช่องจด config เท่านั้น โค้ดไม่สร้าง hosting หรือปรับ Console ให้ |
+| PI_TIMEOUT_MS | Terminal เริ่มต้น 45000 ms; LINE core จำกัดไม่เกิน 25000 ms เพื่อเหลือเวลาตอบ; network ไป LINE จำกัด 8 วินาที |
+
+หากยังไม่มี OA ให้สร้าง test LINE Official Account แล้วเปิด Messaging API ตาม [คู่มือเริ่มต้น LINE](https://developers.line.biz/en/docs/messaging-api/getting-started/) และเข้า channel ที่เชื่อมกับ OA นั้นใน [LINE Developers Console](https://developers.line.biz/console/) หลีกเลี่ยงใช้ OA ที่ให้บริการลูกค้าจริงสำหรับทดลอง
+
+## เริ่ม local server
+
+เมื่อเติม LINE_CHANNEL_SECRET แล้ว:
+
+```sh
+npm run build
+npm run server
+```
+
+URL บนเครื่องคือ `http://127.0.0.1:3000/webhook/line` และ health check `http://127.0.0.1:3000/health` หาก secret ว่าง โปรแกรมจะหยุดพร้อมข้อความตั้งค่า ไม่อ่าน credentials เก่าของ Pi หรือค้น LINE secrets ในเครื่อง
+
+`LINE_DRY_RUN=true` จะไม่มีการส่ง reply ออก และไม่ log เนื้อหาคำถาม/คำตอบ เมื่อ allowlist ว่างจะรับ webhook verification ที่ events=[] ได้ แต่ไม่ประมวลผลแชตผู้ใช้ ไม่มีการกรอกข้อมูลลง Console อัตโนมัติ
+
+## ตั้ง webhook หลังมี HTTPS hosting
+
+1. จัดเตรียม HTTPS endpoint ที่เจ้าของระบบดูแลและ route POST `/webhook/line` ถึง server โดยคง raw request body ไม่ parse/reformat ก่อนตรวจ signature; ยังไม่มี hosting/tunnel ที่สร้างในงานนี้
+2. เติม PUBLIC_BASE_URL ใน .env เพื่อบันทึกปลายทาง แล้วเข้า Messaging API tab ใน Console ตั้ง Webhook URL เป็น `https://<โดเมนของคุณ>/webhook/line` ด้วยตนเอง localhost ใช้รับ webhook จาก LINE โดยตรงไม่ได้
+3. กด Verify: request ที่มี signature ถูกต้องและ events=[] ต้องตอบ 200; signature ไม่ถูกต้องต้องได้ 401
+4. เปิด Use webhook และตรวจ response settings ของ OA เพื่อไม่ให้ auto-reply/greeting ที่ตั้งไว้ชนกับบอต ปรับเฉพาะ OA ทดสอบตามต้องการ
+5. เติมผู้ทดสอบใน allowlist แล้วทดสอบ dry run ก่อน เมื่ออนุญาตให้ส่ง reply จริงจึงตั้ง LINE_DRY_RUN=false และ restart server ด้วยตนเอง ไม่มี push/broadcast/handoff sender ในโค้ดนี้
+6. ทดสอบ FAQ, conflict, unknown, คุยสอง turn, ผู้ใช้ A/B และ event redelivery ตรวจว่าไม่รั่วประวัติหรือส่งซ้ำ; กลับ LINE_DRY_RUN=true และ restart เพื่อหยุดส่ง reply
+
+## พฤติกรรมและข้อจำกัด
+
+- HMAC-SHA256 + timing-safe comparison ตรวจ raw bytes ก่อน JSON.parse; ไม่อาศัยการตรวจ IP แทน signature
+- ACK 200 ก่อนเรียก core แล้วประมวลผลในคิวหน่วยความจำ; body ไม่เกิน 256 KiB, events ไม่เกิน 20, pending queue ไม่เกิน 32
+- รับเฉพาะ text ในแชต 1:1 จาก allowlist แชต group/room และ media ถูกข้าม เพื่อไม่เผยบริบทส่วนตัวในห้องรวม “กลุ่มทดสอบ” หมายถึงรายชื่อผู้ทดสอบที่คุย 1:1
+- แยก Pi session ด้วย channel + OA/direct scope + user ID ไม่รวม Terminal กับ LINE อัตโนมัติ ข้อความที่อ้างว่าเป็นอีกคนไม่เปลี่ยน identity
+- Session อยู่ใน memory, idle expiry 30 นาทีเมื่อมี request ถัดไป, สูงสุด 100 sessions, 20 turns/session, input 2000 ตัวอักษร, คิวต่อ session 3 ข้อความ; หลัง restart ลืมประวัติ
+- Pi จำกัด output 800 tokens/request, model/tool calls ไม่เกิน 4 ต่อ turn, จำกัดการเริ่ม turn ใหม่เมื่อ usage สะสมถึง 20000 tokens; ไม่ใช่ระบบ hard billing cap แบบเงิน งบรายวัน/การกระจายหลายเครื่องยังไม่ได้ทำ
+- Dedupe webhookEventId ใน memory 24 ชั่วโมง สูงสุด 10000 IDs; คิวเกิน capacity ตอบ 503, งานรอเกิน 20 วินาทีถูกข้าม, reply ที่ล่าช้าเกิน 50 วินาทีไม่ส่ง ไม่ retry reply ที่ล้มเหลวเองเพราะผลอาจกำกวม
+- คิวและ dedupe **ยังไม่ durable**: server restart อาจทำให้งานที่ ACK แล้วหายหรือ redelivery ถูกประมวลผลใหม่ ต้องเพิ่ม durable queue/store ก่อนใช้งานจริงที่ต้องรับประกัน delivery
+- Log server มี request ID, channel, outcome และ latency ไม่มี raw body, user ID, reply token, authorization headers หรือ secrets ไม่มีการเก็บประวัติลงดิสก์ แต่ประวัติใน memory ยังคงเป็นข้อมูลที่ต้องดูแล
+- FAQ ขัดกันเรื่องเวลาอนุมัติและบาง email: ชี้หน้าเว็บ/เจ้าหน้าที่ ไม่เลือกยืนยันเลขบัญชีหรือข้อมูลโอน ไม่เก็บสลิปหรือข้อมูลส่วนบุคคล การส่งต่อเป็นคำแนะนำช่องทางเท่านั้น ไม่เปิด case จริง
+- ตัวเลขเวลาเก็บ snapshot ไม่ใช่เวลาที่เจ้าของเว็บแก้ไขล่าสุด ต้อง refresh/ทบทวนข้อมูลก่อนรับรองราคา รอบเรียน หรือเปิดรับสมัคร ข้อมูลเพิ่มเติมแก้ `src/knowledge.ts` และ tests โดยอ้าง source เสมอ
+
+## เอกสารทางการที่ตรวจ
+
+- [Verify webhook signature](https://developers.line.biz/en/docs/messaging-api/verify-webhook-signature/)
+- [Receive messages / asynchronous processing / redelivery](https://developers.line.biz/en/docs/messaging-api/receiving-messages/)
+- [Send reply messages](https://developers.line.biz/en/docs/messaging-api/sending-messages/)
+- [CBTU FAQ](https://cbtumu.net/faq/), [หลักสูตรหน้า Home](https://cbtumu.net/), [About CBTU](https://cbtumu.net/about-cbtu/)

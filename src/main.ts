@@ -1,7 +1,7 @@
 import { createDemo } from './agent.js';
 import { DemoFailure, requestTimeout } from './diagnostics.js';
-import { runConversation } from './conversation.js';
 import { runChat } from './chat.js';
+import { CustomerCore } from './core.js';
 
 async function main() {
   const timeoutMs = requestTimeout(process.env.PI_TIMEOUT_MS);
@@ -15,18 +15,23 @@ async function main() {
       console.log('Session initialized; no model request made.');
       return;
     }
-    if (!modelRuntime.hasConfiguredAuth(provider)) {
-      throw new DemoFailure('No credentials: set GROQ_API_KEY in .env.');
-    }
-    if (process.argv.includes('--chat')) {
-      await runChat(session, timeoutMs);
-      return;
-    }
-    const prompt = process.argv.slice(2).join(' ') || 'ช่วยตรวจสถานะออเดอร์ DEMO-1001 ให้หน่อย';
-    await runConversation(session, prompt, timeoutMs, {
-      text: value => { process.stdout.write(value); },
-      status: value => { process.stderr.write(`${value}\n`); },
-    });
+    let initialSessionAvailable = true;
+    const core = new CustomerCore(async () => {
+      if (initialSessionAvailable) { initialSessionAvailable = false; return session; }
+      return (await createDemo()).session;
+    }, timeoutMs);
+    const client = core.client({ channel: 'terminal', scope: 'local', user: 'tester' });
+    try {
+      if (process.argv.includes('--chat')) {
+        await runChat(client, timeoutMs);
+        return;
+      }
+      const prompt = process.argv.slice(2).join(' ') || 'สวัสดี';
+      await client.send(prompt, {
+        text: value => { process.stdout.write(value); },
+        status: value => { process.stderr.write(`${value}\n`); },
+      });
+    } finally { await core.dispose(); }
   } finally { session.dispose(); }
 }
 

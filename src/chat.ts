@@ -3,9 +3,10 @@ import type { Readable, Writable } from 'node:stream';
 import type { AgentSession } from '@earendil-works/pi-coding-agent';
 import { runConversation } from './conversation.js';
 import { DemoFailure } from './diagnostics.js';
+import type { ChatClient } from './core.js';
 
 export async function runChat(
-  session: AgentSession, timeoutMs: number,
+  session: AgentSession | ChatClient, timeoutMs: number,
   input: Readable = process.stdin, output: Writable = process.stdout,
   status: Writable = process.stderr,
 ) {
@@ -34,10 +35,12 @@ export async function runChat(
         output.write('ผู้ช่วย > ');
         busy = true;
         try {
-          await runConversation(session, prompt, timeoutMs, {
+          const callbacks = {
             text: value => { output.write(value); },
             status: value => { status.write(`${value}\n`); },
-          });
+          } satisfies import('./core.js').Output;
+          if ('send' in session) await session.send(prompt, callbacks);
+          else await runConversation(session, prompt, timeoutMs, callbacks);
         } catch (error) {
           if (!interrupted) status.write(`${error instanceof DemoFailure ? error.message : 'Chat turn failed. Check configuration or network.'}\n`);
         } finally { busy = false; }

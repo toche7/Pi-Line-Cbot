@@ -6,6 +6,7 @@
     "build": "tsc -p tsconfig.json",
     "start": "node --env-file-if-exists=.env dist/main.js",
     "chat": "node --env-file-if-exists=.env dist/main.js --chat",
+    "server": "node --env-file-if-exists=.env dist/server.js",
     "check": "node --env-file-if-exists=.env dist/main.js --check",
     "test": "node --test dist/*.test.js"
   },

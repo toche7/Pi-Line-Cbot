@@ -1,7 +1,8 @@
-import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { Type } from '@sinclair/typebox';
 import { InMemoryCredentialStore } from '@earendil-works/pi-ai';
+import { cbtuPolicy, knowledgeTool } from './knowledge.js';
+import { DemoFailure } from './diagnostics.js';
 import {
   createAgentSession, createExtensionRuntime, ModelRuntime,
   SessionManager, SettingsManager, type ResourceLoader,
@@ -22,20 +23,20 @@ export const orderTool = {
 
 export async function createDemo() {
   const provider = process.env.PI_PROVIDER || 'groq';
-  const modelId = process.env.PI_MODEL || 'llama-3.3-70b-versatile';
+  const modelId = process.env.PI_MODEL || 'qwen/qwen3.8-27b';
   const credentials = new InMemoryCredentialStore();
-  // Optional read-only import of a static API key; never execute key commands or refresh OAuth.
-  if (process.env.PI_AUTH_FILE) {
-    const saved = JSON.parse(await readFile(process.env.PI_AUTH_FILE, 'utf8'));
-    const entry = saved[provider];
-    if (entry?.type === 'api_key' && typeof entry.key === 'string' && !entry.key.startsWith('!')) {
-      await credentials.modify(provider, async () => ({ type: 'api_key', key: entry.key }));
-    }
-  }
+  // Use provider environment credentials only; never discover old Pi auth files.
   const modelRuntime = await ModelRuntime.create({
     credentials, modelsPath: null, allowModelNetwork: false,
     modelsStorePath: resolve('.pi-runtime/models.json'),
   });
+  const stream = modelRuntime.streamSimple.bind(modelRuntime);
+  let modelCalls = 0;
+  let toolCalls = 0;
+  modelRuntime.streamSimple = (model, context, options) => {
+    if (++modelCalls > 4) throw new DemoFailure('Model call budget reached.');
+    return stream(model, context, { ...options, maxTokens: 800, maxRetries: 0, timeoutMs: 30_000 });
+  };
   const catalogModel = modelRuntime.getModel(provider, modelId);
   if (!catalogModel) throw new Error('Model unavailable in SDK catalog; set PI_PROVIDER and PI_MODEL.');
   // Groq's Qwen template rejects the OpenAI developer role inferred for reasoning models.
@@ -48,7 +49,7 @@ export async function createDemo() {
     getPrompts: () => ({ prompts: [], diagnostics: [] }),
     getThemes: () => ({ themes: [], diagnostics: [] }),
     getAgentsFiles: () => ({ agentsFiles: [] }),
-    getSystemPrompt: () => 'You are a concise Thai customer support demo. All data is fictional. Use lookup_demo_order for order questions. Never invent order status. Do not claim to send messages or change orders.',
+    getSystemPrompt: () => cbtuPolicy,
     getSystemPromptSource: () => undefined,
     getAppendSystemPrompt: () => [],
     getAppendSystemPromptSources: () => [],
@@ -57,9 +58,15 @@ export async function createDemo() {
   const { session } = await createAgentSession({
     cwd: process.cwd(), agentDir: resolve('.pi-runtime'), modelRuntime, model,
     thinkingLevel: 'off', resourceLoader,
-    tools: ['lookup_demo_order'], customTools: [orderTool],
+    tools: ['lookup_demo_order', 'search_public_knowledge'], customTools: [orderTool, knowledgeTool],
     settingsManager: SettingsManager.inMemory({ compaction: { enabled: false }, retry: { enabled: false } }),
     sessionManager: SessionManager.inMemory(),
   });
+  session.subscribe(event => { if (event.type === 'agent_start') { modelCalls = 0; toolCalls = 0; } });
+  const beforeToolCall = session.agent.beforeToolCall;
+  session.agent.beforeToolCall = async (context, signal) => {
+    if (++toolCalls > 4) return { block: true, terminate: true, reason: 'Tool call budget reached.' };
+    return beforeToolCall?.(context, signal);
+  };
   return { session, modelRuntime, provider, modelId };
 }

@@ -2,6 +2,7 @@
 export class DemoFailure extends Error {}
 export function describeFailure(raw: string, timedOut: boolean, timeoutMs: number): string {
   if (timedOut) return `Model request timed out after ${timeoutMs} ms.`;
+  if (/call budget/i.test(raw)) return 'Model/tool call budget reached.';
   if (/Unexpected message role/i.test(raw)) return 'Model request rejected (HTTP 400): incompatible message role.';
   if (/\b401\b|invalid.api.key|unauthorized/i.test(raw)) return 'Model authentication failed (HTTP 401). Check the new API key locally.';
   if (/\b403\b/.test(raw)) return 'Model access denied (HTTP 403). Check account permissions.';

@@ -33,7 +33,7 @@ test('SDK runs allowed tool, rejects unregistered tool, and preserves conversati
     return stream;
   };
   try {
-    assert.deepEqual(session.getActiveToolNames(), ['lookup_demo_order']);
+    assert.deepEqual(session.getActiveToolNames(), ['lookup_demo_order', 'search_public_knowledge']);
     await session.prompt('ตรวจ DEMO-1001');
     const results = session.messages.filter(m => m.role === 'toolResult');
     assert.equal(results.length, 2);

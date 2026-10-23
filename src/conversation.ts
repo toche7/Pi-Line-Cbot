@@ -10,8 +10,16 @@ export async function runConversation(
   let timedOut = false;
   let streamedFinalText = '';
   let phase = 'รอคำตอบจากโมเดล';
+  let modelTurns = 0;
+  let toolCalls = 0;
+  let budgetExceeded = false;
   output.status('[กำลังส่งข้อความและรอคำตอบ…]');
   const unsubscribe = session.subscribe(event => {
+    if ((event.type === 'message_start' && event.message.role === 'assistant' && ++modelTurns > 4)
+      || (event.type === 'tool_execution_start' && ++toolCalls > 4)) {
+      budgetExceeded = true;
+      void session.abort();
+    }
     if (event.type === 'message_start' && event.message.role === 'assistant') streamedFinalText = '';
     if (event.type === 'message_update') {
       const update = event.assistantMessageEvent;
@@ -24,7 +32,7 @@ export async function runConversation(
     if (event.type === 'tool_execution_start') {
       phase = 'กำลังใช้ tool';
       // Tool names come from our own allowlist; no tool inputs or credentials are logged.
-      output.status('[tool] กำลังตรวจออเดอร์จำลอง');
+      output.status('[tool] กำลังค้นข้อมูลที่อนุญาต');
     }
     if (event.type === 'tool_execution_end') phase = 'รอโมเดลสรุปผลจาก tool';
   });
@@ -34,6 +42,7 @@ export async function runConversation(
   const timer = setTimeout(() => { timedOut = true; void session.abort(); }, timeoutMs);
   try {
     await session.prompt(prompt);
+    if (budgetExceeded) throw new DemoFailure('Model/tool call budget reached.');
     const last = [...session.messages].reverse().find(message => message.role === 'assistant');
     if (!last || last.stopReason === 'error' || last.stopReason === 'aborted') {
       throw new DemoFailure(describeFailure(last?.errorMessage || '', timedOut, timeoutMs));

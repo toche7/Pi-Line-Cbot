@@ -1,109 +1,82 @@
-# แผน Customer Agent รุ่นแรก
+# แผนและสถานะ ซีบอต — CBTU Customer Agent
 
-วันที่: 23 ตุลาคม 2026
+อัปเดต 23 ตุลาคม 2026 ใช้ชื่อเสียงอ่าน “ซีบอต” เท่านั้น รอยืนยัน spelling อังกฤษ
 
-สถานะ: M1 — ตั้ง Git และเก็บ baseline แล้ว; ยังไม่ได้เริ่มพัฒนา core รุ่นแรกใน M2
+## เป้าหมายและขอบเขตที่ปรับแล้ว
 
-## เป้าหมาย
+ผู้ช่วยผู้สนใจอบรม/ผู้เรียน CBTU ใช้ Pi SDK core เดียวกันผ่าน Terminal สำหรับทดสอบเร็ว และ LINE สำหรับผู้ทดสอบแบบ 1:1 ใช้ knowledge/policy/tools ชุดเดียวกัน ทดสอบ Terminal ก่อนเปิด LINE จริง
 
-สร้าง Customer Agent ที่ใช้ Pi SDK core เดียวกันผ่านสองช่องทาง: Terminal สำหรับทดสอบเร็ว และ LINE สำหรับกลุ่มทดสอบ โดยใช้กติกา แหล่งข้อมูล และ tools ชุดเดียวกัน ทดสอบพฤติกรรมใน Terminal ให้ผ่านก่อนเชื่อม LINE
+ข้อมูลมาจากเว็บไซต์สาธารณะ https://cbtumu.net/ เท่านั้น ไม่ใช้ข้อมูล Notion ภายใน ไม่ถือ mock order เป็นข้อมูลผู้เรียน รุ่นทดลองนี้ตอบ FAQ การสมัคร/เข้าเรียน/เอกสาร/certificate แนะนำหน้าหลักสูตรและช่องทางเจ้าหน้าที่ พร้อม source URL และเวลาเก็บ snapshot
 
-รุ่นแรกต้องตอบ FAQ/ข้อมูลสินค้าและเงื่อนไขจากแหล่งที่กำหนด ตรวจสถานะออเดอร์จำลอง และรับคำขอให้เจ้าหน้าที่ช่วยต่อได้ ต้องบอกตรง ๆ เมื่อไม่มีข้อมูลหรือยังส่งต่อไม่ได้ ไม่กล่าวอ้างว่าดำเนินการสำเร็จหากยังไม่มีหลักฐาน
+เมื่อข้อมูลไม่พบหรือขัดกันให้บอกตรง ๆ ไม่ยืนยันเวลาอนุมัติ ราคา สถานะเปิดรับสมัคร หรือเลขบัญชีจากข้อมูลที่ยังไม่ตรวจสด การส่งต่อหมายถึงชี้ช่องทางหน้า FAQ เท่านั้น ไม่ส่งข้อความ เปิดเคส หรือแจ้งเจ้าหน้าที่จริง
 
-## สถานะปัจจุบัน: เดโมทดลอง engine
+## สถานะ DONE / PARTIAL / TODO
 
-ตรวจโค้ด `src/agent.ts`, `src/main.ts`, `src/chat.ts`, `src/conversation.ts`, `src/diagnostics.ts`, tests, package.json และ .gitignore แล้ว โดยไม่อ่านไฟล์ secrets สถานะผลทดสอบจริงด้านล่างอ้างอิงการทดสอบที่ทำสำเร็จในงานก่อนหน้า งานเขียนแผนนี้ไม่ได้เรียกโมเดลซ้ำ
-
-| สถานะ | สิ่งที่มีแล้ว | หลักฐานและขอบเขต |
+| สถานะ | งาน | หลักฐาน/ข้อจำกัด |
 |---|---|---|
-| DONE | ติดตั้ง Pi SDK และ TypeScript | SDK 1.4.0, package-lock.json; build และ tests ล่าสุด 5 รายการผ่าน |
-| DONE | ถามครั้งเดียว | `npm start -- "คำถาม"` |
-| DONE | แชตต่อเนื่องใน Terminal | `npm run chat`; ใช้ session เดิมในหน่วยความจำจนจบโปรเซส |
-| DONE | เรียกโมเดลจริง | ทดสอบ Groq Qwen ด้วย .env ที่ผู้ใช้ตั้งเอง; แก้ compatibility ของ message role แล้ว |
-| DONE | Tool ตรวจออเดอร์จำลอง | `lookup_demo_order`; DEMO-1001 คืน shipped / DEMO-TRACK-001; เลขอื่นคืน found=false |
-| DONE | จำกัด tools | อนุญาตเฉพาะ tool จำลอง; ไม่โหลด extensions/skills/context อัตโนมัติ; ทดสอบปฏิเสธ bash แล้ว |
-| DONE | ความจำใน session และ live tool calling | ทดสอบจริงสอง turn: จำชื่อจากข้อความก่อนและตรวจออเดอร์ได้ |
-| DONE | Progress, timeout และ error เบื้องต้น | แจ้งทันทีและทุก 5 วินาที; deadline เริ่มต้น 45 วินาที; แยก HTTP/network/timeout และคำตอบว่าง; ไม่พิมพ์ raw provider error |
-| DONE | ออกจากแชตและ cleanup | /exit, /quit, EOF, Ctrl-C; มี tests สำหรับยกเลิกงานที่กำลังทำ |
-| TODO | Core สำหรับบริการหลายลูกค้า | ปัจจุบันมีฟังก์ชันสร้างเดโม ยังไม่มีบริการกลางที่แยก adapter และ customer context อย่างครบถ้วน |
-| TODO | Session แยกลูกค้าและเก็บถาวร | ปัจจุบันหนึ่งโปรเซสแชตมีหนึ่ง session ไม่ใช่ระบบหลายลูกค้า และปิดแล้วลืม |
-| TODO | FAQ/สินค้า/เงื่อนไข | ยังไม่มี dataset, retrieval tool, แหล่งอ้างอิงหรือการจัดการเวอร์ชันข้อมูล |
-| TODO | LINE adapter | ยังไม่มี webhook, ตรวจความถูกต้องของ event, ป้องกัน event ซ้ำ หรือส่งคำตอบ LINE |
-| TODO | Customer identity และสิทธิ์ | ยังไม่มีการ map/verify ลูกค้า หรือ backend authorization สำหรับข้อมูลจริง |
-| TODO | รับคำขอส่งต่อเจ้าหน้าที่ | ยังไม่มี case store, สถานะคำขอ หรือช่องทางส่งต่อจริง |
-| TODO | Logging และ cost control ระดับบริการ | ปัจจุบันเป็น output ใน Terminal และข้อความ error ที่ผ่านการกรอง ยังไม่มี structured audit log หรือเพดาน token/ค่าใช้จ่าย |
-| DONE | Git baseline (M1) | Repository แยกที่ pi-sdk-demo, branch main; เก็บ source/tests/config/เอกสารและ .env.example; กัน secrets/runtime ออก; ไม่มี remote และไม่ push |
+| DONE | M1: Git baseline | local main เริ่มจาก 31365a3; กัน .env/secrets/build/logs/customer runtime ออก; ไม่มี remote/push |
+| DONE | Pi SDK/Terminal | one-shot `npm start`, แชต `npm run chat`, check/build/tests; มี memory ในโปรเซสและ progress/error/timeout |
+| DONE | แยก channel/core | CustomerCore ไม่พิมพ์ stdout เอง รับ trusted identity + callbacks; Terminal/LINE ใช้ core เดียวกัน |
+| DONE | ข้อมูลสาธารณะ CBTU ชุดเริ่มต้น | FAQ/Home/About มี source/capturedAt; deterministic routing สำหรับ FAQ, unknown/conflict; ไม่เรียก Notion ไม่ crawler สด |
+| DONE | กติกาซีบอตและ tools | ชื่อไทย, read-only public knowledge tool และ mock order เดิม; ไม่มี shell/file tools |
+| DONE | Memory session isolation/queue | key แยก channel/OA/direct/user, FIFO รายลูกค้า; ทดสอบ A/B และ Terminal แยกกัน |
+| DONE | LINE adapter + mock tests | raw body HMAC, valid/invalid signature, immediate ACK, in-memory queue/dedupe, allowlist, mock reply; ไม่ส่ง LINE จริง |
+| DONE | Config/คู่มือ LINE | .env.example และ append keys ที่ขาดใน .env โดยไม่เขียนทับค่าเดิม; LINE_SETUP.md; local endpoint ยังต้องเติม config |
+| DONE | Limits เบื้องต้น | input 2000 chars, 20 turns/session, 100 sessions, idle TTL 30 นาที, output 800 tokens, model/tool calls สูงสุด 4/turn, session token threshold 20000; dry run default |
+| PARTIAL | Logging/cost control | safe metadata และ token/call limits มีแล้ว; ยังไม่มี dashboard, monetary/daily budget หรือ billing reconciliation |
+| PARTIAL | การประเมินคุณภาพ | tests 10 รายการผ่าน รวมชุด FAQ 11 คำถาม แต่ยังไม่ใช่การประเมินทุกคำถาม/ทุกภาษา/ทุก prompt injection |
+| TODO | LINE end-to-end จริง | ผู้ใช้ต้องเติม test OA credentials/allowlist และมี HTTPS hosting; ยังไม่ deploy, ตั้ง tunnel หรือส่ง reply จริง |
+| TODO | Persistent sessions/retention | ปัจจุบัน memory only; ต้องกำหนด retention, access control และ deletion ก่อนเลือก store |
+| TODO | Durable queue/dedupe | ปัจจุบัน restart อาจสูญงานที่ ACK หรือประมวลผล redelivery ใหม่; ยังไม่ production delivery guarantee |
+| TODO | Customer verification/ข้อมูลจริง | LINE identity ไม่เท่ากับสิทธิ์ข้อมูลผู้เรียน; ต้อง map/verify/check ownership ก่อนเพิ่ม real-data tools |
+| TODO | Handoff จริง | ยังไม่มี case store/destination/recipient/authorization; แนะนำช่องทางเท่านั้น |
 
-ข้อจำกัดที่ยังเห็น: พฤติกรรมตอบของโมเดลยังไม่ผ่านชุดประเมิน FAQ/การไม่แต่งข้อมูลทั้งหมด และอาการ greeting ค้างที่ผู้ใช้เคยพบยังไม่ reproduce แม้ทดสอบครั้งหลังตอบได้ จึงไม่ถือว่าพิสูจน์ความเสถียรทุกกรณีแล้ว
+## องค์ประกอบปัจจุบัน
 
-## ขอบเขตรุ่นแรก
+1. **Agent core (`src/core.ts`)** จัดการ session/queue/limits ด้วย trusted channel identity ที่ adapter ให้ ข้อความลูกค้าเปลี่ยน identity หรือเพิ่มสิทธิ์ไม่ได้
+2. **Pi engine (`src/agent.ts`)** สร้าง session แบบ in-memory และ explicit resources/tools; ใช้เฉพาะ environment ของโปรเซส ไม่โหลด Pi auth เก่า
+3. **Public knowledge (`src/knowledge.ts`)** ข้อมูลคัดสรุปจาก FAQ/Home/About พร้อม capture timestamp ไม่ตีความเวลาเก็บเป็นเวลาที่เว็บแก้ไขล่าสุด คำตอบ FAQ ใช้กติกาค้นข้อความที่ตรวจได้เพื่อลดการแต่งข้อเท็จจริง ส่วน small talk/memory ใช้โมเดล
+4. **Terminal (`src/main.ts`, `src/chat.ts`)** ใช้ local tester หนึ่ง session, progress ทุก 5 วินาที, timeout, /exit, /quit, Ctrl-C, EOF
+5. **LINE (`src/line.ts`, `src/server.ts`)** รับเฉพาะ text แบบ 1:1 ของ allowlist แยก scope OA/user, ตรวจ raw bytes ก่อน parse, ACK แล้วเข้าคิว; dry run ไม่ส่งข้อความ
+6. **Operational controls** บันทึก request ID/channel/outcome/latency ไม่บันทึก raw body, headers, token, user ID หรือเนื้อหาประวัติลง log; model output/call limits และ deadline มีในโค้ด
 
-- ตอบคำถามจาก FAQ ข้อมูลสินค้า และเงื่อนไขที่เจ้าของข้อมูลรับรอง พร้อมระบุแหล่ง/เวอร์ชันที่ใช้ หากไม่พบหรือข้อมูลขัดกันให้บอกข้อจำกัดและเสนอรับคำขอเจ้าหน้าที่
-- ตรวจออเดอร์จำลองเท่านั้น แยกผล found/not_found ชัดเจน ไม่สร้างเลขติดตามหรือสถานะเอง
-- รับคำขอส่งต่อ: เก็บเป็นเคสภายในพร้อมเลขอ้างอิงและสถานะ เช่น `requested` โดยขอรายละเอียดเท่าที่จำเป็น แจ้งว่าเป็นเพียงการรับคำขอจนกว่าจะมีการส่งต่อที่ตรวจสอบได้
-- มี Terminal adapter และ LINE adapter สำหรับกลุ่มทดสอบ ใช้ core/policy/tool registry เดียวกัน ความต่างเฉพาะการรับส่งข้อความและแสดงสถานะ
-- แยก session รายลูกค้า กำหนดวิธีเก็บ/หมดอายุ/ลบ และกันข้อความพร้อมกันของลูกค้าคนเดียวไม่ให้ชนกัน
-- มี logging ที่ลดข้อมูลส่วนบุคคลและไม่เก็บ secrets, error handling, timeout และงบการใช้งานที่ enforce ในโค้ด
+## กติกาที่ต้องคงไว้
 
-## ไม่รวมในรุ่นแรก
+- สิทธิ์อยู่ที่ backend ไม่ใช่การตัดสินของโมเดล ห้ามใช้ชื่อ/เลขออเดอร์ที่พิมพ์เป็นการยืนยันตัวตน
+- ไม่โหลดความรู้ภายใน CBTU ให้ customer bot และไม่ให้คำสั่งในเว็บ/ข้อความเพิ่ม tool หรือสิทธิ์
+- FAQ ขัดกันเรื่องเริ่มเรียนทันที vs ตรวจเงิน 1–2 วัน และ email บางตอนต่างกัน: ชี้แหล่ง/เจ้าหน้าที่ ไม่เลือกยืนยันเอง
+- ราคาหรือเปิดรับสมัครต้องตรวจจากหน้าหลักสูตรล่าสุด ไม่ใช้ snapshot รับรองความพร้อม
+- mock order ใช้ DEMO-1001 สำหรับสาธิตเท่านั้น ไม่มี real learner/order API
+- ห้ามส่งต่อเจ้าหน้าที่จริงจนกำหนด destination, recipient, ข้อมูลที่ส่ง และได้รับอนุญาต การส่ง reply ตอบผู้ทดสอบก็ยังปิดจนผู้ใช้ตั้งค่าเปิดเอง
+- action เปลี่ยนข้อมูลธุรกิจในอนาคตต้องมี preview/confirmation ที่ผูกพารามิเตอร์และผู้ใช้ พร้อมตรวจสิทธิ์ซ้ำก่อน execute
+- ไม่เก็บ secrets ใน Git/logs และไม่ขอให้ส่ง credentials ผ่านแชต
 
-- อ่านหรือเปลี่ยนออเดอร์จริง ชำระเงิน คืนเงิน ยกเลิกออเดอร์ เปลี่ยนที่อยู่ หรือแก้ข้อมูลลูกค้า
-- เปิดใช้งานสาธารณะให้ลูกค้าทั้งหมด หรือเชื่อมระบบเดิมโดยอัตโนมัติ
-- ให้อำนาจโมเดลใช้ shell/file tools หรือเลือกสิทธิ์ลูกค้าด้วยตัวเอง
-- ส่งข้อความหาเจ้าหน้าที่/บุคคลอื่นจริงในงานปัจจุบัน การส่งต่อจริงต้องกำหนดช่องทาง ผู้รับ ข้อมูลที่จะส่ง และได้รับคำสั่งอนุญาตให้เชื่อม/ส่งก่อน
-- Action ที่เปลี่ยนข้อมูลธุรกิจในอนาคตต้องมี preview และ confirmation ที่ผูกกับ action/พารามิเตอร์/ผู้ใช้ พร้อมตรวจสิทธิ์ซ้ำก่อน execute ไม่ใช้ข้อความยืนยันที่โมเดลสร้างเองแทนการอนุมัติ
+## Milestones และ acceptance criteria ต่อจากนี้
 
-## องค์ประกอบที่เสนอ
-
-1. **Agent core:** รับข้อความและ customer context ที่ backend สร้าง ใช้ Pi session, system policy และ tools กลาง คืนคำตอบพร้อมผลลัพธ์ที่ adapter นำไปแสดงได้ ตัดการพิมพ์ stdout/stderr ออกจาก business logic
-2. **Terminal adapter:** ให้ผู้ทดสอบเลือกลูกค้าจำลองผ่านกลไกทดสอบที่กำหนด ส่งข้อความเข้า core และแสดง progress; ตัวตนจำลองนี้ใช้เฉพาะทดสอบ ไม่ถือเป็นการยืนยันลูกค้าจริง
-3. **LINE adapter:** ตรวจความถูกต้องของ webhook ก่อนสร้าง trusted channel identity, จำกัดกลุ่มทดสอบ, แปลง event เป็นข้อความกลาง, ป้องกัน event ซ้ำ และจัดการส่งคำตอบตามข้อจำกัดของช่องทาง ไม่ส่งข้อความ progress ทุก 5 วินาทีเข้า LINE โดยอัตโนมัติ
-4. **Identity/authorization layer:** map ตัวตนจากช่องทางเป็น customer ID ฝั่ง server ค่าที่ผู้ใช้พิมพ์หรือโมเดลเสนอไม่ใช่หลักฐานสิทธิ์ ห้ามรวมประวัติ Terminal กับ LINE เพียงเพราะชื่อหรือหมายเลขที่อ้างตรงกัน
-5. **Session service/store:** ใช้ key ที่มีขอบเขตช่องทาง/tenant/customer/conversation ชัดเจน หนึ่งลูกค้าไม่เห็นข้อมูลอีกคน จัดคิวราย session; กำหนดนโยบาย restart, retention และการลบก่อนเลือก storage
-6. **Knowledge service:** นำเข้าข้อมูลจากแหล่งที่กำหนด ให้ tool ค้นหาเฉพาะข้อมูลที่อนุญาต คืนเนื้อหากับ source/version จัดการ not_found/conflict และไม่ถือคำสั่งที่แฝงในเอกสารเป็นกติกาของ agent
-7. **Tools:** คง `lookup_demo_order`; เพิ่ม tool ค้น FAQ และ tool บันทึกคำขอเจ้าหน้าที่ภายใน ทุก tool validate input และตรวจสิทธิ์ที่ backend แม้โมเดลเรียกผิด ไม่เปิด built-in file/shell tools
-8. **Handoff service:** เก็บคำขอและติดตามสถานะภายใน การมีเลขเคสไม่เท่ากับเจ้าหน้าที่ได้รับข้อความ ตัวเชื่อมส่งต่อจริงยังปิดไว้จนกว่าจะตกลง destination และขอบเขตการส่ง
-9. **Operations:** configuration ตรวจตอนเริ่มระบบ, log แบบ structured, metrics เวลา/token/cost/error, timeout/cancellation, จำกัดขนาด input/output/history และจำนวน tool/model calls ต่อ turn
-
-## กติกาความปลอดภัยและความถูกต้อง
-
-- ก่อนแตะข้อมูลจริงต้องยืนยันตัวตนและตรวจ ownership ของข้อมูลใน backend; LINE user ID เพียงอย่างเดียวไม่พิสูจน์ว่าเป็นเจ้าของออเดอร์ใด
-- ข้อความลูกค้าและเนื้อหาจากแหล่งความรู้เป็นข้อมูลที่ไม่ควรเชื่อถือเป็นคำสั่งเพิ่มสิทธิ์ ไม่มี prompt ใดเปิด tool ใหม่หรือเปลี่ยน customer ID ที่ backend รับรองได้
-- Logging เก็บ request ID, ตัวระบุลูกค้าที่ลดการระบุตัว, latency, tool name, result category, token usage และ cost ที่วัด/ประมาณได้ ห้ามเก็บ API keys, tokens, headers, webhook secrets หรือ raw provider payload ไม่บันทึกข้อความลูกค้าทั้งหมดเป็นค่าเริ่มต้น
-- Terminal ปัจจุบันแสดงข้อความที่พิมพ์และคำตอบตามปกติ นี่ไม่ใช่หลักฐานว่ามี production logging policy แล้ว ประวัติสนทนาที่จะเก็บต้องมี access control และ retention แยกจาก operational logs
-- กำหนดเพดานต่อข้อความ/ลูกค้า/ช่วงเวลา, max output tokens, context budget และจำนวน tool calls/retries ในโค้ด หาก usage/cost วัดไม่ได้ต้องระบุว่า unknown ไม่บันทึกเป็นศูนย์
-- เมื่อ timeout, rate limit หรือ provider ล้มเหลว ให้ข้อความที่ไม่เผยข้อมูลภายในและสถานะที่ไม่กล่าวอ้างว่างานสำเร็จ ห้าม retry แบบไม่จำกัด
-
-## Milestones และเกณฑ์ผ่าน
-
-ดำเนินตามลำดับ โดย M1 เสร็จแล้ว ขั้นพัฒนาถัดไปคือ M2 ยังไม่เริ่มในรอบ Git นี้
-
-| ลำดับ | งาน | Acceptance criteria ที่ทดสอบได้ |
+| ลำดับ | สถานะ/งาน | เกณฑ์ผ่าน |
 |---|---|---|
-| M1 — DONE | เริ่ม Git และเก็บ baseline | ตรวจรายการไฟล์และสแกน secrets ก่อน commit; .env, credentials, .pi-runtime, logs, session data และ node_modules ไม่ถูก track; .env.example เป็นค่าตัวอย่างไม่มีคีย์; build/tests 5 รายการผ่าน; ไม่มี remote/push |
-| M2 — ถัดไป | สรุปข้อมูล/ข้อตกลง และแยก core | ระบุ FAQ source/version, owner, policy และค่าจำกัดที่แน่นอน; core เรียกได้โดยไม่ผูก Terminal; one-shot/chat เดิมยังผ่าน; adapters ใช้ registry/policy เดียวกัน |
-| M3 | แยก customer sessions และวาง identity gate | ทดสอบลูกค้า A/B สลับข้อความโดยไม่เห็นประวัติอีกฝ่าย; คำอ้างว่าเป็นลูกค้าอื่นเปลี่ยน identity ไม่ได้; concurrent messages ลูกค้าเดียวเรียงลำดับ; restart/expiry/delete เป็นไปตาม retention ที่ตกลง |
-| M4 | เพิ่ม knowledge และรับคำขอเจ้าหน้าที่ภายใน | ชุดคำถามอ้างอิงอย่างน้อย 10 เคสครอบคลุม FAQ/สินค้า/เงื่อนไข; มี not_found, conflict และ prompt injection; ทุกคำตอบข้อเท็จจริงตรวจกลับแหล่งได้; mock order ถูก/ไม่พบไม่แต่งข้อมูล; เคสส่งต่อได้เลขอ้างอิงและไม่อ้างว่าส่งจริง |
-| M5 | ผ่าน Terminal และ operational gates | สถานการณ์หลาย turn/หลายลูกค้า, tool denial, timeout, 401/429, empty response, cancellation ผ่าน; fault injection ยืนยัน budget/loop cap; ใส่ secret จำลองแล้วตรวจ log ไม่พบ; ชุด acceptance ที่ตกลงผ่านทั้งหมดก่อนต่อ LINE |
-| M6 | เชื่อม LINE สำหรับกลุ่มทดสอบ | เมื่อมี OA/credentials/hosting: webhook ที่ตรวจสอบไม่ผ่านถูกปฏิเสธ, event ซ้ำไม่ทำงานซ้ำ, จำกัดผู้ทดสอบ, ส่งคำตอบได้; identity/session isolation และคำถามชุดเดียวกับ Terminal ผ่าน; secret อยู่ใน config ฝั่ง server |
-| M7 | ทดลองกลุ่มเล็กและตัดสินใจรุ่นถัดไป | บันทึกผล correctness, latency, error rate, tokens/cost เทียบเกณฑ์ที่ตกลงก่อนทดลอง; ทดสอบ restart/retention; มีวิธีปิด LINE adapter และกลับไป Terminal; สรุปข้อผิดพลาดที่เหลือก่อนเปิดกว้าง |
+| M1 | DONE — Git | baseline local, staged secret scan, clean working tree, ไม่มี remote/push |
+| M2 | DONE สำหรับ prototype — shared core/CBTU policy | ทั้งสอง adapter ใช้ core/policy/tools เดียวกัน, Terminal ยังรันได้, knowledge มาจาก public URL เท่านั้น |
+| M3 | PARTIAL — sessions/identity | ผ่าน isolation/FIFO/idle TTL; ส่วนถาวรต้องทดสอบ restart/expiry/delete หลังตกลง retention; real-data access ต้อง verify ownership |
+| M4 | PARTIAL — FAQ/contact | ชุดคำถามเริ่มต้นผ่าน found/unknown/conflict/source; เพิ่ม dataset ที่เจ้าของรับรองและชุดคำถามทดสอบจริง; handoff ลดขอบเขตเป็นชี้ช่องทางตามคำสั่งผู้ใช้ ไม่ถือว่าทำส่งต่อจริงเสร็จ |
+| M5 | PARTIAL — reliability/cost | timeout/cancellation/empty response/tool denial และ limits เริ่มต้นผ่าน; ยังต้อง fault/load tests, monetary budget และตรวจคุณภาพคำตอบกว้างขึ้น |
+| M6 | พร้อมตั้งค่า/ยังไม่ E2E — LINE | เมื่อมี test OA/HTTPS: Verify events=[] ได้ 200, invalid signature ได้ 401, allowlist ทำงาน, A/B ไม่รั่ว, redelivery ไม่ซ้ำในโปรเซสเดียว, reply จริงสำเร็จ โดยผู้ใช้เปิดส่งเอง |
+| M7 | TODO — กลุ่มทดสอบ | ตกลง expected answers/latency/error/cost thresholds, retention และ rollback ก่อนทดลอง; เก็บผลจริงเพื่อเลือกงานถัดไป |
 
-เกณฑ์ M4 เป็นขั้นต่ำของชุดทดสอบ ไม่ใช่การรับรองความถูกต้องทุกคำถาม ต้องกำหนด expected answer และผล tool ที่คาดหวังก่อนรัน ไม่ใช้เพียงการที่โมเดลตอบได้เป็นเกณฑ์ผ่าน
+ข้ามขั้น production reliability ไม่ได้เพียงเพราะ mock tests ผ่าน การเตรียม LINE adapter รอบนี้ยังไม่ถือว่าเปิดให้บริการ LINE แล้ว
 
-## ข้อมูลและการตัดสินใจที่ยังขาด
+## ข้อมูล/การตัดสินใจที่ยังขาด
 
-| เรื่อง | ต้องกำหนดก่อนเริ่มส่วนใด |
-|---|---|
-| FAQ/สินค้า/เงื่อนไข | แหล่งข้อมูลที่อนุญาต เจ้าของข้อมูล เวอร์ชัน/วันมีผล รอบปรับปรุง และวิธีตัดสินเมื่อข้อมูลขัดกัน — ก่อน M4 |
-| LINE ทดสอบ | Test OA, กลุ่มผู้ทดสอบ, credentials ที่ตั้งฝั่ง server, HTTPS webhook hosting และผู้ดูแล deployment — ก่อน M6; ไม่ส่ง secrets ผ่านแชต |
-| Customer mapping/verification | นิยามลูกค้า/tenant และวิธีเชื่อมตัวตนข้ามช่องทาง; วิธี verify และตรวจสิทธิ์ออเดอร์จริง — ออกแบบใน M3, ต้องผ่านก่อนเพิ่มข้อมูลจริงในรุ่นอนาคต |
-| Handoff destination | ช่องทาง ผู้รับ/ทีม ข้อมูลที่จะส่ง เวลารับเรื่อง และขอบเขตที่อนุญาต — ก่อนเพิ่มการส่งต่อจริง; รุ่นแรกเริ่มรับเคสภายในได้ |
-| Retention | เก็บประวัตินานเท่าไร ใครอ่านได้ วิธีลบ และเปิดโปรเซสใหม่ต้องจำอะไร — ก่อนเลือก persistent store ใน M3 |
-| Cost/quality limits | งบต่อวัน/ลูกค้า/turn, token/context/tool-call caps, latency และ error threshold — ก่อน M5 และทดลองกลุ่มจริง |
-| Git/remote | มี local repository ที่ pi-sdk-demo แล้ว; หากจะ push ภายหลังต้องกำหนด remote และ private access ก่อน ยังไม่มี remote/push |
+- Test LINE OA: channel ID/secret/access token, tester IDs และ HTTPS hosting เจ้าของระบบจะเติมเองบนเครื่อง
+- แหล่ง public knowledge เลือกแล้ว: FAQ/Home/About; ยังต้องให้เจ้าของข้อมูลทบทวนข้อขัดแย้ง อัปเดต snapshot และอนุมัติ coverage ที่ต้องตอบ
+- วิธี map/verify learner และ ownership ก่อนใช้ข้อมูลจริง ไม่มีการรวมตัวตนข้ามช่องทางอัตโนมัติ
+- Retention และ storage: ตอนนี้ทดลอง memory idle 30 นาที ไม่ได้อนุมัติ retention ถาวร
+- Handoff destination/recipient และการอนุญาตส่งจริง ยังไม่กำหนด ไม่มีการส่งออก
+- งบรายวัน/ลูกค้า, คุณภาพและ SLA, persistent queue/dedupe และ monitoring ก่อน production
+- Remote Git ยังไม่กำหนด จึงไม่ตั้งหรือ push
 
-ข้อมูลเหล่านี้ยังไม่จำเป็นต้องขอเพื่อเขียนแผน แต่เป็น dependency ก่อนลงมือ milestone ที่เกี่ยวข้อง
+## ผลตรวจรอบ CBTU
 
-## จุดจบของงานรอบนี้
+`npm run build`, `npm test` (10 tests) และ `npm run check` ผ่าน; Terminal conflict FAQ แสดงข้อขัดแย้งพร้อม URL/เวลาเก็บถูกต้อง การรัน server เมื่อ LINE_CHANNEL_SECRET ว่างหยุดพร้อมคำแนะนำตามคาด Tests LINE ใช้ signature/reply/fetch จำลอง ไม่มี production LINE API call ตรวจ HTTP จริงเฉพาะ loopback ด้วย fixtures: health 200, invalid signature 401, valid 200, ส่ง event ซ้ำได้ mock reply ครั้งเดียว รอบนี้ไม่เรียกโมเดลจริงเพิ่ม; ผล live Groq Qwen จากเดโมก่อนหน้ายังแยกจากผล mock รุ่น CBTU
 
-งานเขียนแผนเดิมส่งมอบเอกสารและลิงก์จาก README จากนั้นผู้ใช้อนุญาตให้ทำ M1 จึงตั้ง local Git และเก็บ baseline โดยกัน secrets และข้อมูล runtime ออก ไม่เปลี่ยน core หรือพฤติกรรมเดโม ไม่อ่าน/แก้ credentials ไม่ตั้ง remote/push ไม่เรียกโมเดลหรือส่ง LINE และไม่ส่งข้อความหาเจ้าหน้าที่ ขั้นพัฒนาถัดไปคือ M2: สรุปข้อมูล/ข้อตกลงและแยก core ซึ่งยังไม่ได้เริ่มในรอบนี้
+คู่มือการเติม config และตั้ง webhook: [LINE_SETUP.md](./LINE_SETUP.md)
