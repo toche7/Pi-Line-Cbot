@@ -52,6 +52,14 @@ export function retrieveCourses(query: string) {
   const cohort = q.match(/รุ่น(?:ที่)?\s*(\d+)/)?.[1] ?? q.match(/(?:mds|mini data science)\s*(\d+)/)?.[1];
   if (cohort) ids = ids.filter(id => new RegExp(`รุ่น(?:ที่)?\\s*${cohort}(?:\\D|$)`).test(courseCatalog.courses.find(c => c.id === id)!.name));
   const queryTerms = terms(query);
+  // Index only structured, evidence-backed names. Match significant name tokens,
+  // retaining marks and allowing title/spacing variants without merging people.
+  const instructorMatches = courseCatalog.courses.filter(c => c.instructors?.some(t => {
+    const name = normalize(t.name);
+    const nameTerms = [...new Intl.Segmenter('th', { granularity: 'word' }).segment(name)]
+      .filter(s => s.isWordLike && s.segment.length >= 4).map(s => s.segment);
+    return contains(q, name) || nameTerms.some(term => queryTerms.includes(term));
+  }));
   const ranked = courseCatalog.courses.map(c => {
     const name = normalize(c.name), topics = normalize((c.topics ?? []).join(' '));
     const body = normalize([c.description_th, c.audience_th, ...(c.learning_outcomes_th ?? [])].join(' '));
@@ -59,7 +67,7 @@ export function retrieveCourses(query: string) {
     return { course: c, score };
   }).filter(x => x.score >= 3 && (x.course.detail_access === 'public' || queryTerms.some(t => contains(normalize(x.course.name), t))) && (!cohort || ids.includes(x.course.id)))
     .sort((a, b) => b.score - a.score || a.course.id.localeCompare(b.course.id));
-  return { named: courseCatalog.courses.filter(c => ids.includes(c.id)), mentioned: specific.length > 0, ranked, full: full.length > 0, terms: queryTerms };
+  return { named: courseCatalog.courses.filter(c => ids.includes(c.id)), instructorMatches, mentioned: specific.length > 0, ranked, full: full.length > 0, terms: queryTerms };
 }
 
 export function selectCatalog(query: string, lastTopic?: string, interests?: string): CatalogSelection | undefined {
@@ -97,6 +105,7 @@ export function selectCatalog(query: string, lastTopic?: string, interests?: str
     candidates = previous.map(id => courseCatalog.courses.find(c => c.id === id)).filter((c): c is Course => !!c);
   }
   if (!candidates.length && (courseWords || interestFlow || topicOnly) && result.ranked.length) candidates = result.ranked.slice(0, 3).map(x => x.course);
+  if (!candidates.length && courseWords && result.instructorMatches.length) candidates = result.instructorMatches.slice(0, 3);
   if (!candidates.length) {
     const generic = /^(?:มี)?(?:หลักสูตร|คอร์ส|courses?)(?:อะไร|อะไรบ้าง|บ้าง)?$/.test(q.replace(/ครับ|ค่ะ/g, '').trim());
     return { ...base, kind: generic ? 'interest' : 'not_found', courses: [], topic: generic ? 'catalog:interest' : 'catalog:unknown' };

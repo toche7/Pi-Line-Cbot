@@ -16,7 +16,7 @@ function modelFactory(requests: { candidates: string[]; prompt: string }[], fail
     modelRuntime.streamSimple = (model, context) => {
       const user = context.messages.filter(m => m.role === 'user').at(-1);
       const prompt = typeof user?.content === 'string' ? user.content : user?.content.filter(p => p.type === 'text').map(p => p.text).join('') ?? '';
-      const data = prompt.match(/Host retrieved public course candidates[^\n]*?: (\[.*\])\nReturn ONLY/s)?.[1];
+      const data = prompt.match(/Host retrieved public course candidates[^\n]*?: (\[.*\])\nFor a general course description/s)?.[1];
       const candidates = data ? JSON.parse(data).map((c: { id: string }) => c.id) : [];
       requests.push({ candidates, prompt });
       const message: AssistantMessage = {

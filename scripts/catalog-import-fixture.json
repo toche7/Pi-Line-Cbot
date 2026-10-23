@@ -1,0 +1,169 @@
+{
+  "schema_version": "1.1.0",
+  "collection_date": "2026-10-23",
+  "timezone": "Asia/Bangkok",
+  "status": "research_for_owner_review_not_runtime_ingestion",
+  "scope": "19 courses + 1 bundle observed in public Home pagination; not every item in payment selector or site archive",
+  "null_means": "not found or unavailable; never assume false/free/unlimited",
+  "availability_rule": "Observed page text only; dates, prices and capacity must be confirmed before advising a purchase.",
+  "collection": {
+    "built_at": "2026-10-23T15:29:48.059426+00:00",
+    "mode": "reviewed_snapshot_migration",
+    "expected_ids": [
+      "cbtu-01",
+      "cbtu-02",
+      "cbtu-03",
+      "cbtu-04",
+      "cbtu-05",
+      "cbtu-06",
+      "cbtu-07",
+      "cbtu-08",
+      "cbtu-09",
+      "cbtu-10",
+      "cbtu-11",
+      "cbtu-12",
+      "cbtu-13",
+      "cbtu-14",
+      "cbtu-15",
+      "cbtu-16",
+      "cbtu-17",
+      "cbtu-18",
+      "cbtu-19",
+      "cbtu-20"
+    ],
+    "fetch_errors": [],
+    "coverage": "complete",
+    "summary_policy": "Existing authored summaries/raw schedules retained from reviewed snapshot. Fresh teacher/price/status metadata only. Re-review authored text before runtime ingestion.",
+    "listing_coverage_ref": "catalog_observations.json (historical UI enumeration; refresh is not fresh discovery)"
+  },
+  "courses": [
+    {
+      "id": "cbtu-06",
+      "record_type": "course",
+      "name": "การวิเคราะห์ข้อมูลด้วย Microsoft Excel",
+      "canonical_url": "https://cbtumu.net/coursenew/analyticsmicrosoftexcel/",
+      "detail_access": "public",
+      "description_th": "ฝึกใช้ Excel เพื่อจัดข้อมูล คำนวณ วิเคราะห์ และสร้างรายงาน",
+      "topics": [
+        "Excel basics",
+        "Formatting",
+        "Formulas",
+        "IF",
+        "VLOOKUP/HLOOKUP/XLOOKUP",
+        "Sort/Filter",
+        "PivotTable",
+        "Charts"
+      ],
+      "learning_outcomes_th": [
+        "ฝึกใช้ Excel เพื่อจัดข้อมูล คำนวณ วิเคราะห์ และสร้างรายงาน"
+      ],
+      "audience_th": null,
+      "prerequisites_th": null,
+      "format_th": "วิดีโอออนไลน์ เรียนด้วยตนเอง",
+      "duration_text": null,
+      "session_dates_text": null,
+      "instructors_text": "กานต์นภัส ช้ำเกตุ (จาก listing และหน้า Bundle)",
+      "price": {
+        "displayed_amount": 1000.0,
+        "currency": "THB",
+        "reference_amount": null,
+        "label": null,
+        "is_current_offer_verified": false
+      },
+      "enrollment": {
+        "observed_text": "Add to Cart",
+        "is_live_availability_verified": false,
+        "catalog_observed_text": null
+      },
+      "certificate": {
+        "observed_text": "Certificate of completion",
+        "course_specific_pass_criteria": null,
+        "general_faq_rule": "เรียนจบและผ่านการประเมินตามเกณฑ์; ไม่พบเกณฑ์คะแนนของรายวิชา",
+        "faq_url": "https://cbtumu.net/faq/"
+      },
+      "application_links": [
+        {
+          "url": "https://cbtumu.net/coursenew/analyticsmicrosoftexcel/",
+          "type": "course_detail_entry",
+          "transaction_not_tested": true
+        }
+      ],
+      "additional_public_links": [],
+      "flags": [
+        "curated_summary_and_schedule_need_review_after_refresh"
+      ],
+      "provenance": {
+        "requested_url": "https://cbtumu.net/coursenew/analyticsmicrosoftexcel/",
+        "resolved_url": "https://cbtumu.net/coursenew/analyticsmicrosoftexcel/",
+        "retrieved_at": "2026-10-23T15:25:26.224097+00:00",
+        "html_sha256": "d60f03a429178f9dd379a0af8e84471a796b2a1e7471363a5a1d4c808abd618e"
+      },
+      "field_sources": {
+        "name": "h1 + canonical link",
+        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased) | reviewed snapshot retrieved_at=2026-10-23T12:35:55.730569+00:00",
+        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found | reviewed snapshot retrieved_at=2026-10-23T12:35:55.730569+00:00",
+        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration | reviewed snapshot retrieved_at=2026-10-23T12:35:55.730569+00:00",
+        "instructors_text": "Legacy raw field retained; use instructors + instructor_evidence for verified teachers.",
+        "price,enrollment": "sidebar .tutor-card-body",
+        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only | reviewed snapshot retrieved_at=2026-10-23T12:35:55.730569+00:00"
+      },
+      "evidence": {
+        "pricing_and_status_excerpt": "฿1,000.00 Add to Cart",
+        "duration_and_certificate_excerpt": "Intermediate [aggregate omitted] October 6, 2026 Last Updated Certificate of completion",
+        "named_teachers_excerpt": null
+      },
+      "missing_fields": [
+        "audience_th",
+        "certificate.course_specific_pass_criteria",
+        "duration_text",
+        "prerequisites_th",
+        "session_dates_text"
+      ],
+      "source_refs": [
+        {
+          "url": "https://cbtumu.net/coursenew/analyticsmicrosoftexcel/",
+          "role": "public_detail"
+        },
+        {
+          "url": "https://cbtumu.net/",
+          "role": "catalog_UI_pagination_observed_2026-10-23"
+        },
+        {
+          "url": "https://cbtumu.net/faq/",
+          "role": "general_certificate_rule_not_course_specific"
+        },
+        {
+          "url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+          "role": "named_teacher_for_Excel"
+        }
+      ],
+      "catalog_author_text": null,
+      "included_course_ids": [],
+      "instructor_evidence": [
+        {
+          "name": "นางสาว กานต์นภัส ช้ำเกตุ",
+          "source_url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+          "source_type": "explicit_bundle_teacher",
+          "excerpt": "การวิเคราะห์ข้อมูลด้วย Microsoft Excel | ผู้สอน นางสาว กานต์นภัส ช้ำเกตุ",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+            "resolved_url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+            "retrieved_at": "2026-10-23T15:25:27.685206+00:00",
+            "html_sha256": "2546fecb124257b9a1f89c1654d24871c8be5f8fdf0b97a759ce1033899166f7"
+          }
+        }
+      ],
+      "instructors": [
+        {
+          "name": "นางสาว กานต์นภัส ช้ำเกตุ",
+          "source_url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+          "source_type": "explicit_bundle_teacher"
+        }
+      ],
+      "dates": {
+        "raw": null,
+        "parsed": null
+      }
+    }
+  ]
+}

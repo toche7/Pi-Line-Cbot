@@ -9,7 +9,8 @@
     "server": "node --env-file-if-exists=.env dist/server.js",
     "line:check": "node --env-file-if-exists=.env dist/line-readiness.js",
     "check": "node --env-file-if-exists=.env dist/main.js --check",
-    "test": "node --test dist/*.test.js"
+    "test": "node --test dist/*.test.js",
+    "test:catalog-import": "node --test scripts/catalog-import.test.mjs"
   },
   "engines": {
     "node": ">=22.19.0"

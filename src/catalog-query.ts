@@ -2,10 +2,10 @@ import { courseCatalog, type Course } from './course-catalog.js';
 import { retrieveCourses, renderCatalog, selectCatalog, type CatalogSelection } from './catalog.js';
 import { adviseCourses, validAdvice, type AdviceState } from './course-adviser.js';
 import { briefCard, briefSourceNote, renderBriefField, type BriefField } from './course-briefs.js';
-import { readCourseFields, validCourseFields, type CourseField } from './course-reader.js';
+import { readCourseFields, validCourseFields, validCourseFilters, filterCourses, type CourseField, type CourseFilter } from './course-reader.js';
 
 export type CatalogState = { matchedIds: string[]; shownIds: string[]; offset: number; limit: number; query: string; field: 'list' | 'price' | 'summary' | 'details'; advice?: AdviceState; readFields?: CourseField[] };
-export type CatalogQuery = { operation: 'list' | 'count' | 'price' | 'sort_price' | 'more' | 'summary' | 'advise' | 'read'; scope: 'all' | 'previous' | 'search'; query?: string; limit?: number; order?: 'asc' | 'desc'; fields?: CourseField[] };
+export type CatalogQuery = { operation: 'list' | 'count' | 'price' | 'sort_price' | 'more' | 'summary' | 'advise' | 'read'; scope: 'all' | 'previous' | 'search'; query?: string; limit?: number; order?: 'asc' | 'desc'; fields?: CourseField[]; filters?: CourseFilter[] };
 export type CatalogRoute = { answer?: string; selection?: CatalogSelection; state?: CatalogState; topic?: string };
 const rows = courseCatalog.courses;
 const byIds = (ids: string[]) => ids.map(id => rows.find(c => c.id === id)).filter((c): c is Course => !!c);
@@ -28,13 +28,14 @@ export function parseCatalogQuery(value: any): CatalogQuery {
     || (value.operation === 'advise' && !value.query?.trim())
     || (value.operation === 'read' && !validCourseFields(value.fields))
     || (value.fields !== undefined && !validCourseFields(value.fields))
+    || (value.filters !== undefined && !validCourseFilters(value.filters))
     || (value.limit !== undefined && (!Number.isInteger(value.limit) || value.limit < 1 || value.limit > 10))
     || (value.order !== undefined && !['asc', 'desc'].includes(value.order))) throw new Error('Invalid catalog operation');
-  return { operation: value.operation, scope: value.scope, query: value.query, limit: value.limit, order: value.order, fields: value.fields };
+  return { operation: value.operation, scope: value.scope, query: value.query, limit: value.limit, order: value.order, fields: value.fields, filters: value.filters };
 }
 function search(query: string) {
   const result = retrieveCourses(query);
-  return result.named.length ? result.named : result.ranked.map(x => x.course);
+  return result.named.length ? result.named : result.instructorMatches.length ? result.instructorMatches : result.ranked.map(x => x.course);
 }
 function snapshotPrice(c: Course) {
   if (c.price.displayed_amount === null) return 'ไม่พบราคา (ไม่ถือว่าฟรี)';
@@ -59,8 +60,9 @@ export function executeCatalogQuery(command: CatalogQuery, previous?: CatalogSta
     return result;
   }
   let matches = command.scope === 'all' ? rows : command.scope === 'search' ? search(command.query!) : previous ? byIds(previous.matchedIds) : [];
+  if (command.filters) matches = filterCourses(matches, command.filters);
   if (command.operation === 'read') {
-    const displayed = command.scope === 'previous' && previous?.shownIds.length ? byIds(previous.shownIds) : matches;
+    const displayed = command.scope === 'previous' && previous?.shownIds.length ? byIds(previous.shownIds).filter(c => matches.includes(c)) : matches;
     const shown = displayed.slice(0, Math.min(command.limit ?? 3, 3));
     const state: CatalogState | undefined = shown.length ? { matchedIds: ids(matches), shownIds: ids(shown),
       offset: command.scope === 'previous' ? previous?.offset ?? 0 : 0, limit: shown.length,
@@ -73,7 +75,8 @@ export function executeCatalogQuery(command: CatalogQuery, previous?: CatalogSta
   if (command.operation === 'count') {
     const courses = matches.filter(c => c.record_type === 'course').length, bundles = matches.length - courses;
     return { answer: `ใน${command.scope === 'all' ? 'ข้อมูลเว็บที่เก็บไว้ทั้งหมด' : 'ชุดรายการที่กำลังดู'} มี ${courses} หลักสูตร${bundles ? ` + ${bundles} bundle` : ''} รวม ${matches.length} รายการครับ\nhttps://cbtumu.net/\n${briefSourceNote(matches)}`,
-      state: command.scope === 'previous' && previous ? previous : { matchedIds: ids(matches), shownIds: [], offset: 0, limit: 3, query: command.query ?? '', field: 'list', advice: previous?.advice } };
+      state: command.scope === 'previous' && previous && !command.filters ? previous : { matchedIds: ids(matches), shownIds: [], offset: 0, limit: 3,
+        query: command.filters ? command.filters.map(f => `${f.field}:${f.value}`).join('; ').slice(0, 200) : command.query ?? '', field: 'list', advice: previous?.advice } };
   }
   const missingPrices = matches.filter(c => c.price.displayed_amount === null).length;
   if (command.operation === 'sort_price') {
@@ -82,13 +85,13 @@ export function executeCatalogQuery(command: CatalogQuery, previous?: CatalogSta
   }
   const field: CatalogState['field'] = command.operation === 'price' || command.operation === 'sort_price' ? 'price'
     : command.operation === 'summary' ? 'summary' : command.operation === 'more' ? previous?.field ?? 'list' : 'list';
-  const useShown = command.scope === 'previous' && ['price', 'summary'].includes(command.operation) && previous?.shownIds.length;
+  const useShown = command.scope === 'previous' && !command.filters && ['price', 'summary'].includes(command.operation) && previous?.shownIds.length;
   const offset = command.operation === 'more' ? (previous?.offset ?? 0) + (previous?.shownIds.length ?? 0) : 0;
   const limit = command.limit ?? (useShown ? previous!.shownIds.length : previous?.limit ?? 3);
   const shown = useShown ? byIds(previous!.shownIds) : matches.slice(offset, offset + limit);
   if (!shown.length) return { answer: `แสดงครบ ${matches.length} รายการในกลุ่มนี้แล้วครับ ต้องการค้นหัวข้ออื่นหรือดูราคาก็บอกได้`, state: previous };
   const state: CatalogState = { matchedIds: ids(matches), shownIds: ids(shown), offset: useShown ? previous!.offset : offset,
-    limit, query: (command.scope === 'search' ? command.query! : previous?.query ?? '').slice(0, 200), field, advice: previous?.advice };
+    limit, query: (command.filters ? command.filters.map(f => `${f.field}:${f.value}`).join('; ') : command.scope === 'search' ? command.query! : previous?.query ?? '').slice(0, 200), field, advice: previous?.advice };
   if (command.operation === 'more' && previous?.readFields) {
     state.readFields = previous.readFields;
     return { answer: readCourseFields(shown.slice(0, 3), state.readFields), state: { ...state, shownIds: ids(shown.slice(0, 3)), limit: Math.min(limit, 3) }, topic: 'catalog:' + ids(shown.slice(0, 3)).join(',') };
@@ -106,7 +109,7 @@ function inferOperation(query: string, state?: CatalogState): CatalogQuery | und
   const retrieval = retrieveCourses(q);
   // Operation/request verbs can overlap description text. A new filter needs a
   // name/title match or a technical topic token, not just any lexical body hit.
-  const subject = retrieval.named.length > 0 || retrieval.terms.some(term => rows.some(c => {
+  const subject = retrieval.named.length > 0 || retrieval.instructorMatches.length > 0 || retrieval.terms.some(term => rows.some(c => {
     const title = c.name.normalize('NFKC').toLowerCase();
     return /[a-z0-9]/i.test(term)
       ? new RegExp(`(?:^|[^a-z0-9])${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:$|[^a-z0-9])`, 'i').test([title, ...(c.topics ?? [])].join(' '))
@@ -146,7 +149,7 @@ export function routeCatalog(query: string, previous?: CatalogState, lastTopic?:
   if (!selection) return;
   const found = retrieveCourses(query);
   // Topic browse is a list operation; ambiguity applies to names/versions, not all multi-match searches.
-  if (selection.kind === 'ambiguous' && selection.field !== 'compare' && found.named.length === 0 && found.ranked.length) {
+  if (selection.kind === 'ambiguous' && selection.field !== 'compare' && found.named.length === 0 && (found.ranked.length || found.instructorMatches.length)) {
     return executeCatalogQuery({ operation: 'list', scope: 'search', query: query.slice(0, 200) }, previous);
   }
   const candidates = selection.courses;
@@ -168,5 +171,5 @@ export function recoverCatalogState(recent: { user: string; assistant: string }[
   }
 }
 export function catalogPlanningContext(state?: CatalogState) {
-  return state ? { matchedCount: state.matchedIds.length, shown: byIds(state.shownIds).map(c => ({ id: c.id, name: c.name })), filter: state.query, pageSize: state.limit, advice: state.advice } : null;
+  return state ? { matchedCount: state.matchedIds.length, shown: byIds(state.shownIds).map(c => ({ id: c.id, name: c.name })), filter: state.query, pageSize: state.limit, lastReadFields: state.readFields, advice: state.advice } : null;
 }

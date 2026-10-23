@@ -4,20 +4,156 @@ export interface Course {
   description_th: string | null; topics: string[] | null; learning_outcomes_th: string[] | null;
   audience_th: string | null; prerequisites_th: string | null; format_th: string | null; duration_text: string | null;
   session_dates_text: string | null; instructors_text: string | null;
+  instructors: { name: string; source_url: string; source_type: 'course_detail' | 'explicit_bundle_teacher' }[] | null;
+  instructor_evidence: { name: string; source_url: string; source_type: 'course_detail' | 'explicit_bundle_teacher'; excerpt: string; provenance: Course['provenance'] }[];
+  evidence: Record<string, string | null>; dates: { raw: string | null; parsed: { start_date: string; end_date: string | null }[] | null }; included_course_ids: string[];
   price: { displayed_amount: number | null; currency: string | null; reference_amount: number | null; label: string | null; is_current_offer_verified: boolean };
-  enrollment: { observed_text: string | null; is_live_availability_verified: boolean; catalog_observed_text?: string };
+  enrollment: { observed_text: string | null; is_live_availability_verified: boolean; catalog_observed_text?: string | null };
   certificate: { observed_text: string | null; course_specific_pass_criteria: string | null; general_faq_rule: string; faq_url: string };
   flags: string[]; missing_fields: string[];
   provenance: { requested_url: string; resolved_url: string; retrieved_at: string; html_sha256: string };
   field_sources: Record<string, string>; source_refs: { url: string; role: string }[];
 }
-export const courseCatalog: { collectionDate: string; sourceStatus: string; ingestion: string; sourceSha256: string; reportSha256: string; validationSha256: string; courses: Course[] } = {
+export const courseCatalog: { schemaVersion: string; validationWarnings: { code: string; path: string; message: string }[]; collectionDate: string; sourceStatus: string; ingestion: string; sourceSha256: string; reportSha256: string; validationSha256: string; courses: Course[] } = {
+  "schemaVersion": "1.1.0",
   "collectionDate": "2026-10-23",
   "sourceStatus": "research_for_owner_review_not_runtime_ingestion",
   "ingestion": "Owner-authorized public metadata only; unresolved conflicts/protected fields remain unverified",
-  "sourceSha256": "b9b683a2710a86e99622149182c25c926359c01d79ad2236262915934c7f2dca",
-  "reportSha256": "00f91e2ce965331cf8758204cdc2753e14b5158695ca97cfb52317c84f2464a2",
-  "validationSha256": "644225fa96d93c2b2245f7065990edf272b5a8a9a2c39c79450545bbb713b685",
+  "sourceSha256": "9c2f2098b34a147808eac29835c3eddad8238e56995a43e76f8ff9d8ec7c4cac",
+  "reportSha256": "63135f643099f2825ebae2d8fb3f4074c4d52208b69237da522c7ba4e08326c9",
+  "validationSha256": "8bee1f9c89be6fd14bd570eaacbd0085ad2840075ad75642a58add78efb34d9d",
+  "validationWarnings": [
+    {
+      "code": "review_flags",
+      "path": "/courses/0",
+      "message": "dated_sessions_are_before_collection_date, curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/1",
+      "message": "curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/2",
+      "message": "catalog_By_author_differs_from_named_teachers, curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/3",
+      "message": "linked_program_hub_has_unverified_cohort2_waitlist_conflicts, curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/4",
+      "message": "completed_cohort_news, newer_program_hub_is_separate_cohort11_not_this_cohort, linked_schedule_not_read, curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/5",
+      "message": "curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/6",
+      "message": "alternate_teacher_name_forms_in_bundle_require_review, curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/7",
+      "message": "curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/8",
+      "message": "Requirements_widget_uses_NSN_while_course_describes_n8n, curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "instructor_unknown",
+      "path": "/courses/9",
+      "message": "No explicit named-teacher evidence; catalog By is not promoted"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/9",
+      "message": "dated_sessions_are_before_collection_date, past_session_dates_but_add_to_cart_displayed, explicit_teacher_not_found_catalog_author_not_promoted, legacy_instructors_text_contains_catalog_author_unverified_as_teacher, curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/10",
+      "message": "curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/11",
+      "message": "curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/12",
+      "message": "curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "instructor_unknown",
+      "path": "/courses/13",
+      "message": "No explicit named-teacher evidence; catalog By is not promoted"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/13",
+      "message": "explicit_teacher_not_found_catalog_author_not_promoted, legacy_instructors_text_contains_catalog_author_unverified_as_teacher, curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/14",
+      "message": "dated_sessions_are_before_collection_date, past_session_dates_but_add_to_cart_displayed, curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/15",
+      "message": "dated_sessions_are_before_collection_date, past_session_dates_but_add_to_cart_displayed, curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "instructor_unknown",
+      "path": "/courses/16",
+      "message": "No explicit named-teacher evidence; catalog By is not promoted"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/16",
+      "message": "dated_sessions_are_before_collection_date, explicit_teacher_not_found_catalog_author_not_promoted, legacy_instructors_text_contains_catalog_author_unverified_as_teacher, curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "instructor_unknown",
+      "path": "/courses/17",
+      "message": "No explicit named-teacher evidence; catalog By is not promoted"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/17",
+      "message": "password_protected_detail_not_accessed, explicit_teacher_not_found_catalog_author_not_promoted, curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "instructor_unknown",
+      "path": "/courses/18",
+      "message": "No explicit named-teacher evidence; catalog By is not promoted"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/18",
+      "message": "explicit_teacher_not_found_catalog_author_not_promoted, legacy_instructors_text_contains_catalog_author_unverified_as_teacher, curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/19",
+      "message": "bundle_duration_requires_verification, curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "curated_summaries",
+      "path": "/collection",
+      "message": "Authored summaries/manifest are curated; this is not a general autonomous crawler"
+    }
+  ],
   "courses": [
     {
       "id": "cbtu-01",
@@ -53,7 +189,8 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
       },
       "enrollment": {
         "observed_text": "Enrollment is now closed",
-        "is_live_availability_verified": false
+        "is_live_availability_verified": false,
+        "catalog_observed_text": null
       },
       "certificate": {
         "observed_text": "Certificate of completion",
@@ -62,26 +199,27 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
         "faq_url": "https://cbtumu.net/faq/"
       },
       "flags": [
-        "dated_sessions_are_before_collection_date"
+        "dated_sessions_are_before_collection_date",
+        "curated_summary_and_schedule_need_review_after_refresh"
       ],
       "missing_fields": [
-        "prerequisites_th",
-        "certificate.course_specific_pass_criteria"
+        "certificate.course_specific_pass_criteria",
+        "prerequisites_th"
       ],
       "provenance": {
         "requested_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
         "resolved_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
-        "retrieved_at": "2026-10-23T12:35:55.441979+00:00",
+        "retrieved_at": "2026-10-23T15:25:25.957639+00:00",
         "html_sha256": "cbaa4e65d7350cb487568aaec41d18713f2575b086601683b3ebfb6cba1f3088"
       },
       "field_sources": {
         "name": "h1 + canonical link",
-        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased)",
-        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found",
-        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration",
-        "instructors_text": "About Course ผู้สอน; catalog By or Bundle where explicitly labelled",
+        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased) | reviewed snapshot retrieved_at=2026-10-23T12:35:55.441979+00:00",
+        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found | reviewed snapshot retrieved_at=2026-10-23T12:35:55.441979+00:00",
+        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration | reviewed snapshot retrieved_at=2026-10-23T12:35:55.441979+00:00",
+        "instructors_text": "Legacy raw field retained; use instructors + instructor_evidence for verified teachers.",
         "price,enrollment": "sidebar .tutor-card-body",
-        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only"
+        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only | reviewed snapshot retrieved_at=2026-10-23T12:35:55.441979+00:00"
       },
       "source_refs": [
         {
@@ -96,7 +234,72 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
           "url": "https://cbtumu.net/faq/",
           "role": "general_certificate_rule_not_course_specific"
         }
-      ]
+      ],
+      "instructors": [
+        {
+          "name": "ผศ. ดร.ทวีศักดิ์ สมานชื่น",
+          "source_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+          "source_type": "course_detail"
+        },
+        {
+          "name": "น.ท. ดร.บัญชา ช่วยสี",
+          "source_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+          "source_type": "course_detail"
+        },
+        {
+          "name": "ดร. ผกามาศ ไพโรจน์",
+          "source_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+          "source_type": "course_detail"
+        }
+      ],
+      "instructor_evidence": [
+        {
+          "name": "ผศ. ดร.ทวีศักดิ์ สมานชื่น",
+          "source_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+          "source_type": "course_detail",
+          "excerpt": "ผู้สอน ผศ. ดร.ทวีศักดิ์ สมานชื่น",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+            "resolved_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+            "retrieved_at": "2026-10-23T15:25:25.957639+00:00",
+            "html_sha256": "cbaa4e65d7350cb487568aaec41d18713f2575b086601683b3ebfb6cba1f3088"
+          }
+        },
+        {
+          "name": "น.ท. ดร.บัญชา ช่วยสี",
+          "source_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+          "source_type": "course_detail",
+          "excerpt": "ผู้สอน น.ท. ดร.บัญชา ช่วยสี",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+            "resolved_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+            "retrieved_at": "2026-10-23T15:25:25.957639+00:00",
+            "html_sha256": "cbaa4e65d7350cb487568aaec41d18713f2575b086601683b3ebfb6cba1f3088"
+          }
+        },
+        {
+          "name": "ดร. ผกามาศ ไพโรจน์",
+          "source_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+          "source_type": "course_detail",
+          "excerpt": "ผู้สอน ดร. ผกามาศ ไพโรจน์",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+            "resolved_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+            "retrieved_at": "2026-10-23T15:25:25.957639+00:00",
+            "html_sha256": "cbaa4e65d7350cb487568aaec41d18713f2575b086601683b3ebfb6cba1f3088"
+          }
+        }
+      ],
+      "evidence": {
+        "pricing_and_status_excerpt": "฿2,000.00 Enrollment is now closed",
+        "duration_and_certificate_excerpt": "Intermediate [aggregate omitted] October 15, 2026 Last Updated Certificate of completion",
+        "named_teachers_excerpt": "ผู้สอน ผศ. ดร.ทวีศักดิ์ สมานชื่น; น.ท. ดร.บัญชา ช่วยสี; ดร. ผกามาศ ไพโรจน์"
+      },
+      "dates": {
+        "raw": "13 กันยายน–4 ตุลาคม 2569 วันอาทิตย์ 13:00–16:00",
+        "parsed": null
+      },
+      "included_course_ids": []
     },
     {
       "id": "cbtu-02",
@@ -129,7 +332,8 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
       },
       "enrollment": {
         "observed_text": "Enroll Now",
-        "is_live_availability_verified": false
+        "is_live_availability_verified": false,
+        "catalog_observed_text": null
       },
       "certificate": {
         "observed_text": null,
@@ -137,26 +341,28 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
         "general_faq_rule": "เรียนจบและผ่านการประเมินตามเกณฑ์; ไม่พบเกณฑ์คะแนนของรายวิชา",
         "faq_url": "https://cbtumu.net/faq/"
       },
-      "flags": [],
+      "flags": [
+        "curated_summary_and_schedule_need_review_after_refresh"
+      ],
       "missing_fields": [
-        "session_dates_text",
+        "certificate.course_specific_pass_criteria",
         "certificate.course_specific_statement",
-        "certificate.course_specific_pass_criteria"
+        "session_dates_text"
       ],
       "provenance": {
         "requested_url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-research/",
         "resolved_url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-research/",
-        "retrieved_at": "2026-10-23T12:35:55.459058+00:00",
-        "html_sha256": "a3810584cd44264a1a66a446021c54579aaffa07717f339a0c4206c8a5a769c8"
+        "retrieved_at": "2026-10-23T15:25:25.932309+00:00",
+        "html_sha256": "ab4f85dac59d8f96eb917393511e33a997903c82f40cc1ed6ece470dfcc677d2"
       },
       "field_sources": {
         "name": "h1 + canonical link",
-        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased)",
-        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found",
-        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration",
-        "instructors_text": "About Course ผู้สอน; catalog By or Bundle where explicitly labelled",
+        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased) | reviewed snapshot retrieved_at=2026-10-23T12:35:55.459058+00:00",
+        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found | reviewed snapshot retrieved_at=2026-10-23T12:35:55.459058+00:00",
+        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration | reviewed snapshot retrieved_at=2026-10-23T12:35:55.459058+00:00",
+        "instructors_text": "Legacy raw field retained; use instructors + instructor_evidence for verified teachers.",
         "price,enrollment": "sidebar .tutor-card-body",
-        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only"
+        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only | reviewed snapshot retrieved_at=2026-10-23T12:35:55.459058+00:00"
       },
       "source_refs": [
         {
@@ -171,7 +377,38 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
           "url": "https://cbtumu.net/faq/",
           "role": "general_certificate_rule_not_course_specific"
         }
-      ]
+      ],
+      "instructors": [
+        {
+          "name": "ผศ. ดร.ทวีศักดิ์ สมานชื่น",
+          "source_url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-research/",
+          "source_type": "course_detail"
+        }
+      ],
+      "instructor_evidence": [
+        {
+          "name": "ผศ. ดร.ทวีศักดิ์ สมานชื่น",
+          "source_url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-research/",
+          "source_type": "course_detail",
+          "excerpt": "ผู้สอน ผศ. ดร.ทวีศักดิ์ สมานชื่น",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-research/",
+            "resolved_url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-research/",
+            "retrieved_at": "2026-10-23T15:25:25.932309+00:00",
+            "html_sha256": "ab4f85dac59d8f96eb917393511e33a997903c82f40cc1ed6ece470dfcc677d2"
+          }
+        }
+      ],
+      "evidence": {
+        "pricing_and_status_excerpt": "Free Enroll Now Free access this course",
+        "duration_and_certificate_excerpt": "Intermediate [aggregate omitted] 1 hour 30 minutes Duration October 6, 2026 Last Updated",
+        "named_teachers_excerpt": "ผู้สอน ผศ. ดร.ทวีศักดิ์ สมานชื่น"
+      },
+      "dates": {
+        "raw": null,
+        "parsed": null
+      },
+      "included_course_ids": []
     },
     {
       "id": "cbtu-03",
@@ -206,7 +443,8 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
       },
       "enrollment": {
         "observed_text": "Enroll Now",
-        "is_live_availability_verified": false
+        "is_live_availability_verified": false,
+        "catalog_observed_text": null
       },
       "certificate": {
         "observed_text": "Certificate of completion",
@@ -215,26 +453,27 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
         "faq_url": "https://cbtumu.net/faq/"
       },
       "flags": [
-        "catalog_By_author_differs_from_named_teachers"
+        "catalog_By_author_differs_from_named_teachers",
+        "curated_summary_and_schedule_need_review_after_refresh"
       ],
       "missing_fields": [
-        "session_dates_text",
-        "certificate.course_specific_pass_criteria"
+        "certificate.course_specific_pass_criteria",
+        "session_dates_text"
       ],
       "provenance": {
         "requested_url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-work/",
         "resolved_url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-work/",
-        "retrieved_at": "2026-10-23T12:35:55.445918+00:00",
+        "retrieved_at": "2026-10-23T15:25:25.945722+00:00",
         "html_sha256": "241b3fb5e050fbea3f0772398e9ff369c38148d2859b03eaf06eb49d31bfc895"
       },
       "field_sources": {
         "name": "h1 + canonical link",
-        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased)",
-        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found",
-        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration",
-        "instructors_text": "About Course ผู้สอน; catalog By or Bundle where explicitly labelled",
+        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased) | reviewed snapshot retrieved_at=2026-10-23T12:35:55.445918+00:00",
+        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found | reviewed snapshot retrieved_at=2026-10-23T12:35:55.445918+00:00",
+        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration | reviewed snapshot retrieved_at=2026-10-23T12:35:55.445918+00:00",
+        "instructors_text": "Legacy raw field retained; use instructors + instructor_evidence for verified teachers.",
         "price,enrollment": "sidebar .tutor-card-body",
-        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only"
+        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only | reviewed snapshot retrieved_at=2026-10-23T12:35:55.445918+00:00"
       },
       "source_refs": [
         {
@@ -249,7 +488,55 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
           "url": "https://cbtumu.net/faq/",
           "role": "general_certificate_rule_not_course_specific"
         }
-      ]
+      ],
+      "instructors": [
+        {
+          "name": "คุณดำรงพล ชนะวรรณ",
+          "source_url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-work/",
+          "source_type": "course_detail"
+        },
+        {
+          "name": "คุณอภิญญา ชูชาติ",
+          "source_url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-work/",
+          "source_type": "course_detail"
+        }
+      ],
+      "instructor_evidence": [
+        {
+          "name": "คุณดำรงพล ชนะวรรณ",
+          "source_url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-work/",
+          "source_type": "course_detail",
+          "excerpt": "ผู้สอน คุณดำรงพล ชนะวรรณ",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-work/",
+            "resolved_url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-work/",
+            "retrieved_at": "2026-10-23T15:25:25.945722+00:00",
+            "html_sha256": "241b3fb5e050fbea3f0772398e9ff369c38148d2859b03eaf06eb49d31bfc895"
+          }
+        },
+        {
+          "name": "คุณอภิญญา ชูชาติ",
+          "source_url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-work/",
+          "source_type": "course_detail",
+          "excerpt": "ผู้สอน คุณอภิญญา ชูชาติ",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-work/",
+            "resolved_url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-work/",
+            "retrieved_at": "2026-10-23T15:25:25.945722+00:00",
+            "html_sha256": "241b3fb5e050fbea3f0772398e9ff369c38148d2859b03eaf06eb49d31bfc895"
+          }
+        }
+      ],
+      "evidence": {
+        "pricing_and_status_excerpt": "Free Enroll Now Free access this course",
+        "duration_and_certificate_excerpt": "Intermediate [aggregate omitted] 2 hours Duration October 6, 2026 Last Updated Certificate of completion",
+        "named_teachers_excerpt": "ผู้สอน คุณดำรงพล ชนะวรรณ; คุณอภิญญา ชูชาติ"
+      },
+      "dates": {
+        "raw": null,
+        "parsed": null
+      },
+      "included_course_ids": []
     },
     {
       "id": "cbtu-04",
@@ -288,7 +575,8 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
       },
       "enrollment": {
         "observed_text": "Enrollment is now closed",
-        "is_live_availability_verified": false
+        "is_live_availability_verified": false,
+        "catalog_observed_text": null
       },
       "certificate": {
         "observed_text": "Certificate of completion",
@@ -297,7 +585,8 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
         "faq_url": "https://cbtumu.net/faq/"
       },
       "flags": [
-        "linked_program_hub_has_unverified_cohort2_waitlist_conflicts"
+        "linked_program_hub_has_unverified_cohort2_waitlist_conflicts",
+        "curated_summary_and_schedule_need_review_after_refresh"
       ],
       "missing_fields": [
         "certificate.course_specific_pass_criteria"
@@ -305,17 +594,17 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
       "provenance": {
         "requested_url": "https://cbtumu.net/coursenew/miniaiagentengineer/",
         "resolved_url": "https://cbtumu.net/coursenew/miniaiagentengineer/",
-        "retrieved_at": "2026-10-23T12:35:55.720449+00:00",
-        "html_sha256": "21e7a2fe95892036786bca3ea157e89aee9d63cbb5b06ecee2cd80c257bd2736"
+        "retrieved_at": "2026-10-23T15:25:26.211029+00:00",
+        "html_sha256": "2733d3932fd1ad7229bcd51f3a1a500fafe64906d2c311559e0f6c6cb8bd2550"
       },
       "field_sources": {
         "name": "h1 + canonical link",
-        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased)",
-        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found",
-        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration",
-        "instructors_text": "About Course ผู้สอน; catalog By or Bundle where explicitly labelled",
+        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased) | reviewed snapshot retrieved_at=2026-10-23T12:35:55.720449+00:00",
+        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found | reviewed snapshot retrieved_at=2026-10-23T12:35:55.720449+00:00",
+        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration | reviewed snapshot retrieved_at=2026-10-23T12:35:55.720449+00:00",
+        "instructors_text": "Legacy raw field retained; use instructors + instructor_evidence for verified teachers.",
         "price,enrollment": "sidebar .tutor-card-body",
-        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only"
+        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only | reviewed snapshot retrieved_at=2026-10-23T12:35:55.720449+00:00"
       },
       "source_refs": [
         {
@@ -330,7 +619,72 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
           "url": "https://cbtumu.net/faq/",
           "role": "general_certificate_rule_not_course_specific"
         }
-      ]
+      ],
+      "instructors": [
+        {
+          "name": "ผศ. ดร.ทวีศักดิ์ สมานชื่น",
+          "source_url": "https://cbtumu.net/coursenew/miniaiagentengineer/",
+          "source_type": "course_detail"
+        },
+        {
+          "name": "น.ท. ดร.บัญชา ช่วยสี",
+          "source_url": "https://cbtumu.net/coursenew/miniaiagentengineer/",
+          "source_type": "course_detail"
+        },
+        {
+          "name": "ภก. ดร.สามารถ จำรัส",
+          "source_url": "https://cbtumu.net/coursenew/miniaiagentengineer/",
+          "source_type": "course_detail"
+        }
+      ],
+      "instructor_evidence": [
+        {
+          "name": "ผศ. ดร.ทวีศักดิ์ สมานชื่น",
+          "source_url": "https://cbtumu.net/coursenew/miniaiagentengineer/",
+          "source_type": "course_detail",
+          "excerpt": "ผู้สอน ผศ. ดร.ทวีศักดิ์ สมานชื่น",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/coursenew/miniaiagentengineer/",
+            "resolved_url": "https://cbtumu.net/coursenew/miniaiagentengineer/",
+            "retrieved_at": "2026-10-23T15:25:26.211029+00:00",
+            "html_sha256": "2733d3932fd1ad7229bcd51f3a1a500fafe64906d2c311559e0f6c6cb8bd2550"
+          }
+        },
+        {
+          "name": "น.ท. ดร.บัญชา ช่วยสี",
+          "source_url": "https://cbtumu.net/coursenew/miniaiagentengineer/",
+          "source_type": "course_detail",
+          "excerpt": "ผู้สอน น.ท. ดร.บัญชา ช่วยสี",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/coursenew/miniaiagentengineer/",
+            "resolved_url": "https://cbtumu.net/coursenew/miniaiagentengineer/",
+            "retrieved_at": "2026-10-23T15:25:26.211029+00:00",
+            "html_sha256": "2733d3932fd1ad7229bcd51f3a1a500fafe64906d2c311559e0f6c6cb8bd2550"
+          }
+        },
+        {
+          "name": "ภก. ดร.สามารถ จำรัส",
+          "source_url": "https://cbtumu.net/coursenew/miniaiagentengineer/",
+          "source_type": "course_detail",
+          "excerpt": "ผู้สอน ภก. ดร.สามารถ จำรัส",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/coursenew/miniaiagentengineer/",
+            "resolved_url": "https://cbtumu.net/coursenew/miniaiagentengineer/",
+            "retrieved_at": "2026-10-23T15:25:26.211029+00:00",
+            "html_sha256": "2733d3932fd1ad7229bcd51f3a1a500fafe64906d2c311559e0f6c6cb8bd2550"
+          }
+        }
+      ],
+      "evidence": {
+        "pricing_and_status_excerpt": "฿24,000.00 Enrollment is now closed",
+        "duration_and_certificate_excerpt": "Intermediate [aggregate omitted] October 6, 2026 Last Updated Certificate of completion",
+        "named_teachers_excerpt": "ผู้สอน ผศ. ดร.ทวีศักดิ์ สมานชื่น; น.ท. ดร.บัญชา ช่วยสี; ภก. ดร.สามารถ จำรัส"
+      },
+      "dates": {
+        "raw": "วันเสาร์ 09:00–16:00; ไม่พบวันเริ่ม/สิ้นสุดในหน้า CBTU",
+        "parsed": null
+      },
+      "included_course_ids": []
     },
     {
       "id": "cbtu-05",
@@ -365,7 +719,8 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
       },
       "enrollment": {
         "observed_text": "Enrollment is now closed",
-        "is_live_availability_verified": false
+        "is_live_availability_verified": false,
+        "catalog_observed_text": null
       },
       "certificate": {
         "observed_text": "Certificate of completion",
@@ -376,26 +731,27 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
       "flags": [
         "completed_cohort_news",
         "newer_program_hub_is_separate_cohort11_not_this_cohort",
-        "linked_schedule_not_read"
+        "linked_schedule_not_read",
+        "curated_summary_and_schedule_need_review_after_refresh"
       ],
       "missing_fields": [
-        "prerequisites_th",
-        "certificate.course_specific_pass_criteria"
+        "certificate.course_specific_pass_criteria",
+        "prerequisites_th"
       ],
       "provenance": {
         "requested_url": "https://cbtumu.net/coursenew/minidatascience10/",
         "resolved_url": "https://cbtumu.net/coursenew/minidatascience10/",
-        "retrieved_at": "2026-10-23T12:35:55.710673+00:00",
+        "retrieved_at": "2026-10-23T15:25:26.233131+00:00",
         "html_sha256": "44bbf453d27077d2ccee646c4f8745e46a9c411513d486597cee1b6562185efb"
       },
       "field_sources": {
         "name": "h1 + canonical link",
-        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased)",
-        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found",
-        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration",
-        "instructors_text": "About Course ผู้สอน; catalog By or Bundle where explicitly labelled",
+        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased) | reviewed snapshot retrieved_at=2026-10-23T12:35:55.710673+00:00",
+        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found | reviewed snapshot retrieved_at=2026-10-23T12:35:55.710673+00:00",
+        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration | reviewed snapshot retrieved_at=2026-10-23T12:35:55.710673+00:00",
+        "instructors_text": "Legacy raw field retained; use instructors + instructor_evidence for verified teachers.",
         "price,enrollment": "sidebar .tutor-card-body",
-        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only"
+        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only | reviewed snapshot retrieved_at=2026-10-23T12:35:55.710673+00:00"
       },
       "source_refs": [
         {
@@ -410,7 +766,72 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
           "url": "https://cbtumu.net/faq/",
           "role": "general_certificate_rule_not_course_specific"
         }
-      ]
+      ],
+      "instructors": [
+        {
+          "name": "ผศ. ดร.ทวีศักดิ์ สมานชื่น",
+          "source_url": "https://cbtumu.net/coursenew/minidatascience10/",
+          "source_type": "course_detail"
+        },
+        {
+          "name": "ผศ. ดร.วรัญญู วงษ์เสรี",
+          "source_url": "https://cbtumu.net/coursenew/minidatascience10/",
+          "source_type": "course_detail"
+        },
+        {
+          "name": "ดร.ธนสาร หงส์ไพศาลวิวัฒน์",
+          "source_url": "https://cbtumu.net/coursenew/minidatascience10/",
+          "source_type": "course_detail"
+        }
+      ],
+      "instructor_evidence": [
+        {
+          "name": "ผศ. ดร.ทวีศักดิ์ สมานชื่น",
+          "source_url": "https://cbtumu.net/coursenew/minidatascience10/",
+          "source_type": "course_detail",
+          "excerpt": "ผู้สอน ผศ. ดร.ทวีศักดิ์ สมานชื่น",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/coursenew/minidatascience10/",
+            "resolved_url": "https://cbtumu.net/coursenew/minidatascience10/",
+            "retrieved_at": "2026-10-23T15:25:26.233131+00:00",
+            "html_sha256": "44bbf453d27077d2ccee646c4f8745e46a9c411513d486597cee1b6562185efb"
+          }
+        },
+        {
+          "name": "ผศ. ดร.วรัญญู วงษ์เสรี",
+          "source_url": "https://cbtumu.net/coursenew/minidatascience10/",
+          "source_type": "course_detail",
+          "excerpt": "ผู้สอน ผศ. ดร.วรัญญู วงษ์เสรี",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/coursenew/minidatascience10/",
+            "resolved_url": "https://cbtumu.net/coursenew/minidatascience10/",
+            "retrieved_at": "2026-10-23T15:25:26.233131+00:00",
+            "html_sha256": "44bbf453d27077d2ccee646c4f8745e46a9c411513d486597cee1b6562185efb"
+          }
+        },
+        {
+          "name": "ดร.ธนสาร หงส์ไพศาลวิวัฒน์",
+          "source_url": "https://cbtumu.net/coursenew/minidatascience10/",
+          "source_type": "course_detail",
+          "excerpt": "ผู้สอน ดร.ธนสาร หงส์ไพศาลวิวัฒน์",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/coursenew/minidatascience10/",
+            "resolved_url": "https://cbtumu.net/coursenew/minidatascience10/",
+            "retrieved_at": "2026-10-23T15:25:26.233131+00:00",
+            "html_sha256": "44bbf453d27077d2ccee646c4f8745e46a9c411513d486597cee1b6562185efb"
+          }
+        }
+      ],
+      "evidence": {
+        "pricing_and_status_excerpt": "฿28,000.00 Enrollment is now closed",
+        "duration_and_certificate_excerpt": "Intermediate [aggregate omitted] October 6, 2026 Last Updated Certificate of completion",
+        "named_teachers_excerpt": "ผู้สอน ผศ. ดร.ทวีศักดิ์ สมานชื่น; ผศ. ดร.วรัญญู วงษ์เสรี; ดร.ธนสาร หงส์ไพศาลวิวัฒน์"
+      },
+      "dates": {
+        "raw": "09:00–16:00; ตารางวันเรียนเป็นลิงก์ Google Drive ยังไม่ได้อ่านไฟล์",
+        "parsed": null
+      },
+      "included_course_ids": []
     },
     {
       "id": "cbtu-06",
@@ -447,7 +868,8 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
       },
       "enrollment": {
         "observed_text": "Add to Cart",
-        "is_live_availability_verified": false
+        "is_live_availability_verified": false,
+        "catalog_observed_text": null
       },
       "certificate": {
         "observed_text": "Certificate of completion",
@@ -455,28 +877,30 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
         "general_faq_rule": "เรียนจบและผ่านการประเมินตามเกณฑ์; ไม่พบเกณฑ์คะแนนของรายวิชา",
         "faq_url": "https://cbtumu.net/faq/"
       },
-      "flags": [],
+      "flags": [
+        "curated_summary_and_schedule_need_review_after_refresh"
+      ],
       "missing_fields": [
         "audience_th",
-        "prerequisites_th",
+        "certificate.course_specific_pass_criteria",
         "duration_text",
-        "session_dates_text",
-        "certificate.course_specific_pass_criteria"
+        "prerequisites_th",
+        "session_dates_text"
       ],
       "provenance": {
         "requested_url": "https://cbtumu.net/coursenew/analyticsmicrosoftexcel/",
         "resolved_url": "https://cbtumu.net/coursenew/analyticsmicrosoftexcel/",
-        "retrieved_at": "2026-10-23T12:35:55.730569+00:00",
+        "retrieved_at": "2026-10-23T15:25:26.224097+00:00",
         "html_sha256": "d60f03a429178f9dd379a0af8e84471a796b2a1e7471363a5a1d4c808abd618e"
       },
       "field_sources": {
         "name": "h1 + canonical link",
-        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased)",
-        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found",
-        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration",
-        "instructors_text": "About Course ผู้สอน; catalog By or Bundle where explicitly labelled",
+        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased) | reviewed snapshot retrieved_at=2026-10-23T12:35:55.730569+00:00",
+        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found | reviewed snapshot retrieved_at=2026-10-23T12:35:55.730569+00:00",
+        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration | reviewed snapshot retrieved_at=2026-10-23T12:35:55.730569+00:00",
+        "instructors_text": "Legacy raw field retained; use instructors + instructor_evidence for verified teachers.",
         "price,enrollment": "sidebar .tutor-card-body",
-        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only"
+        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only | reviewed snapshot retrieved_at=2026-10-23T12:35:55.730569+00:00"
       },
       "source_refs": [
         {
@@ -495,7 +919,38 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
           "url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
           "role": "named_teacher_for_Excel"
         }
-      ]
+      ],
+      "instructors": [
+        {
+          "name": "นางสาว กานต์นภัส ช้ำเกตุ",
+          "source_url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+          "source_type": "explicit_bundle_teacher"
+        }
+      ],
+      "instructor_evidence": [
+        {
+          "name": "นางสาว กานต์นภัส ช้ำเกตุ",
+          "source_url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+          "source_type": "explicit_bundle_teacher",
+          "excerpt": "การวิเคราะห์ข้อมูลด้วย Microsoft Excel | ผู้สอน นางสาว กานต์นภัส ช้ำเกตุ",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+            "resolved_url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+            "retrieved_at": "2026-10-23T15:25:27.685206+00:00",
+            "html_sha256": "2546fecb124257b9a1f89c1654d24871c8be5f8fdf0b97a759ce1033899166f7"
+          }
+        }
+      ],
+      "evidence": {
+        "pricing_and_status_excerpt": "฿1,000.00 Add to Cart",
+        "duration_and_certificate_excerpt": "Intermediate [aggregate omitted] October 6, 2026 Last Updated Certificate of completion",
+        "named_teachers_excerpt": null
+      },
+      "dates": {
+        "raw": null,
+        "parsed": null
+      },
+      "included_course_ids": []
     },
     {
       "id": "cbtu-07",
@@ -532,7 +987,8 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
       },
       "enrollment": {
         "observed_text": "Add to Cart",
-        "is_live_availability_verified": false
+        "is_live_availability_verified": false,
+        "catalog_observed_text": null
       },
       "certificate": {
         "observed_text": "Certificate of completion",
@@ -540,26 +996,29 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
         "general_faq_rule": "เรียนจบและผ่านการประเมินตามเกณฑ์; ไม่พบเกณฑ์คะแนนของรายวิชา",
         "faq_url": "https://cbtumu.net/faq/"
       },
-      "flags": [],
+      "flags": [
+        "alternate_teacher_name_forms_in_bundle_require_review",
+        "curated_summary_and_schedule_need_review_after_refresh"
+      ],
       "missing_fields": [
+        "certificate.course_specific_pass_criteria",
         "duration_text",
-        "session_dates_text",
-        "certificate.course_specific_pass_criteria"
+        "session_dates_text"
       ],
       "provenance": {
         "requested_url": "https://cbtumu.net/coursenew/creativemediadesignwithcanva/",
         "resolved_url": "https://cbtumu.net/coursenew/creativemediadesignwithcanva/",
-        "retrieved_at": "2026-10-23T12:35:56.025722+00:00",
+        "retrieved_at": "2026-10-23T15:25:26.525984+00:00",
         "html_sha256": "f9ca6e0d60d75ffd3d620aa39da95349f751a33e770de7fed5ede23c62ecd473"
       },
       "field_sources": {
         "name": "h1 + canonical link",
-        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased)",
-        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found",
-        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration",
-        "instructors_text": "About Course ผู้สอน; catalog By or Bundle where explicitly labelled",
+        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased) | reviewed snapshot retrieved_at=2026-10-23T12:35:56.025722+00:00",
+        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found | reviewed snapshot retrieved_at=2026-10-23T12:35:56.025722+00:00",
+        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration | reviewed snapshot retrieved_at=2026-10-23T12:35:56.025722+00:00",
+        "instructors_text": "Legacy raw field retained; use instructors + instructor_evidence for verified teachers.",
         "price,enrollment": "sidebar .tutor-card-body",
-        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only"
+        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only | reviewed snapshot retrieved_at=2026-10-23T12:35:56.025722+00:00"
       },
       "source_refs": [
         {
@@ -574,7 +1033,38 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
           "url": "https://cbtumu.net/faq/",
           "role": "general_certificate_rule_not_course_specific"
         }
-      ]
+      ],
+      "instructors": [
+        {
+          "name": "คุณอภิญญา ชูชาติ",
+          "source_url": "https://cbtumu.net/coursenew/creativemediadesignwithcanva/",
+          "source_type": "course_detail"
+        }
+      ],
+      "instructor_evidence": [
+        {
+          "name": "คุณอภิญญา ชูชาติ",
+          "source_url": "https://cbtumu.net/coursenew/creativemediadesignwithcanva/",
+          "source_type": "course_detail",
+          "excerpt": "ผู้สอน คุณอภิญญา ชูชาติ",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/coursenew/creativemediadesignwithcanva/",
+            "resolved_url": "https://cbtumu.net/coursenew/creativemediadesignwithcanva/",
+            "retrieved_at": "2026-10-23T15:25:26.525984+00:00",
+            "html_sha256": "f9ca6e0d60d75ffd3d620aa39da95349f751a33e770de7fed5ede23c62ecd473"
+          }
+        }
+      ],
+      "evidence": {
+        "pricing_and_status_excerpt": "฿1,000.00 Add to Cart",
+        "duration_and_certificate_excerpt": "Beginner [aggregate omitted] October 6, 2026 Last Updated Certificate of completion",
+        "named_teachers_excerpt": "ผู้สอน คุณอภิญญา ชูชาติ"
+      },
+      "dates": {
+        "raw": null,
+        "parsed": null
+      },
+      "included_course_ids": []
     },
     {
       "id": "cbtu-08",
@@ -610,7 +1100,8 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
       },
       "enrollment": {
         "observed_text": "Add to Cart",
-        "is_live_availability_verified": false
+        "is_live_availability_verified": false,
+        "catalog_observed_text": null
       },
       "certificate": {
         "observed_text": "Certificate of completion",
@@ -618,25 +1109,27 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
         "general_faq_rule": "เรียนจบและผ่านการประเมินตามเกณฑ์; ไม่พบเกณฑ์คะแนนของรายวิชา",
         "faq_url": "https://cbtumu.net/faq/"
       },
-      "flags": [],
+      "flags": [
+        "curated_summary_and_schedule_need_review_after_refresh"
+      ],
       "missing_fields": [
-        "session_dates_text",
-        "certificate.course_specific_pass_criteria"
+        "certificate.course_specific_pass_criteria",
+        "session_dates_text"
       ],
       "provenance": {
         "requested_url": "https://cbtumu.net/coursenew/generativeaiinhealthproductmarketing/",
         "resolved_url": "https://cbtumu.net/coursenew/generativeaiinhealthproductmarketing/",
-        "retrieved_at": "2026-10-23T12:35:56.039181+00:00",
+        "retrieved_at": "2026-10-23T15:25:26.540796+00:00",
         "html_sha256": "1d043759c8fb7090ad557a925b2c9575b959a897674a96e5301894ea75f58ed1"
       },
       "field_sources": {
         "name": "h1 + canonical link",
-        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased)",
-        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found",
-        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration",
-        "instructors_text": "About Course ผู้สอน; catalog By or Bundle where explicitly labelled",
+        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased) | reviewed snapshot retrieved_at=2026-10-23T12:35:56.039181+00:00",
+        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found | reviewed snapshot retrieved_at=2026-10-23T12:35:56.039181+00:00",
+        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration | reviewed snapshot retrieved_at=2026-10-23T12:35:56.039181+00:00",
+        "instructors_text": "Legacy raw field retained; use instructors + instructor_evidence for verified teachers.",
         "price,enrollment": "sidebar .tutor-card-body",
-        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only"
+        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only | reviewed snapshot retrieved_at=2026-10-23T12:35:56.039181+00:00"
       },
       "source_refs": [
         {
@@ -651,7 +1144,38 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
           "url": "https://cbtumu.net/faq/",
           "role": "general_certificate_rule_not_course_specific"
         }
-      ]
+      ],
+      "instructors": [
+        {
+          "name": "ภก.ดร.สามารถ จำรัส",
+          "source_url": "https://cbtumu.net/coursenew/generativeaiinhealthproductmarketing/",
+          "source_type": "course_detail"
+        }
+      ],
+      "instructor_evidence": [
+        {
+          "name": "ภก.ดร.สามารถ จำรัส",
+          "source_url": "https://cbtumu.net/coursenew/generativeaiinhealthproductmarketing/",
+          "source_type": "course_detail",
+          "excerpt": "ผู้สอน ภก.ดร.สามารถ จำรัส",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/coursenew/generativeaiinhealthproductmarketing/",
+            "resolved_url": "https://cbtumu.net/coursenew/generativeaiinhealthproductmarketing/",
+            "retrieved_at": "2026-10-23T15:25:26.540796+00:00",
+            "html_sha256": "1d043759c8fb7090ad557a925b2c9575b959a897674a96e5301894ea75f58ed1"
+          }
+        }
+      ],
+      "evidence": {
+        "pricing_and_status_excerpt": "฿1,000.00 Add to Cart",
+        "duration_and_certificate_excerpt": "Intermediate [aggregate omitted] 5 hours Duration October 6, 2026 Last Updated Certificate of completion",
+        "named_teachers_excerpt": "ผู้สอน ภก.ดร.สามารถ จำรัส"
+      },
+      "dates": {
+        "raw": null,
+        "parsed": null
+      },
+      "included_course_ids": []
     },
     {
       "id": "cbtu-09",
@@ -687,7 +1211,8 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
       },
       "enrollment": {
         "observed_text": "Add to Cart",
-        "is_live_availability_verified": false
+        "is_live_availability_verified": false,
+        "catalog_observed_text": null
       },
       "certificate": {
         "observed_text": "Certificate of completion",
@@ -696,27 +1221,28 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
         "faq_url": "https://cbtumu.net/faq/"
       },
       "flags": [
-        "Requirements_widget_uses_NSN_while_course_describes_n8n"
+        "Requirements_widget_uses_NSN_while_course_describes_n8n",
+        "curated_summary_and_schedule_need_review_after_refresh"
       ],
       "missing_fields": [
+        "certificate.course_specific_pass_criteria",
         "duration_text",
-        "session_dates_text",
-        "certificate.course_specific_pass_criteria"
+        "session_dates_text"
       ],
       "provenance": {
         "requested_url": "https://cbtumu.net/coursenew/aiagentwithn8n/",
         "resolved_url": "https://cbtumu.net/coursenew/aiagentwithn8n/",
-        "retrieved_at": "2026-10-23T12:35:56.013300+00:00",
+        "retrieved_at": "2026-10-23T15:25:26.512103+00:00",
         "html_sha256": "963e79a0d2de2514ad63d5fdd782c7b522e7def056a3c0ceaf144936f659d188"
       },
       "field_sources": {
         "name": "h1 + canonical link",
-        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased)",
-        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found",
-        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration",
-        "instructors_text": "About Course ผู้สอน; catalog By or Bundle where explicitly labelled",
+        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased) | reviewed snapshot retrieved_at=2026-10-23T12:35:56.013300+00:00",
+        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found | reviewed snapshot retrieved_at=2026-10-23T12:35:56.013300+00:00",
+        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration | reviewed snapshot retrieved_at=2026-10-23T12:35:56.013300+00:00",
+        "instructors_text": "Legacy raw field retained; use instructors + instructor_evidence for verified teachers.",
         "price,enrollment": "sidebar .tutor-card-body",
-        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only"
+        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only | reviewed snapshot retrieved_at=2026-10-23T12:35:56.013300+00:00"
       },
       "source_refs": [
         {
@@ -731,7 +1257,38 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
           "url": "https://cbtumu.net/faq/",
           "role": "general_certificate_rule_not_course_specific"
         }
-      ]
+      ],
+      "instructors": [
+        {
+          "name": "ผศ.ดร. ทวีศักดิ์ สมานชื่น",
+          "source_url": "https://cbtumu.net/coursenew/aiagentwithn8n/",
+          "source_type": "course_detail"
+        }
+      ],
+      "instructor_evidence": [
+        {
+          "name": "ผศ.ดร. ทวีศักดิ์ สมานชื่น",
+          "source_url": "https://cbtumu.net/coursenew/aiagentwithn8n/",
+          "source_type": "course_detail",
+          "excerpt": "ผู้สอน ผศ.ดร. ทวีศักดิ์ สมานชื่น",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/coursenew/aiagentwithn8n/",
+            "resolved_url": "https://cbtumu.net/coursenew/aiagentwithn8n/",
+            "retrieved_at": "2026-10-23T15:25:26.512103+00:00",
+            "html_sha256": "963e79a0d2de2514ad63d5fdd782c7b522e7def056a3c0ceaf144936f659d188"
+          }
+        }
+      ],
+      "evidence": {
+        "pricing_and_status_excerpt": "฿1,000.00 Add to Cart",
+        "duration_and_certificate_excerpt": "Beginner [aggregate omitted] October 6, 2026 Last Updated Certificate of completion",
+        "named_teachers_excerpt": "ผู้สอน ผศ.ดร. ทวีศักดิ์ สมานชื่น"
+      },
+      "dates": {
+        "raw": null,
+        "parsed": null
+      },
+      "included_course_ids": []
     },
     {
       "id": "cbtu-10",
@@ -766,7 +1323,8 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
       },
       "enrollment": {
         "observed_text": "Add to Cart",
-        "is_live_availability_verified": false
+        "is_live_availability_verified": false,
+        "catalog_observed_text": null
       },
       "certificate": {
         "observed_text": "Certificate of completion",
@@ -776,27 +1334,31 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
       },
       "flags": [
         "dated_sessions_are_before_collection_date",
-        "past_session_dates_but_add_to_cart_displayed"
+        "past_session_dates_but_add_to_cart_displayed",
+        "explicit_teacher_not_found_catalog_author_not_promoted",
+        "legacy_instructors_text_contains_catalog_author_unverified_as_teacher",
+        "curated_summary_and_schedule_need_review_after_refresh"
       ],
       "missing_fields": [
         "audience_th",
-        "prerequisites_th",
-        "certificate.course_specific_pass_criteria"
+        "certificate.course_specific_pass_criteria",
+        "instructors",
+        "prerequisites_th"
       ],
       "provenance": {
         "requested_url": "https://cbtumu.net/coursenew/n8n-workshop/",
         "resolved_url": "https://cbtumu.net/coursenew/n8n-workshop/",
-        "retrieved_at": "2026-10-23T12:35:56.301693+00:00",
+        "retrieved_at": "2026-10-23T15:25:26.813938+00:00",
         "html_sha256": "5394df0a1912a6deb4943d5db1a91efd3cbcdfa813e126d89c479af169f236fd"
       },
       "field_sources": {
         "name": "h1 + canonical link",
-        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased)",
-        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found",
-        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration",
-        "instructors_text": "About Course ผู้สอน; catalog By or Bundle where explicitly labelled",
+        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased) | reviewed snapshot retrieved_at=2026-10-23T12:35:56.301693+00:00",
+        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found | reviewed snapshot retrieved_at=2026-10-23T12:35:56.301693+00:00",
+        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration | reviewed snapshot retrieved_at=2026-10-23T12:35:56.301693+00:00",
+        "instructors_text": "Legacy raw field retained; use instructors + instructor_evidence for verified teachers.",
         "price,enrollment": "sidebar .tutor-card-body",
-        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only"
+        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only | reviewed snapshot retrieved_at=2026-10-23T12:35:56.301693+00:00"
       },
       "source_refs": [
         {
@@ -811,7 +1373,19 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
           "url": "https://cbtumu.net/faq/",
           "role": "general_certificate_rule_not_course_specific"
         }
-      ]
+      ],
+      "instructors": null,
+      "instructor_evidence": [],
+      "evidence": {
+        "pricing_and_status_excerpt": "฿3,000.00 Add to Cart",
+        "duration_and_certificate_excerpt": "Intermediate [aggregate omitted] October 6, 2026 Last Updated Certificate of completion",
+        "named_teachers_excerpt": null
+      },
+      "dates": {
+        "raw": "รุ่นที่ 2: 21 และ 28 กุมภาพันธ์ 2569 เวลา 09:00–16:00",
+        "parsed": null
+      },
+      "included_course_ids": []
     },
     {
       "id": "cbtu-11",
@@ -846,7 +1420,8 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
       },
       "enrollment": {
         "observed_text": "Add to Cart",
-        "is_live_availability_verified": false
+        "is_live_availability_verified": false,
+        "catalog_observed_text": null
       },
       "certificate": {
         "observed_text": "Certificate of completion",
@@ -854,25 +1429,27 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
         "general_faq_rule": "เรียนจบและผ่านการประเมินตามเกณฑ์; ไม่พบเกณฑ์คะแนนของรายวิชา",
         "faq_url": "https://cbtumu.net/faq/"
       },
-      "flags": [],
+      "flags": [
+        "curated_summary_and_schedule_need_review_after_refresh"
+      ],
       "missing_fields": [
-        "session_dates_text",
-        "certificate.course_specific_pass_criteria"
+        "certificate.course_specific_pass_criteria",
+        "session_dates_text"
       ],
       "provenance": {
         "requested_url": "https://cbtumu.net/coursenew/basicpromptengineering2026/",
         "resolved_url": "https://cbtumu.net/coursenew/basicpromptengineering2026/",
-        "retrieved_at": "2026-10-23T12:35:56.320231+00:00",
-        "html_sha256": "b6395479b86ce68390ec2cb819efbbe0a924d76fddee84740bf49ef4c8713a40"
+        "retrieved_at": "2026-10-23T15:25:26.825337+00:00",
+        "html_sha256": "fe562a203017185d7094619697824a8f5992f9378c0a2a3d7c1cb07fe3b15f4a"
       },
       "field_sources": {
         "name": "h1 + canonical link",
-        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased)",
-        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found",
-        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration",
-        "instructors_text": "About Course ผู้สอน; catalog By or Bundle where explicitly labelled",
+        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased) | reviewed snapshot retrieved_at=2026-10-23T12:35:56.320231+00:00",
+        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found | reviewed snapshot retrieved_at=2026-10-23T12:35:56.320231+00:00",
+        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration | reviewed snapshot retrieved_at=2026-10-23T12:35:56.320231+00:00",
+        "instructors_text": "Legacy raw field retained; use instructors + instructor_evidence for verified teachers.",
         "price,enrollment": "sidebar .tutor-card-body",
-        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only"
+        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only | reviewed snapshot retrieved_at=2026-10-23T12:35:56.320231+00:00"
       },
       "source_refs": [
         {
@@ -887,7 +1464,38 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
           "url": "https://cbtumu.net/faq/",
           "role": "general_certificate_rule_not_course_specific"
         }
-      ]
+      ],
+      "instructors": [
+        {
+          "name": "ผศ.ดร. ทวีศักดิ์ สมานชื่น",
+          "source_url": "https://cbtumu.net/coursenew/basicpromptengineering2026/",
+          "source_type": "course_detail"
+        }
+      ],
+      "instructor_evidence": [
+        {
+          "name": "ผศ.ดร. ทวีศักดิ์ สมานชื่น",
+          "source_url": "https://cbtumu.net/coursenew/basicpromptengineering2026/",
+          "source_type": "course_detail",
+          "excerpt": "ผู้สอน ผศ.ดร. ทวีศักดิ์ สมานชื่น",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/coursenew/basicpromptengineering2026/",
+            "resolved_url": "https://cbtumu.net/coursenew/basicpromptengineering2026/",
+            "retrieved_at": "2026-10-23T15:25:26.825337+00:00",
+            "html_sha256": "fe562a203017185d7094619697824a8f5992f9378c0a2a3d7c1cb07fe3b15f4a"
+          }
+        }
+      ],
+      "evidence": {
+        "pricing_and_status_excerpt": "฿1,000.00 Add to Cart",
+        "duration_and_certificate_excerpt": "Beginner [aggregate omitted] 2 hours Duration October 6, 2026 Last Updated Certificate of completion",
+        "named_teachers_excerpt": "ผู้สอน ผศ.ดร. ทวีศักดิ์ สมานชื่น"
+      },
+      "dates": {
+        "raw": null,
+        "parsed": null
+      },
+      "included_course_ids": []
     },
     {
       "id": "cbtu-12",
@@ -932,26 +1540,28 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
         "general_faq_rule": "เรียนจบและผ่านการประเมินตามเกณฑ์; ไม่พบเกณฑ์คะแนนของรายวิชา",
         "faq_url": "https://cbtumu.net/faq/"
       },
-      "flags": [],
+      "flags": [
+        "curated_summary_and_schedule_need_review_after_refresh"
+      ],
       "missing_fields": [
-        "session_dates_text",
+        "certificate.course_specific_pass_criteria",
         "price.displayed_amount",
-        "certificate.course_specific_pass_criteria"
+        "session_dates_text"
       ],
       "provenance": {
         "requested_url": "https://cbtumu.net/coursenew/aiagentforall/",
         "resolved_url": "https://cbtumu.net/coursenew/aiagentforall/",
-        "retrieved_at": "2026-10-23T12:35:56.323917+00:00",
+        "retrieved_at": "2026-10-23T15:25:26.803454+00:00",
         "html_sha256": "91c1721063a6ab13c2d9f8a27d242375b5fb4bf027e4722a2274ac965727eee4"
       },
       "field_sources": {
         "name": "h1 + canonical link",
-        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased)",
-        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found",
-        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration",
-        "instructors_text": "About Course ผู้สอน; catalog By or Bundle where explicitly labelled",
+        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased) | reviewed snapshot retrieved_at=2026-10-23T12:35:56.323917+00:00",
+        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found | reviewed snapshot retrieved_at=2026-10-23T12:35:56.323917+00:00",
+        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration | reviewed snapshot retrieved_at=2026-10-23T12:35:56.323917+00:00",
+        "instructors_text": "Legacy raw field retained; use instructors + instructor_evidence for verified teachers.",
         "price,enrollment": "sidebar .tutor-card-body",
-        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only"
+        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only | reviewed snapshot retrieved_at=2026-10-23T12:35:56.323917+00:00"
       },
       "source_refs": [
         {
@@ -966,7 +1576,38 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
           "url": "https://cbtumu.net/faq/",
           "role": "general_certificate_rule_not_course_specific"
         }
-      ]
+      ],
+      "instructors": [
+        {
+          "name": "ผศ.ดร. ทวีศักดิ์ สมานชื่น",
+          "source_url": "https://cbtumu.net/coursenew/aiagentforall/",
+          "source_type": "course_detail"
+        }
+      ],
+      "instructor_evidence": [
+        {
+          "name": "ผศ.ดร. ทวีศักดิ์ สมานชื่น",
+          "source_url": "https://cbtumu.net/coursenew/aiagentforall/",
+          "source_type": "course_detail",
+          "excerpt": "ผู้สอน ผศ.ดร. ทวีศักดิ์ สมานชื่น",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/coursenew/aiagentforall/",
+            "resolved_url": "https://cbtumu.net/coursenew/aiagentforall/",
+            "retrieved_at": "2026-10-23T15:25:26.803454+00:00",
+            "html_sha256": "91c1721063a6ab13c2d9f8a27d242375b5fb4bf027e4722a2274ac965727eee4"
+          }
+        }
+      ],
+      "evidence": {
+        "pricing_and_status_excerpt": "This course is full right now. We limit the number of students to create an optimized and productive group dynamic.",
+        "duration_and_certificate_excerpt": "Beginner [aggregate omitted] 2 hours 30 minutes Duration October 6, 2026 Last Updated Certificate of completion",
+        "named_teachers_excerpt": "ผู้สอน ผศ.ดร. ทวีศักดิ์ สมานชื่น"
+      },
+      "dates": {
+        "raw": null,
+        "parsed": null
+      },
+      "included_course_ids": []
     },
     {
       "id": "cbtu-13",
@@ -1009,28 +1650,30 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
         "general_faq_rule": "เรียนจบและผ่านการประเมินตามเกณฑ์; ไม่พบเกณฑ์คะแนนของรายวิชา",
         "faq_url": "https://cbtumu.net/faq/"
       },
-      "flags": [],
+      "flags": [
+        "curated_summary_and_schedule_need_review_after_refresh"
+      ],
       "missing_fields": [
         "audience_th",
+        "certificate.course_specific_pass_criteria",
         "duration_text",
-        "session_dates_text",
         "price.displayed_amount",
-        "certificate.course_specific_pass_criteria"
+        "session_dates_text"
       ],
       "provenance": {
         "requested_url": "https://cbtumu.net/coursenew/ai-agents-in-action/",
         "resolved_url": "https://cbtumu.net/coursenew/ai-agents-in-action/",
-        "retrieved_at": "2026-10-23T12:35:57.054275+00:00",
+        "retrieved_at": "2026-10-23T15:25:27.120909+00:00",
         "html_sha256": "0f20494fffeb230f1bcbf0ae0a4052ab065e8041c252bf5c3f8f969f8ed743a0"
       },
       "field_sources": {
         "name": "h1 + canonical link",
-        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased)",
-        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found",
-        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration",
-        "instructors_text": "About Course ผู้สอน; catalog By or Bundle where explicitly labelled",
+        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased) | reviewed snapshot retrieved_at=2026-10-23T12:35:57.054275+00:00",
+        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found | reviewed snapshot retrieved_at=2026-10-23T12:35:57.054275+00:00",
+        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration | reviewed snapshot retrieved_at=2026-10-23T12:35:57.054275+00:00",
+        "instructors_text": "Legacy raw field retained; use instructors + instructor_evidence for verified teachers.",
         "price,enrollment": "sidebar .tutor-card-body",
-        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only"
+        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only | reviewed snapshot retrieved_at=2026-10-23T12:35:57.054275+00:00"
       },
       "source_refs": [
         {
@@ -1045,7 +1688,38 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
           "url": "https://cbtumu.net/faq/",
           "role": "general_certificate_rule_not_course_specific"
         }
-      ]
+      ],
+      "instructors": [
+        {
+          "name": "ผศ.ดร. ทวีศักดิ์ สมานชื่น",
+          "source_url": "https://cbtumu.net/coursenew/ai-agents-in-action/",
+          "source_type": "course_detail"
+        }
+      ],
+      "instructor_evidence": [
+        {
+          "name": "ผศ.ดร. ทวีศักดิ์ สมานชื่น",
+          "source_url": "https://cbtumu.net/coursenew/ai-agents-in-action/",
+          "source_type": "course_detail",
+          "excerpt": "ผู้สอน ผศ.ดร. ทวีศักดิ์ สมานชื่น",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/coursenew/ai-agents-in-action/",
+            "resolved_url": "https://cbtumu.net/coursenew/ai-agents-in-action/",
+            "retrieved_at": "2026-10-23T15:25:27.120909+00:00",
+            "html_sha256": "0f20494fffeb230f1bcbf0ae0a4052ab065e8041c252bf5c3f8f969f8ed743a0"
+          }
+        }
+      ],
+      "evidence": {
+        "pricing_and_status_excerpt": "This course is full right now. We limit the number of students to create an optimized and productive group dynamic.",
+        "duration_and_certificate_excerpt": "Intermediate [aggregate omitted] October 6, 2026 Last Updated Certificate of completion",
+        "named_teachers_excerpt": "ผู้สอน ผศ.ดร. ทวีศักดิ์ สมานชื่น"
+      },
+      "dates": {
+        "raw": null,
+        "parsed": null
+      },
+      "included_course_ids": []
     },
     {
       "id": "cbtu-14",
@@ -1091,26 +1765,31 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
         "general_faq_rule": "เรียนจบและผ่านการประเมินตามเกณฑ์; ไม่พบเกณฑ์คะแนนของรายวิชา",
         "faq_url": "https://cbtumu.net/faq/"
       },
-      "flags": [],
+      "flags": [
+        "explicit_teacher_not_found_catalog_author_not_promoted",
+        "legacy_instructors_text_contains_catalog_author_unverified_as_teacher",
+        "curated_summary_and_schedule_need_review_after_refresh"
+      ],
       "missing_fields": [
-        "session_dates_text",
+        "certificate.course_specific_pass_criteria",
+        "instructors",
         "price.displayed_amount",
-        "certificate.course_specific_pass_criteria"
+        "session_dates_text"
       ],
       "provenance": {
         "requested_url": "https://cbtumu.net/coursenew/ai-for-all/",
         "resolved_url": "https://cbtumu.net/coursenew/ai-for-all/",
-        "retrieved_at": "2026-10-23T12:35:56.603081+00:00",
+        "retrieved_at": "2026-10-23T15:25:27.114619+00:00",
         "html_sha256": "04284d5f799b5a94fa6cf7b8d4219485f30701f5f430432c64a5d8c47d327c76"
       },
       "field_sources": {
         "name": "h1 + canonical link",
-        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased)",
-        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found",
-        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration",
-        "instructors_text": "About Course ผู้สอน; catalog By or Bundle where explicitly labelled",
+        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased) | reviewed snapshot retrieved_at=2026-10-23T12:35:56.603081+00:00",
+        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found | reviewed snapshot retrieved_at=2026-10-23T12:35:56.603081+00:00",
+        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration | reviewed snapshot retrieved_at=2026-10-23T12:35:56.603081+00:00",
+        "instructors_text": "Legacy raw field retained; use instructors + instructor_evidence for verified teachers.",
         "price,enrollment": "sidebar .tutor-card-body",
-        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only"
+        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only | reviewed snapshot retrieved_at=2026-10-23T12:35:56.603081+00:00"
       },
       "source_refs": [
         {
@@ -1125,7 +1804,19 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
           "url": "https://cbtumu.net/faq/",
           "role": "general_certificate_rule_not_course_specific"
         }
-      ]
+      ],
+      "instructors": null,
+      "instructor_evidence": [],
+      "evidence": {
+        "pricing_and_status_excerpt": "This course is full right now. We limit the number of students to create an optimized and productive group dynamic.",
+        "duration_and_certificate_excerpt": "Intermediate [aggregate omitted] 2 hours Duration October 6, 2026 Last Updated Certificate of completion",
+        "named_teachers_excerpt": null
+      },
+      "dates": {
+        "raw": null,
+        "parsed": null
+      },
+      "included_course_ids": []
     },
     {
       "id": "cbtu-15",
@@ -1161,7 +1852,8 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
       },
       "enrollment": {
         "observed_text": "Add to Cart",
-        "is_live_availability_verified": false
+        "is_live_availability_verified": false,
+        "catalog_observed_text": null
       },
       "certificate": {
         "observed_text": "Certificate of completion",
@@ -1171,7 +1863,8 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
       },
       "flags": [
         "dated_sessions_are_before_collection_date",
-        "past_session_dates_but_add_to_cart_displayed"
+        "past_session_dates_but_add_to_cart_displayed",
+        "curated_summary_and_schedule_need_review_after_refresh"
       ],
       "missing_fields": [
         "certificate.course_specific_pass_criteria"
@@ -1179,17 +1872,17 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
       "provenance": {
         "requested_url": "https://cbtumu.net/coursenew/dataanalytic/",
         "resolved_url": "https://cbtumu.net/coursenew/dataanalytic/",
-        "retrieved_at": "2026-10-23T12:35:56.995082+00:00",
+        "retrieved_at": "2026-10-23T15:25:27.093913+00:00",
         "html_sha256": "77e5b474690b47a1778d8ecec88c40055d656820a49d72a06b1f3e019c608da1"
       },
       "field_sources": {
         "name": "h1 + canonical link",
-        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased)",
-        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found",
-        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration",
-        "instructors_text": "About Course ผู้สอน; catalog By or Bundle where explicitly labelled",
+        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased) | reviewed snapshot retrieved_at=2026-10-23T12:35:56.995082+00:00",
+        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found | reviewed snapshot retrieved_at=2026-10-23T12:35:56.995082+00:00",
+        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration | reviewed snapshot retrieved_at=2026-10-23T12:35:56.995082+00:00",
+        "instructors_text": "Legacy raw field retained; use instructors + instructor_evidence for verified teachers.",
         "price,enrollment": "sidebar .tutor-card-body",
-        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only"
+        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only | reviewed snapshot retrieved_at=2026-10-23T12:35:56.995082+00:00"
       },
       "source_refs": [
         {
@@ -1204,7 +1897,89 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
           "url": "https://cbtumu.net/faq/",
           "role": "general_certificate_rule_not_course_specific"
         }
-      ]
+      ],
+      "instructors": [
+        {
+          "name": "ผศ. ดร.ทวีศักดิ์ สมานชื่น",
+          "source_url": "https://cbtumu.net/coursenew/dataanalytic/",
+          "source_type": "course_detail"
+        },
+        {
+          "name": "น.ท. ดร.บัญชา ช่วยสี",
+          "source_url": "https://cbtumu.net/coursenew/dataanalytic/",
+          "source_type": "course_detail"
+        },
+        {
+          "name": "ผศ. ดร.วรัญญู วงษ์เสรี",
+          "source_url": "https://cbtumu.net/coursenew/dataanalytic/",
+          "source_type": "course_detail"
+        },
+        {
+          "name": "อ.อดิศร นิลวิสุทธิ์",
+          "source_url": "https://cbtumu.net/coursenew/dataanalytic/",
+          "source_type": "course_detail"
+        }
+      ],
+      "instructor_evidence": [
+        {
+          "name": "ผศ. ดร.ทวีศักดิ์ สมานชื่น",
+          "source_url": "https://cbtumu.net/coursenew/dataanalytic/",
+          "source_type": "course_detail",
+          "excerpt": "ผู้สอน ผศ. ดร.ทวีศักดิ์ สมานชื่น",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/coursenew/dataanalytic/",
+            "resolved_url": "https://cbtumu.net/coursenew/dataanalytic/",
+            "retrieved_at": "2026-10-23T15:25:27.093913+00:00",
+            "html_sha256": "77e5b474690b47a1778d8ecec88c40055d656820a49d72a06b1f3e019c608da1"
+          }
+        },
+        {
+          "name": "น.ท. ดร.บัญชา ช่วยสี",
+          "source_url": "https://cbtumu.net/coursenew/dataanalytic/",
+          "source_type": "course_detail",
+          "excerpt": "ผู้สอน น.ท. ดร.บัญชา ช่วยสี",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/coursenew/dataanalytic/",
+            "resolved_url": "https://cbtumu.net/coursenew/dataanalytic/",
+            "retrieved_at": "2026-10-23T15:25:27.093913+00:00",
+            "html_sha256": "77e5b474690b47a1778d8ecec88c40055d656820a49d72a06b1f3e019c608da1"
+          }
+        },
+        {
+          "name": "ผศ. ดร.วรัญญู วงษ์เสรี",
+          "source_url": "https://cbtumu.net/coursenew/dataanalytic/",
+          "source_type": "course_detail",
+          "excerpt": "ผู้สอน ผศ. ดร.วรัญญู วงษ์เสรี",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/coursenew/dataanalytic/",
+            "resolved_url": "https://cbtumu.net/coursenew/dataanalytic/",
+            "retrieved_at": "2026-10-23T15:25:27.093913+00:00",
+            "html_sha256": "77e5b474690b47a1778d8ecec88c40055d656820a49d72a06b1f3e019c608da1"
+          }
+        },
+        {
+          "name": "อ.อดิศร นิลวิสุทธิ์",
+          "source_url": "https://cbtumu.net/coursenew/dataanalytic/",
+          "source_type": "course_detail",
+          "excerpt": "ผู้สอน อ.อดิศร นิลวิสุทธิ์",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/coursenew/dataanalytic/",
+            "resolved_url": "https://cbtumu.net/coursenew/dataanalytic/",
+            "retrieved_at": "2026-10-23T15:25:27.093913+00:00",
+            "html_sha256": "77e5b474690b47a1778d8ecec88c40055d656820a49d72a06b1f3e019c608da1"
+          }
+        }
+      ],
+      "evidence": {
+        "pricing_and_status_excerpt": "฿3,150.00 ฿4,500.00 Add to Cart",
+        "duration_and_certificate_excerpt": "Intermediate [aggregate omitted] October 6, 2026 Last Updated Certificate of completion",
+        "named_teachers_excerpt": "ผู้สอน ผศ. ดร.ทวีศักดิ์ สมานชื่น; น.ท. ดร.บัญชา ช่วยสี; ผศ. ดร.วรัญญู วงษ์เสรี; อ.อดิศร นิลวิสุทธิ์"
+      },
+      "dates": {
+        "raw": "8, 15, 22 กุมภาพันธ์ และ 1, 8, 15 มีนาคม 2569 เวลา 13:00–16:00",
+        "parsed": null
+      },
+      "included_course_ids": []
     },
     {
       "id": "cbtu-16",
@@ -1240,7 +2015,8 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
       },
       "enrollment": {
         "observed_text": "Add to Cart",
-        "is_live_availability_verified": false
+        "is_live_availability_verified": false,
+        "catalog_observed_text": null
       },
       "certificate": {
         "observed_text": "Certificate of completion",
@@ -1250,27 +2026,28 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
       },
       "flags": [
         "dated_sessions_are_before_collection_date",
-        "past_session_dates_but_add_to_cart_displayed"
+        "past_session_dates_but_add_to_cart_displayed",
+        "curated_summary_and_schedule_need_review_after_refresh"
       ],
       "missing_fields": [
         "audience_th",
-        "prerequisites_th",
-        "certificate.course_specific_pass_criteria"
+        "certificate.course_specific_pass_criteria",
+        "prerequisites_th"
       ],
       "provenance": {
         "requested_url": "https://cbtumu.net/coursenew/datascienceessentials/",
         "resolved_url": "https://cbtumu.net/coursenew/datascienceessentials/",
-        "retrieved_at": "2026-10-23T12:35:57.306546+00:00",
+        "retrieved_at": "2026-10-23T15:25:27.378204+00:00",
         "html_sha256": "cfd2d02bb0cca01a93a130683e8d7fc400c0deeefb418650bc67bd8999ee396d"
       },
       "field_sources": {
         "name": "h1 + canonical link",
-        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased)",
-        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found",
-        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration",
-        "instructors_text": "About Course ผู้สอน; catalog By or Bundle where explicitly labelled",
+        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased) | reviewed snapshot retrieved_at=2026-10-23T12:35:57.306546+00:00",
+        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found | reviewed snapshot retrieved_at=2026-10-23T12:35:57.306546+00:00",
+        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration | reviewed snapshot retrieved_at=2026-10-23T12:35:57.306546+00:00",
+        "instructors_text": "Legacy raw field retained; use instructors + instructor_evidence for verified teachers.",
         "price,enrollment": "sidebar .tutor-card-body",
-        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only"
+        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only | reviewed snapshot retrieved_at=2026-10-23T12:35:57.306546+00:00"
       },
       "source_refs": [
         {
@@ -1285,7 +2062,72 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
           "url": "https://cbtumu.net/faq/",
           "role": "general_certificate_rule_not_course_specific"
         }
-      ]
+      ],
+      "instructors": [
+        {
+          "name": "ผศ. ดร.ทวีศักดิ์ สมานชื่น",
+          "source_url": "https://cbtumu.net/coursenew/datascienceessentials/",
+          "source_type": "course_detail"
+        },
+        {
+          "name": "ผศ. ดร.โษฑศ์รัตต ธรรมบุษดี",
+          "source_url": "https://cbtumu.net/coursenew/datascienceessentials/",
+          "source_type": "course_detail"
+        },
+        {
+          "name": "ผศ. ดร.วรัญญู วงษ์เสรี",
+          "source_url": "https://cbtumu.net/coursenew/datascienceessentials/",
+          "source_type": "course_detail"
+        }
+      ],
+      "instructor_evidence": [
+        {
+          "name": "ผศ. ดร.ทวีศักดิ์ สมานชื่น",
+          "source_url": "https://cbtumu.net/coursenew/datascienceessentials/",
+          "source_type": "course_detail",
+          "excerpt": "ผู้สอน ผศ. ดร.ทวีศักดิ์ สมานชื่น",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/coursenew/datascienceessentials/",
+            "resolved_url": "https://cbtumu.net/coursenew/datascienceessentials/",
+            "retrieved_at": "2026-10-23T15:25:27.378204+00:00",
+            "html_sha256": "cfd2d02bb0cca01a93a130683e8d7fc400c0deeefb418650bc67bd8999ee396d"
+          }
+        },
+        {
+          "name": "ผศ. ดร.โษฑศ์รัตต ธรรมบุษดี",
+          "source_url": "https://cbtumu.net/coursenew/datascienceessentials/",
+          "source_type": "course_detail",
+          "excerpt": "ผู้สอน ผศ. ดร.โษฑศ์รัตต ธรรมบุษดี",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/coursenew/datascienceessentials/",
+            "resolved_url": "https://cbtumu.net/coursenew/datascienceessentials/",
+            "retrieved_at": "2026-10-23T15:25:27.378204+00:00",
+            "html_sha256": "cfd2d02bb0cca01a93a130683e8d7fc400c0deeefb418650bc67bd8999ee396d"
+          }
+        },
+        {
+          "name": "ผศ. ดร.วรัญญู วงษ์เสรี",
+          "source_url": "https://cbtumu.net/coursenew/datascienceessentials/",
+          "source_type": "course_detail",
+          "excerpt": "ผู้สอน ผศ. ดร.วรัญญู วงษ์เสรี",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/coursenew/datascienceessentials/",
+            "resolved_url": "https://cbtumu.net/coursenew/datascienceessentials/",
+            "retrieved_at": "2026-10-23T15:25:27.378204+00:00",
+            "html_sha256": "cfd2d02bb0cca01a93a130683e8d7fc400c0deeefb418650bc67bd8999ee396d"
+          }
+        }
+      ],
+      "evidence": {
+        "pricing_and_status_excerpt": "฿6,300.00 ฿9,000.00 Add to Cart",
+        "duration_and_certificate_excerpt": "Intermediate [aggregate omitted] October 6, 2026 Last Updated Certificate of completion",
+        "named_teachers_excerpt": "ผู้สอน ผศ. ดร.ทวีศักดิ์ สมานชื่น; ผศ. ดร.โษฑศ์รัตต ธรรมบุษดี; ผศ. ดร.วรัญญู วงษ์เสรี"
+      },
+      "dates": {
+        "raw": "7, 14, 21, 28 มีนาคม และ 4, 11 เมษายน 2569 เวลา 09:00–16:00",
+        "parsed": null
+      },
+      "included_course_ids": []
     },
     {
       "id": "cbtu-17",
@@ -1320,7 +2162,8 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
       },
       "enrollment": {
         "observed_text": "Enrollment is now closed",
-        "is_live_availability_verified": false
+        "is_live_availability_verified": false,
+        "catalog_observed_text": null
       },
       "certificate": {
         "observed_text": "Certificate of completion",
@@ -1329,26 +2172,30 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
         "faq_url": "https://cbtumu.net/faq/"
       },
       "flags": [
-        "dated_sessions_are_before_collection_date"
+        "dated_sessions_are_before_collection_date",
+        "explicit_teacher_not_found_catalog_author_not_promoted",
+        "legacy_instructors_text_contains_catalog_author_unverified_as_teacher",
+        "curated_summary_and_schedule_need_review_after_refresh"
       ],
       "missing_fields": [
         "audience_th",
+        "instructors",
         "prerequisites_th"
       ],
       "provenance": {
-        "requested_url": "https://cbtumu.net/coursenew/data-analyst-level-4-%e0%b8%a3%e0%b8%b8%e0%b9%88%e0%b8%99%e0%b8%97%e0%b8%b5%e0%b9%88-4/",
-        "resolved_url": "https://cbtumu.net/coursenew/data-analyst-level-4-%e0%b8%a3%e0%b8%b8%e0%b9%88%e0%b8%99%e0%b8%97%e0%b8%b5%e0%b9%88-4/",
-        "retrieved_at": "2026-10-23T12:35:57.641886+00:00",
+        "requested_url": "https://cbtumu.net/coursenew/data-analyst-level-4-รุ่นที่-4/",
+        "resolved_url": "https://cbtumu.net/coursenew/data-analyst-level-4-%E0%B8%A3%E0%B8%B8%E0%B9%88%E0%B8%99%E0%B8%97%E0%B8%B5%E0%B9%88-4/",
+        "retrieved_at": "2026-10-23T15:25:27.398304+00:00",
         "html_sha256": "71752831b9f9367a11c37f53091d4d5f8c38bf5d285d379eb17230867cc0bb3f"
       },
       "field_sources": {
         "name": "h1 + canonical link",
-        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased)",
-        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found",
-        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration",
-        "instructors_text": "About Course ผู้สอน; catalog By or Bundle where explicitly labelled",
+        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased) | reviewed snapshot retrieved_at=2026-10-23T12:35:57.641886+00:00",
+        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found | reviewed snapshot retrieved_at=2026-10-23T12:35:57.641886+00:00",
+        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration | reviewed snapshot retrieved_at=2026-10-23T12:35:57.641886+00:00",
+        "instructors_text": "Legacy raw field retained; use instructors + instructor_evidence for verified teachers.",
         "price,enrollment": "sidebar .tutor-card-body",
-        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only"
+        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only | reviewed snapshot retrieved_at=2026-10-23T12:35:57.641886+00:00"
       },
       "source_refs": [
         {
@@ -1363,7 +2210,19 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
           "url": "https://cbtumu.net/faq/",
           "role": "general_certificate_rule_not_course_specific"
         }
-      ]
+      ],
+      "instructors": null,
+      "instructor_evidence": [],
+      "evidence": {
+        "pricing_and_status_excerpt": "฿3,000.00 Enrollment is now closed",
+        "duration_and_certificate_excerpt": "Intermediate [aggregate omitted] October 6, 2026 Last Updated Certificate of completion",
+        "named_teachers_excerpt": null
+      },
+      "dates": {
+        "raw": "2, 9, 16, 23 พฤศจิกายน 2568 เวลา 13:00–16:00",
+        "parsed": null
+      },
+      "included_course_ids": []
     },
     {
       "id": "cbtu-18",
@@ -1399,35 +2258,39 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
         "faq_url": "https://cbtumu.net/faq/"
       },
       "flags": [
-        "password_protected_detail_not_accessed"
+        "password_protected_detail_not_accessed",
+        "explicit_teacher_not_found_catalog_author_not_promoted",
+        "curated_summary_and_schedule_need_review_after_refresh"
       ],
       "missing_fields": [
-        "description_th",
-        "topics",
         "audience_th",
-        "prerequisites_th",
-        "format_th",
-        "duration_text",
-        "session_dates_text",
-        "instructors_text",
-        "price.displayed_amount",
+        "certificate.course_specific_pass_criteria",
         "certificate.course_specific_statement",
-        "certificate.course_specific_pass_criteria"
+        "description_th",
+        "duration_text",
+        "format_th",
+        "instructors",
+        "instructors_text",
+        "learning_outcomes_th",
+        "prerequisites_th",
+        "price.displayed_amount",
+        "session_dates_text",
+        "topics"
       ],
       "provenance": {
         "requested_url": "https://cbtumu.net/coursenew/exambasicpromptengineeringupdate/",
         "resolved_url": "https://cbtumu.net/coursenew/exambasicpromptengineeringupdate/",
-        "retrieved_at": "2026-10-23T12:35:57.648560+00:00",
+        "retrieved_at": "2026-10-23T15:25:27.646822+00:00",
         "html_sha256": "578be27c87da53b50f44d65b69572220c545d0a50d5b91c24562480c87040930"
       },
       "field_sources": {
         "name": "h1 + canonical link",
-        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased)",
-        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found",
-        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration",
-        "instructors_text": "About Course ผู้สอน; catalog By or Bundle where explicitly labelled",
+        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased) | reviewed snapshot retrieved_at=2026-10-23T12:35:57.648560+00:00",
+        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found | reviewed snapshot retrieved_at=2026-10-23T12:35:57.648560+00:00",
+        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration | reviewed snapshot retrieved_at=2026-10-23T12:35:57.648560+00:00",
+        "instructors_text": "Legacy raw field retained; use instructors + instructor_evidence for verified teachers.",
         "price,enrollment": "sidebar .tutor-card-body",
-        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only"
+        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only | reviewed snapshot retrieved_at=2026-10-23T12:35:57.648560+00:00"
       },
       "source_refs": [
         {
@@ -1442,7 +2305,19 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
           "url": "https://cbtumu.net/faq/",
           "role": "general_certificate_rule_not_course_specific"
         }
-      ]
+      ],
+      "instructors": null,
+      "instructor_evidence": [],
+      "evidence": {
+        "pricing_and_status_excerpt": null,
+        "duration_and_certificate_excerpt": null,
+        "named_teachers_excerpt": null
+      },
+      "dates": {
+        "raw": null,
+        "parsed": null
+      },
+      "included_course_ids": []
     },
     {
       "id": "cbtu-19",
@@ -1476,7 +2351,8 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
       },
       "enrollment": {
         "observed_text": "Enrollment is now closed",
-        "is_live_availability_verified": false
+        "is_live_availability_verified": false,
+        "catalog_observed_text": null
       },
       "certificate": {
         "observed_text": "Certificate of completion",
@@ -1484,26 +2360,31 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
         "general_faq_rule": "เรียนจบและผ่านการประเมินตามเกณฑ์; ไม่พบเกณฑ์คะแนนของรายวิชา",
         "faq_url": "https://cbtumu.net/faq/"
       },
-      "flags": [],
+      "flags": [
+        "explicit_teacher_not_found_catalog_author_not_promoted",
+        "legacy_instructors_text_contains_catalog_author_unverified_as_teacher",
+        "curated_summary_and_schedule_need_review_after_refresh"
+      ],
       "missing_fields": [
-        "session_dates_text",
+        "certificate.course_specific_pass_criteria",
+        "instructors",
         "price.displayed_amount",
-        "certificate.course_specific_pass_criteria"
+        "session_dates_text"
       ],
       "provenance": {
         "requested_url": "https://cbtumu.net/coursenew/basic-prompt-engineering/",
         "resolved_url": "https://cbtumu.net/coursenew/basic-prompt-engineering/",
-        "retrieved_at": "2026-10-23T12:35:57.582877+00:00",
-        "html_sha256": "f33012f5185f7b1cd90e7b8b8f3daee54e04bf9aa0c771ef15308e2136160f56"
+        "retrieved_at": "2026-10-23T15:25:27.677376+00:00",
+        "html_sha256": "3df0091ad37bd0e8c2687abcbcb28a5f79bc1f62d7e0dd3a1f9394ec281b929c"
       },
       "field_sources": {
         "name": "h1 + canonical link",
-        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased)",
-        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found",
-        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration",
-        "instructors_text": "About Course ผู้สอน; catalog By or Bundle where explicitly labelled",
+        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased) | reviewed snapshot retrieved_at=2026-10-23T12:35:57.582877+00:00",
+        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found | reviewed snapshot retrieved_at=2026-10-23T12:35:57.582877+00:00",
+        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration | reviewed snapshot retrieved_at=2026-10-23T12:35:57.582877+00:00",
+        "instructors_text": "Legacy raw field retained; use instructors + instructor_evidence for verified teachers.",
         "price,enrollment": "sidebar .tutor-card-body",
-        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only"
+        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only | reviewed snapshot retrieved_at=2026-10-23T12:35:57.582877+00:00"
       },
       "source_refs": [
         {
@@ -1518,7 +2399,19 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
           "url": "https://cbtumu.net/faq/",
           "role": "general_certificate_rule_not_course_specific"
         }
-      ]
+      ],
+      "instructors": null,
+      "instructor_evidence": [],
+      "evidence": {
+        "pricing_and_status_excerpt": "Enrollment is now closed",
+        "duration_and_certificate_excerpt": "Intermediate [aggregate omitted] 2 hours Duration June 16, 2026 Last Updated Certificate of completion",
+        "named_teachers_excerpt": null
+      },
+      "dates": {
+        "raw": null,
+        "parsed": null
+      },
+      "included_course_ids": []
     },
     {
       "id": "cbtu-20",
@@ -1551,7 +2444,8 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
       },
       "enrollment": {
         "observed_text": "Add to Cart",
-        "is_live_availability_verified": false
+        "is_live_availability_verified": false,
+        "catalog_observed_text": null
       },
       "certificate": {
         "observed_text": "คำอธิบาย Bundle ระบุมี certificate",
@@ -1560,28 +2454,29 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
         "faq_url": "https://cbtumu.net/faq/"
       },
       "flags": [
-        "bundle_duration_requires_verification"
+        "bundle_duration_requires_verification",
+        "curated_summary_and_schedule_need_review_after_refresh"
       ],
       "missing_fields": [
         "audience_th",
+        "certificate.course_specific_pass_criteria",
         "prerequisites_th",
-        "session_dates_text",
-        "certificate.course_specific_pass_criteria"
+        "session_dates_text"
       ],
       "provenance": {
         "requested_url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
         "resolved_url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
-        "retrieved_at": "2026-10-23T12:35:57.859779+00:00",
+        "retrieved_at": "2026-10-23T15:25:27.685206+00:00",
         "html_sha256": "2546fecb124257b9a1f89c1654d24871c8be5f8fdf0b97a759ce1033899166f7"
       },
       "field_sources": {
         "name": "h1 + canonical link",
-        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased)",
-        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found",
-        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration",
-        "instructors_text": "About Course ผู้สอน; catalog By or Bundle where explicitly labelled",
+        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased) | reviewed snapshot retrieved_at=2026-10-23T12:35:57.859779+00:00",
+        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found | reviewed snapshot retrieved_at=2026-10-23T12:35:57.859779+00:00",
+        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration | reviewed snapshot retrieved_at=2026-10-23T12:35:57.859779+00:00",
+        "instructors_text": "Legacy raw field retained; use instructors + instructor_evidence for verified teachers.",
         "price,enrollment": "sidebar .tutor-card-body",
-        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only"
+        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only | reviewed snapshot retrieved_at=2026-10-23T12:35:57.859779+00:00"
       },
       "source_refs": [
         {
@@ -1596,6 +2491,76 @@ export const courseCatalog: { collectionDate: string; sourceStatus: string; inge
           "url": "https://cbtumu.net/faq/",
           "role": "general_certificate_rule_not_course_specific"
         }
+      ],
+      "instructors": [
+        {
+          "name": "นางสาว อภิญญา ชูชาติ",
+          "source_url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+          "source_type": "explicit_bundle_teacher"
+        },
+        {
+          "name": "นางสาว กานต์นภัส ช้ำเกตุ",
+          "source_url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+          "source_type": "explicit_bundle_teacher"
+        },
+        {
+          "name": "ผศ.ดร. ทวีศักดิ์ สมานชื่น",
+          "source_url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+          "source_type": "explicit_bundle_teacher"
+        }
+      ],
+      "instructor_evidence": [
+        {
+          "name": "นางสาว อภิญญา ชูชาติ",
+          "source_url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+          "source_type": "explicit_bundle_teacher",
+          "excerpt": "สร้างสื่อสวยด้วย Canva | ผู้สอน นางสาว อภิญญา ชูชาติ",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+            "resolved_url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+            "retrieved_at": "2026-10-23T15:25:27.685206+00:00",
+            "html_sha256": "2546fecb124257b9a1f89c1654d24871c8be5f8fdf0b97a759ce1033899166f7"
+          }
+        },
+        {
+          "name": "นางสาว กานต์นภัส ช้ำเกตุ",
+          "source_url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+          "source_type": "explicit_bundle_teacher",
+          "excerpt": "การวิเคราะห์ข้อมูลด้วย Microsoft Excel | ผู้สอน นางสาว กานต์นภัส ช้ำเกตุ",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+            "resolved_url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+            "retrieved_at": "2026-10-23T15:25:27.685206+00:00",
+            "html_sha256": "2546fecb124257b9a1f89c1654d24871c8be5f8fdf0b97a759ce1033899166f7"
+          }
+        },
+        {
+          "name": "ผศ.ดร. ทวีศักดิ์ สมานชื่น",
+          "source_url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+          "source_type": "explicit_bundle_teacher",
+          "excerpt": "AI Agent with n8n | ผู้สอน ผศ.ดร. ทวีศักดิ์ สมานชื่น",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+            "resolved_url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+            "retrieved_at": "2026-10-23T15:25:27.685206+00:00",
+            "html_sha256": "2546fecb124257b9a1f89c1654d24871c8be5f8fdf0b97a759ce1033899166f7"
+          }
+        }
+      ],
+      "evidence": {
+        "pricing_and_status_excerpt": "฿1,500.00 ฿4,000.00 62.5% off Add to Cart",
+        "duration_and_certificate_excerpt": "4 Total Courses [aggregate omitted] 02:00:00 Duration 90 Lesson Content 0 Downloadable Resources 10 Quiz Papers",
+        "named_teachers_excerpt": null
+      },
+      "dates": {
+        "raw": null,
+        "parsed": null
+      },
+      "included_course_ids": [
+        "cbtu-07",
+        "cbtu-06",
+        "cbtu-09",
+        "cbtu-11"
       ]
     }
   ]

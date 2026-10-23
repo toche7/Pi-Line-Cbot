@@ -1,0 +1,754 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.1.0",
+      "type": "string"
+    },
+    "collection_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "timezone": {
+      "const": "Asia/Bangkok"
+    },
+    "status": {
+      "const": "research_for_owner_review_not_runtime_ingestion"
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "null_means": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "availability_rule": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "collection": {
+      "type": "object",
+      "properties": {
+        "built_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "mode": {
+          "enum": [
+            "reviewed_snapshot_migration",
+            "curated_manifest_refresh"
+          ]
+        },
+        "expected_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "uniqueItems": true
+        },
+        "fetch_errors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "url": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^https://"
+              },
+              "error": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              }
+            },
+            "required": [
+              "id",
+              "url",
+              "error"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "coverage": {
+          "enum": [
+            "complete",
+            "incomplete"
+          ]
+        },
+        "summary_policy": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "listing_coverage_ref": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        }
+      },
+      "required": [
+        "built_at",
+        "mode",
+        "expected_ids",
+        "fetch_errors",
+        "coverage",
+        "summary_policy",
+        "listing_coverage_ref"
+      ],
+      "additionalProperties": false
+    },
+    "courses": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/course"
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "schema_version",
+    "collection_date",
+    "timezone",
+    "status",
+    "scope",
+    "null_means",
+    "availability_rule",
+    "collection",
+    "courses"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:cbtu:research:courses:1.1.0",
+  "title": "CBTU public research catalog 1.1.0",
+  "$defs": {
+    "provenance": {
+      "type": "object",
+      "properties": {
+        "requested_url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "resolved_url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "retrieved_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "html_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "requested_url",
+        "resolved_url",
+        "retrieved_at",
+        "html_sha256"
+      ],
+      "additionalProperties": false
+    },
+    "instructor": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "source_url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "source_type": {
+          "enum": [
+            "course_detail",
+            "explicit_bundle_teacher"
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "source_url",
+        "source_type"
+      ],
+      "additionalProperties": false
+    },
+    "instructor_evidence": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "source_url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "source_type": {
+          "enum": [
+            "course_detail",
+            "explicit_bundle_teacher"
+          ]
+        },
+        "excerpt": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        }
+      },
+      "required": [
+        "name",
+        "source_url",
+        "source_type",
+        "excerpt",
+        "provenance"
+      ],
+      "additionalProperties": false
+    },
+    "course": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^cbtu-[0-9]{2,}$"
+        },
+        "record_type": {
+          "enum": [
+            "course",
+            "bundle"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "canonical_url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "detail_access": {
+          "enum": [
+            "public",
+            "password_protected"
+          ]
+        },
+        "description_th": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "topics": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "uniqueItems": true,
+          "minItems": 1
+        },
+        "learning_outcomes_th": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "minItems": 1
+        },
+        "audience_th": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "prerequisites_th": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "format_th": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "duration_text": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "session_dates_text": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "dates": {
+          "type": "object",
+          "properties": {
+            "raw": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "parsed": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "object",
+                "properties": {
+                  "start_date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "end_date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date"
+                  },
+                  "source_text": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "timezone": {
+                    "const": "Asia/Bangkok"
+                  }
+                },
+                "required": [
+                  "start_date",
+                  "end_date",
+                  "source_text",
+                  "timezone"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "raw",
+            "parsed"
+          ],
+          "additionalProperties": false
+        },
+        "instructors_text": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "instructors": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/instructor"
+          },
+          "minItems": 1
+        },
+        "instructor_evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/instructor_evidence"
+          }
+        },
+        "catalog_author_text": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "price": {
+          "type": "object",
+          "properties": {
+            "displayed_amount": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "currency": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^[A-Z]{3}$"
+            },
+            "reference_amount": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "label": {
+              "enum": [
+                "Free",
+                null
+              ]
+            },
+            "is_current_offer_verified": {
+              "const": false,
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "displayed_amount",
+            "currency",
+            "reference_amount",
+            "label",
+            "is_current_offer_verified"
+          ],
+          "additionalProperties": false
+        },
+        "enrollment": {
+          "type": "object",
+          "properties": {
+            "observed_text": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "is_live_availability_verified": {
+              "const": false,
+              "type": "boolean"
+            },
+            "catalog_observed_text": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "minLength": 1,
+              "pattern": "\\S"
+            }
+          },
+          "required": [
+            "observed_text",
+            "is_live_availability_verified",
+            "catalog_observed_text"
+          ],
+          "additionalProperties": false
+        },
+        "certificate": {
+          "type": "object",
+          "properties": {
+            "observed_text": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "course_specific_pass_criteria": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "general_faq_rule": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "faq_url": {
+              "type": "string",
+              "format": "uri",
+              "pattern": "^https://"
+            }
+          },
+          "required": [
+            "observed_text",
+            "course_specific_pass_criteria",
+            "general_faq_rule",
+            "faq_url"
+          ],
+          "additionalProperties": false
+        },
+        "application_links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "url": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^https://"
+              },
+              "type": {
+                "const": "course_detail_entry"
+              },
+              "transaction_not_tested": {
+                "const": true,
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "url",
+              "type",
+              "transaction_not_tested"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "additional_public_links": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https://"
+          },
+          "uniqueItems": true
+        },
+        "flags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "uniqueItems": true
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        },
+        "field_sources": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "description_th,topics,learning_outcomes_th": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "audience_th,prerequisites_th": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "format_th,duration_text,session_dates_text": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "instructors_text": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "price,enrollment": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "certificate": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            }
+          },
+          "required": [
+            "name",
+            "description_th,topics,learning_outcomes_th",
+            "audience_th,prerequisites_th",
+            "format_th,duration_text,session_dates_text",
+            "instructors_text",
+            "price,enrollment",
+            "certificate"
+          ],
+          "additionalProperties": false
+        },
+        "evidence": {
+          "type": "object",
+          "properties": {
+            "pricing_and_status_excerpt": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "duration_and_certificate_excerpt": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "named_teachers_excerpt": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "minLength": 1,
+              "pattern": "\\S"
+            }
+          },
+          "required": [
+            "pricing_and_status_excerpt",
+            "duration_and_certificate_excerpt",
+            "named_teachers_excerpt"
+          ],
+          "additionalProperties": false
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "url": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^https://"
+              },
+              "role": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              }
+            },
+            "required": [
+              "url",
+              "role"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "included_course_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^cbtu-[0-9]{2,}$"
+          },
+          "uniqueItems": true
+        },
+        "missing_fields": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "description_th",
+              "topics",
+              "learning_outcomes_th",
+              "audience_th",
+              "prerequisites_th",
+              "format_th",
+              "duration_text",
+              "session_dates_text",
+              "instructors_text",
+              "instructors",
+              "price.displayed_amount",
+              "certificate.course_specific_statement",
+              "certificate.course_specific_pass_criteria"
+            ]
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "id",
+        "record_type",
+        "name",
+        "canonical_url",
+        "detail_access",
+        "description_th",
+        "topics",
+        "learning_outcomes_th",
+        "audience_th",
+        "prerequisites_th",
+        "format_th",
+        "duration_text",
+        "session_dates_text",
+        "dates",
+        "instructors_text",
+        "instructors",
+        "instructor_evidence",
+        "catalog_author_text",
+        "price",
+        "enrollment",
+        "certificate",
+        "application_links",
+        "additional_public_links",
+        "flags",
+        "provenance",
+        "field_sources",
+        "evidence",
+        "source_refs",
+        "included_course_ids",
+        "missing_fields"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

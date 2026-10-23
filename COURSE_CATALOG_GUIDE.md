@@ -14,19 +14,20 @@
 
 Research มีสถานะ `research_for_owner_review_not_runtime_ingestion` อยู่ตามเดิม เจ้าของอนุญาตให้เชื่อมเฉพาะ public metadata snapshot นี้แล้ว จึงสร้าง projection แยกที่ `src/course-catalog.ts` พร้อมสถานะการนำเข้าและ SHA256 ของ source/report/validation ไม่แก้ collector หรือไฟล์ research และไม่ถือว่าข้อขัดแย้งได้รับการแก้ ไม่ได้นำ review_required/payment accounts หรือข้อมูล cohort เว็บย่อยที่ยังไม่ยืนยันเข้าบอต
 
-Source SHA256 ของชุดที่นำเข้า: `b9b683a2710a86e99622149182c25c926359c01d79ad2236262915934c7f2dca`
+Source SHA256 ของชุดปัจจุบัน schema 1.1.0: `9c2f2098b34a147808eac29835c3eddad8238e56995a43e76f8ff9d8ec7c4cac` ตรวจตรงกับ validation report และ archive ใน versions แล้ว รายละเอียดผู้สอน/ข้อจำกัดอยู่ใน [COURSE_INSTRUCTORS_GUIDE.md](./COURSE_INSTRUCTORS_GUIDE.md)
 
 Snapshot เก็บชื่อ/URL/description/topics/outcomes/audience/prerequisites/format/duration/dates/instructors/price/enrollment/certificate พร้อม field_sources, source_refs, retrieved_at, HTML hash, flags และ missing_fields ไม่แปลง null เป็นฟรี/ไม่มีเงื่อนไข ไม่อ่านหรือ bypass หน้าที่ล็อก ราคาที่แสดงไม่ใช่ราคา checkout ปัจจุบัน และ Add to Cart/Enroll Now ไม่ยืนยันเปิดรับสมัคร
 
 หากเจ้าของอนุญาต refresh ชุดวิจัยใหม่แล้ว ให้ทบทวน report/validation/conflicts ก่อนรัน:
 
 ```sh
-node scripts/import-course-catalog.mjs
+CATALOG_PYTHON=/path/to/python3 node scripts/import-course-catalog.mjs
 npm run build
 npm test
+CATALOG_PYTHON=/path/to/python3 npm run test:catalog-import
 ```
 
-คำสั่ง import ไม่ fetch เว็บ ไม่แก้ research และไม่รันอัตโนมัติเมื่อมีคนเปลี่ยน source การ build ปกติใช้ projection ที่ commit แล้ว ไม่ต้องมี research อยู่ใน deployment การทดสอบ structural ไม่แทนการทบทวนความถูกต้องเนื้อหาโดยเจ้าของ
+เลือก Python ที่มี jsonschema (ทดสอบ Python3.11.8/jsonschema4.26.0); ค่าเริ่มต้นคือ python3 ใน PATH dependency นี้ใช้ตอน import/ทดสอบ import เท่านั้น ไม่ต้องมีสำหรับ server/build ปกติ คำสั่ง import ไม่ fetch เว็บ ไม่แก้ research และไม่รันอัตโนมัติเมื่อมีคนเปลี่ยน source ตรวจ schema/evidence ซ้ำด้วย validator แบบอ่านอย่างเดียว, fingerprint, last-good archive, stable IDs/URLs/flags แล้ว atomic rename projection เมื่อผ่านทั้งหมด ถ้า schema/report/hash/evidence ผิดหรือ dependency ขาดจะไม่แทนที่ runtime catalog เดิม การ build ปกติใช้ projection ที่ commit แล้ว ไม่ต้องมี research อยู่ใน deployment การทดสอบ structural ไม่แทนการทบทวนความถูกต้องเนื้อหาโดยเจ้าของ
 
 ## วิธีค้นหาและตอบ
 

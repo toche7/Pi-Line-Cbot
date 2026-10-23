@@ -12,7 +12,7 @@
 
 ## อ่านรายละเอียดตามความหมายของคำถาม
 
-โมเดลเลือก operation `read` พร้อมชื่อหลักสูตร/บริบทเดิมและ field จาก schema สาธารณะ 13 หัวข้อ: name, work_examples, outcomes, topics, audience, prerequisites, format, duration, sessions, price, instructors, certificate, availability โค้ดตรวจ field whitelist และอ่านค่าจาก full public record หรือ reviewed brief สำหรับงาน/ผลลัพธ์ ไม่ส่ง full catalog เข้าโมเดล ไม่เปิด path/key อื่นให้โมเดลอ่าน และไม่ใช้ข้อความข้อเท็จจริงที่โมเดลแต่ง
+โมเดลเลือก operation `read` พร้อมชื่อหลักสูตร/บริบทเดิมและ field จาก schema สาธารณะ 13 หัวข้อ: name, work_examples, outcomes, topics, audience, prerequisites, format, duration, sessions, price, instructors, certificate, availability โค้ดตรวจ field whitelist และอ่านค่าจาก full public record หรือ reviewed brief สำหรับงาน/ผลลัพธ์ ไม่ส่ง full catalog เข้าโมเดล ไม่เปิด path/key อื่นให้โมเดลอ่าน และไม่ใช้ข้อความข้อเท็จจริงที่โมเดลแต่ง ปัจจุบัน instructors ใช้เฉพาะ structured evidence ของ schema1.1.0 ไม่ใช้ legacy instructors_text/By; ดูผลตรวจและ5หลักสูตรที่ยังไม่ทราบใน [COURSE_INSTRUCTORS_GUIDE.md](./COURSE_INSTRUCTORS_GUIDE.md)
 
 อ่านได้ครั้งละไม่เกิน3หลักสูตรและ5หัวข้อ ถามต่ออ้างรายการที่แสดงล่าสุดได้ `ดูต่อ` คง fields เดิม หากไม่มีชื่อ/บริบทให้ถามหลักสูตรก่อน หากข้อมูลไม่มีให้แจ้งว่าหาไม่พบในแหล่งที่เก็บไว้ คำถามใบประกาศที่มีบริบทหลักสูตรให้โมเดลเลือกข้อมูลเฉพาะวิชาหรือ FAQ ทั่วไปได้ ไม่บังคับตอบ FAQ ก่อนเสมอ
 

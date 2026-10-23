@@ -1,17 +1,40 @@
 // Explicit owner-authorized snapshot import. Never changes shared research files.
-import { readFile, writeFile } from 'node:fs/promises';
-import { createHash } from 'node:crypto';
+import { readFile, writeFile, rename, unlink } from 'node:fs/promises';
+import { createHash, randomUUID } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
+import { resolve, join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 const sha = text => createHash('sha256').update(text).digest('hex');
-const raw = await readFile('research/cbtu-website/courses.json', 'utf8');
-const report = await readFile('research/cbtu-website/SOURCE_REPORT.md', 'utf8');
-const validationRaw = await readFile('research/cbtu-website/validation.json', 'utf8');
+// Optional paths support isolated import regression fixtures; neither path is a network source.
+const inputDir = resolve(process.argv[2] ?? 'research/cbtu-website');
+const output = resolve(process.argv[3] ?? 'src/course-catalog.ts');
+const raw = await readFile(join(inputDir, 'courses.json'), 'utf8');
+const report = await readFile(join(inputDir, 'SOURCE_REPORT.md'), 'utf8');
+const validationRaw = await readFile(join(inputDir, 'validation_report.json'), 'utf8');
 const source = JSON.parse(raw), validation = JSON.parse(validationRaw);
-if (source.status !== 'research_for_owner_review_not_runtime_ingestion' || source.courses.length !== 20
-  || validation.catalog_records !== 20 || validation.courses !== 19 || validation.bundles !== 1) throw new Error('Unexpected research/validation counts or status');
+if (source.schema_version !== '1.1.0' || source.status !== 'research_for_owner_review_not_runtime_ingestion' || source.courses?.length !== 20
+  || validation.schema_version !== '1.1.0' || validation.valid !== true || validation.errors?.length !== 0
+  || validation.published_catalog_sha256 !== sha(raw)) throw new Error('Unsupported schema, invalid report or catalog fingerprint');
+const archived = await readFile(join(inputDir, 'versions', sha(raw), 'courses.json'), 'utf8');
+if (archived !== raw) throw new Error('Published catalog differs from archived last-good version');
+let previous;
+try {
+  const existing = await readFile(output, 'utf8');
+  const serialized = existing.match(/ = (\{[\s\S]*\});\s*$/)?.[1];
+  if (!serialized) throw new Error('Cannot parse existing last-good catalog');
+  previous = JSON.parse(serialized);
+} catch (error) { if (error.code !== 'ENOENT') throw error; }
+const scripts = dirname(fileURLToPath(import.meta.url));
+// Revalidate exact candidate bytes rather than trusting a past "valid" flag.
+const fresh = JSON.parse(execFileSync(process.env.CATALOG_PYTHON ?? 'python3', ['-B', join(scripts, 'validate-course-import.py')], {
+  input: `{"candidate":${raw},"previous":${JSON.stringify(previous ?? null)}}`, encoding: 'utf8', maxBuffer: 1024 * 1024,
+}));
+if (!fresh.valid || fresh.errors.length) throw new Error('Fresh schema/evidence validation failed');
 const ids = new Set(), urls = new Set();
 const fields = ['id', 'record_type', 'name', 'canonical_url', 'detail_access', 'description_th', 'topics', 'learning_outcomes_th',
   'audience_th', 'prerequisites_th', 'format_th', 'duration_text', 'session_dates_text', 'instructors_text', 'price', 'enrollment',
-  'certificate', 'flags', 'missing_fields', 'provenance', 'field_sources', 'source_refs'];
+  'certificate', 'flags', 'missing_fields', 'provenance', 'field_sources', 'source_refs',
+  'instructors', 'instructor_evidence', 'evidence', 'dates', 'included_course_ids'];
 const courses = source.courses.map(c => {
   const url = new URL(c.canonical_url);
   const canonical = decodeURI(url.href);
@@ -23,10 +46,18 @@ const courses = source.courses.map(c => {
   ids.add(c.id); urls.add(canonical);
   return Object.fromEntries(fields.map(field => [field, c[field] ?? null]));
 });
-if (courses.filter(c => c.record_type === 'bundle').length !== 1 || courses.filter(c => c.detail_access !== 'public').length !== 1) throw new Error('Unexpected record/access types');
-const snapshot = { collectionDate: source.collection_date, sourceStatus: source.status,
+if (courses.filter(c => c.record_type === 'course').length !== 19 || courses.filter(c => c.record_type === 'bundle').length !== 1 || courses.filter(c => c.detail_access !== 'public').length !== 1) throw new Error('Unexpected record/access types');
+const snapshot = { schemaVersion: source.schema_version, collectionDate: source.collection_date, sourceStatus: source.status,
   ingestion: 'Owner-authorized public metadata only; unresolved conflicts/protected fields remain unverified',
-  sourceSha256: sha(raw), reportSha256: sha(report), validationSha256: sha(validationRaw), courses };
+  sourceSha256: sha(raw), reportSha256: sha(report), validationSha256: sha(validationRaw),
+  validationWarnings: validation.warnings, courses };
 const header = `// Generated read-only projection; run scripts/import-course-catalog.mjs only for an authorized refresh.\nexport interface Course {\n  id: string; record_type: string; name: string; canonical_url: string; detail_access: string;\n  description_th: string | null; topics: string[] | null; learning_outcomes_th: string[] | null;\n  audience_th: string | null; prerequisites_th: string | null; format_th: string | null; duration_text: string | null;\n  session_dates_text: string | null; instructors_text: string | null;\n  price: { displayed_amount: number | null; currency: string | null; reference_amount: number | null; label: string | null; is_current_offer_verified: boolean };\n  enrollment: { observed_text: string | null; is_live_availability_verified: boolean; catalog_observed_text?: string };\n  certificate: { observed_text: string | null; course_specific_pass_criteria: string | null; general_faq_rule: string; faq_url: string };\n  flags: string[]; missing_fields: string[];\n  provenance: { requested_url: string; resolved_url: string; retrieved_at: string; html_sha256: string };\n  field_sources: Record<string, string>; source_refs: { url: string; role: string }[];\n}\nexport const courseCatalog: { collectionDate: string; sourceStatus: string; ingestion: string; sourceSha256: string; reportSha256: string; validationSha256: string; courses: Course[] } = `;
-await writeFile('src/course-catalog.ts', header + JSON.stringify(snapshot, null, 2) + ';\n');
-console.log(`Validated and projected ${courses.length} public metadata records; source SHA256 ${sha(raw)}. Research files unchanged.`);
+const typedHeader = header.replace('  price: {', `  instructors: { name: string; source_url: string; source_type: 'course_detail' | 'explicit_bundle_teacher' }[] | null;\n  instructor_evidence: { name: string; source_url: string; source_type: 'course_detail' | 'explicit_bundle_teacher'; excerpt: string; provenance: Course['provenance'] }[];\n  evidence: Record<string, string | null>; dates: { raw: string | null; parsed: { start_date: string; end_date: string | null }[] | null }; included_course_ids: string[];\n  price: {`)
+  .replace('collectionDate: string;', 'schemaVersion: string; validationWarnings: { code: string; path: string; message: string }[]; collectionDate: string;')
+  .replace('catalog_observed_text?: string', 'catalog_observed_text?: string | null');
+const temporary = output + '.' + randomUUID() + '.tmp';
+try {
+  await writeFile(temporary, typedHeader + JSON.stringify(snapshot, null, 2) + ';\n', { flag: 'wx' });
+  await rename(temporary, output);
+} finally { await unlink(temporary).catch(error => { if (error.code !== 'ENOENT') throw error; }); }
+console.log(`Validated schema 1.1.0 and projected ${courses.length} public records; warnings=${validation.warnings.length}; source SHA256 ${sha(raw)}. Research files unchanged.`);
