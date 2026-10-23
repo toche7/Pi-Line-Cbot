@@ -90,7 +90,14 @@ export class CustomerCore {
             if (orderId) {
               const result = await orderTool.execute('core-mock', { orderId });
               answer = `${result.details.found ? `ออเดอร์จำลอง ${orderId}: shipped / DEMO-TRACK-001` : 'ไม่พบออเดอร์จำลองนี้'}\nเป็นข้อมูลสมมติ ไม่ใช่ข้อมูลผู้เรียน CBTU`;
-            } else answer = routed ? routed.answer : publicAnswer(prompt);
+            } else {
+              answer = routed ? routed.answer : publicAnswer(prompt);
+              // General course/certificate FAQ must not mask a factual follow-up
+              // about the displayed course. The planner can still choose knowledge
+              // for a general FAQ or read for course-specific public fields.
+              if (!routed && previousCatalog?.shownIds.length && answer
+                && ['certificate', 'courses'].includes(topicForAnswer(answer) ?? '')) answer = undefined;
+            }
             if (!routed && answer === undefined && current.lastTopic && !current.lastTopic.startsWith('catalog:') && isTopicFollowup(prompt)) answer = renderKnowledge(current.lastTopic);
             if (answer !== undefined) {
               // Store host-grounded turns through Pi's supported history API for later conversational context.
@@ -104,10 +111,12 @@ export class CustomerCore {
                 throw new DemoFailure(`โมเดลถูกจำกัดการใช้งาน (429) รออีก ${Math.ceil((this.modelCooldownUntil - this.now()) / 1000)} วินาทีแล้วลองใหม่ ระหว่างนี้ FAQ ยังใช้ได้`);
               }
               let reply: string;
+              let semanticRead = false;
               try {
                 reply = catalog && this.now() < this.modelCooldownUntil ? renderCatalog(catalog)
-                  : await runDialogue(session, prompt, this.timeoutMs, output, catalog, { state: previousCatalog, resolve: plan => {
-                    routed = executeCatalogQuery(parseCatalogQuery(plan), previousCatalog);
+                  : await runDialogue(session, prompt, this.timeoutMs, output, catalog, { state: nextCatalog, resolve: plan => {
+                    routed = executeCatalogQuery(parseCatalogQuery(plan), nextCatalog);
+                    semanticRead = true;
                     nextCatalog = routed.state ?? previousCatalog;
                     return routed.answer!;
                   } });
@@ -125,8 +134,8 @@ export class CustomerCore {
               }
               output.text(reply + '\n');
               renderedAnswer = reply;
-              current.lastTopic = catalog ? catalogTopicForAnswer(reply, catalog) : routed?.topic ?? topicForAnswer(reply);
-              if (catalog && nextCatalog && current.lastTopic?.startsWith('catalog:')) nextCatalog = { ...nextCatalog, shownIds: current.lastTopic.slice(8).split(',') };
+              current.lastTopic = semanticRead ? routed?.topic : catalog ? catalogTopicForAnswer(reply, catalog) : routed?.topic ?? topicForAnswer(reply);
+              if (!semanticRead && catalog && nextCatalog && current.lastTopic?.startsWith('catalog:')) nextCatalog = { ...nextCatalog, shownIds: current.lastTopic.slice(8).split(',') };
             }
             // Persist rendered answers, never raw model JSON, reasoning, tool payloads or provider errors.
             current.memory.recent.push({ user: prompt.slice(0, 1000), assistant: safeText(renderedAnswer).slice(0, 1000), at: this.now() });

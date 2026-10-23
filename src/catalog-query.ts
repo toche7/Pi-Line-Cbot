@@ -2,9 +2,10 @@ import { courseCatalog, type Course } from './course-catalog.js';
 import { retrieveCourses, renderCatalog, selectCatalog, type CatalogSelection } from './catalog.js';
 import { adviseCourses, validAdvice, type AdviceState } from './course-adviser.js';
 import { briefCard, briefSourceNote, renderBriefField, type BriefField } from './course-briefs.js';
+import { readCourseFields, validCourseFields, type CourseField } from './course-reader.js';
 
-export type CatalogState = { matchedIds: string[]; shownIds: string[]; offset: number; limit: number; query: string; field: 'list' | 'price' | 'summary' | 'details'; advice?: AdviceState };
-export type CatalogQuery = { operation: 'list' | 'count' | 'price' | 'sort_price' | 'more' | 'summary' | 'advise'; scope: 'all' | 'previous' | 'search'; query?: string; limit?: number; order?: 'asc' | 'desc' };
+export type CatalogState = { matchedIds: string[]; shownIds: string[]; offset: number; limit: number; query: string; field: 'list' | 'price' | 'summary' | 'details'; advice?: AdviceState; readFields?: CourseField[] };
+export type CatalogQuery = { operation: 'list' | 'count' | 'price' | 'sort_price' | 'more' | 'summary' | 'advise' | 'read'; scope: 'all' | 'previous' | 'search'; query?: string; limit?: number; order?: 'asc' | 'desc'; fields?: CourseField[] };
 export type CatalogRoute = { answer?: string; selection?: CatalogSelection; state?: CatalogState; topic?: string };
 const rows = courseCatalog.courses;
 const byIds = (ids: string[]) => ids.map(id => rows.find(c => c.id === id)).filter((c): c is Course => !!c);
@@ -18,16 +19,18 @@ export function validCatalogState(value: unknown): value is CatalogState {
   return !!s && validIds(s.matchedIds) && validIds(s.shownIds) && s.shownIds.every(id => s.matchedIds.includes(id))
     && Number.isInteger(s.offset) && s.offset >= 0 && s.offset <= 20 && Number.isInteger(s.limit) && s.limit >= 1 && s.limit <= 10
     && typeof s.query === 'string' && s.query.length <= 200 && ['list', 'price', 'summary', 'details'].includes(s.field)
-    && (s.advice === undefined || validAdvice(s.advice));
+    && (s.advice === undefined || validAdvice(s.advice)) && (s.readFields === undefined || validCourseFields(s.readFields));
 }
 export function parseCatalogQuery(value: any): CatalogQuery {
-  if (!value || !['list', 'count', 'price', 'sort_price', 'more', 'summary', 'advise'].includes(value.operation)
+  if (!value || !['list', 'count', 'price', 'sort_price', 'more', 'summary', 'advise', 'read'].includes(value.operation)
     || !['all', 'previous', 'search'].includes(value.scope) || (value.query !== undefined && (typeof value.query !== 'string' || value.query.length > 200))
     || (value.scope === 'search' && !value.query?.trim())
     || (value.operation === 'advise' && !value.query?.trim())
+    || (value.operation === 'read' && !validCourseFields(value.fields))
+    || (value.fields !== undefined && !validCourseFields(value.fields))
     || (value.limit !== undefined && (!Number.isInteger(value.limit) || value.limit < 1 || value.limit > 10))
     || (value.order !== undefined && !['asc', 'desc'].includes(value.order))) throw new Error('Invalid catalog operation');
-  return { operation: value.operation, scope: value.scope, query: value.query, limit: value.limit, order: value.order };
+  return { operation: value.operation, scope: value.scope, query: value.query, limit: value.limit, order: value.order, fields: value.fields };
 }
 function search(query: string) {
   const result = retrieveCourses(query);
@@ -56,6 +59,14 @@ export function executeCatalogQuery(command: CatalogQuery, previous?: CatalogSta
     return result;
   }
   let matches = command.scope === 'all' ? rows : command.scope === 'search' ? search(command.query!) : previous ? byIds(previous.matchedIds) : [];
+  if (command.operation === 'read') {
+    const displayed = command.scope === 'previous' && previous?.shownIds.length ? byIds(previous.shownIds) : matches;
+    const shown = displayed.slice(0, Math.min(command.limit ?? 3, 3));
+    const state: CatalogState | undefined = shown.length ? { matchedIds: ids(matches), shownIds: ids(shown),
+      offset: command.scope === 'previous' ? previous?.offset ?? 0 : 0, limit: shown.length,
+      query: (command.query ?? previous?.query ?? '').slice(0, 200), field: 'details', advice: previous?.advice, readFields: command.fields } : previous;
+    return { answer: readCourseFields(shown, command.fields!), state, topic: shown.length ? 'catalog:' + ids(shown).join(',') : undefined };
+  }
   if (!matches.length) return { answer: command.scope === 'previous'
     ? 'ยังไม่มีรายการหลักสูตรอ้างอิงครับ อยากดูทั้งหมด หรือสนใจหัวข้อ/ชื่อหลักสูตรไหน?'
     : 'ไม่พบรายการที่ตรงใน snapshot นี้ครับ ไม่ได้หมายความว่าไม่มีหลักสูตรนั้นจริง ลองชื่อเต็มหรือหัวข้ออื่น และตรวจ https://cbtumu.net/ ได้', state: previous };
@@ -78,6 +89,10 @@ export function executeCatalogQuery(command: CatalogQuery, previous?: CatalogSta
   if (!shown.length) return { answer: `แสดงครบ ${matches.length} รายการในกลุ่มนี้แล้วครับ ต้องการค้นหัวข้ออื่นหรือดูราคาก็บอกได้`, state: previous };
   const state: CatalogState = { matchedIds: ids(matches), shownIds: ids(shown), offset: useShown ? previous!.offset : offset,
     limit, query: (command.scope === 'search' ? command.query! : previous?.query ?? '').slice(0, 200), field, advice: previous?.advice };
+  if (command.operation === 'more' && previous?.readFields) {
+    state.readFields = previous.readFields;
+    return { answer: readCourseFields(shown.slice(0, 3), state.readFields), state: { ...state, shownIds: ids(shown.slice(0, 3)), limit: Math.min(limit, 3) }, topic: 'catalog:' + ids(shown.slice(0, 3)).join(',') };
+  }
   const label = command.operation === 'sort_price' ? `เรียงราคา snapshot ${command.order === 'asc' ? 'ต่ำไปสูง' : 'สูงไปต่ำ'} เฉพาะ ${matches.length} รายการที่มีราคา${missingPrices ? `; อีก ${missingPrices} รายการไม่มีราคา จึงไม่รวมในการจัดอันดับ` : ''}`
     : field === 'price' ? 'แสดงราคาที่หน้าเว็บเคยระบุได้ครับ แต่ยังยืนยันราคาปัจจุบันไม่ได้' : field === 'summary' ? 'สรุปรายการก่อนหน้าแบบกระชับครับ' : `พบ ${matches.length} รายการ แสดง ${offset + 1}–${offset + shown.length}`;
   return { answer: `${label}\n${shown.map((c, i) => card(c, (useShown ? previous!.offset : offset) + i + 1, field)).join('\n\n')}\n${offset + shown.length < matches.length ? `\nยังมีรายการต่อ พิมพ์ “ดูต่อ” ได้\n` : '\n'}${briefSourceNote(shown, field === 'price')}`, state,

@@ -36,7 +36,7 @@ export function adviseCourses(query: string, previous?: CatalogState, semanticAn
   // Explicit lookups and controls may interrupt advice without being stored as answers.
   if (/ราคา|กี่|จำนวน|เปรียบเทียบ|\bcompare\b|ดูต่อ|รายการ|ทั้งหมด|ใบประกาศ|เหมาะกับใคร|ใครควรเรียน|เนื้อหา|หัวข้อ|สอนอะไร|รายละเอียด|\/|ฉันชื่อ|ผมชื่อ/.test(query)) return;
   const pending = old && old.stage !== 'ready';
-  const answerLike = pending && !/[?？]|ไหม|เหรอ|ทำไม|สวัสดี|เหนื่อย|พักก่อน|คุยเล่น/.test(query)
+  const answerLike = pending && !/[?？]|ไหม|เหรอ|ทำไม|อะไร|อย่างไร|ยังไง|ไหน|ใคร|สวัสดี|เหนื่อย|พักก่อน|คุยเล่น/.test(query)
     && (semanticAnswer || old.stage === 'goal' && usefulGoal(query) && (/(?:อยาก|ต้องการ|ทำ|งาน|ใช้|สร้าง|สรุป|วิเคราะห์|เขียน|พัฒนา|จัดการ|ออกแบบ|ผลิต|แก้|เพิ่ม|ลด)/.test(query) || rankForGoal({ stage: 'goal', goal: query }).length > 0)
       || old.stage === 'background' && /พื้นฐาน|เคย|เป็น|เริ่ม|ใหม่|ใช้|เขียน|ได้|beginner|experience/i.test(query)
       || old.stage === 'time' && /เวลา|นาที|ชั่วโมง|วัน|สัปดาห์|เดือน|สะดวก|วิดีโอ|ออนไลน์|hour|week/i.test(query));
