@@ -27,7 +27,8 @@ const aliases: Record<string, string[]> = {
   'cbtu-19': ['basic prompt engineering'],
   'cbtu-20': ['popular course bundle', 'bundle', 'ชุดรวมหลักสูตร'],
 };
-const stop = new Set(['หลักสูตร', 'คอร์ส', 'course', 'courses', 'เรียน', 'อยาก', 'สนใจ', 'แนะนำ', 'อะไร', 'มี', 'บ้าง', 'ไหม', 'ครับ', 'ค่ะ', 'ราคา', 'เท่าไร', 'เท่าไหร่', 'เปรียบเทียบ', 'compare', 'and', 'with', 'for', 'the', 'please']);
+const stop = new Set(['หลักสูตร', 'คอร์ส', 'course', 'courses', 'เรียน', 'อยาก', 'สนใจ', 'แนะนำ', 'อะไร', 'มี', 'บ้าง', 'ไหม', 'ครับ', 'ค่ะ', 'ราคา', 'เท่าไร', 'เท่าไหร่', 'เปรียบเทียบ', 'compare', 'and', 'with', 'for', 'the', 'please',
+  'ขอ', 'ดู', 'ด้วย', 'ตัว', 'อัน', 'รายการ', 'ทุก', 'แต่ละ', 'ทั้งหมด', 'จำนวน', 'กี่', 'มากกว่า', 'แพง', 'ถูก', 'ที่สุด', 'ได้', 'ตรวจสอบ', 'ทำไม', 'ไม่', 'ละ', 'หน่อย', 'สรุป', 'เขียน', 'กระชับ', 'บอก', 'รู้', 'ช่วย', 'เพิ่มเติม', 'list', 'count', 'price', 'prices', 'sort', 'all', 'more', 'most', 'expensive', 'cheapest', 'highest', 'lowest']);
 function terms(query: string) {
   const words = [...new Intl.Segmenter('th', { granularity: 'word' }).segment(normalize(query))]
     .filter(s => s.isWordLike).map(s => s.segment).filter(s => s.length > 1 && !stop.has(s));
@@ -55,7 +56,7 @@ export function retrieveCourses(query: string) {
     const body = normalize([c.description_th, c.audience_th, ...(c.learning_outcomes_th ?? [])].join(' '));
     const score = queryTerms.reduce((sum, t) => sum + (contains(name, t) ? 6 : 0) + (contains(topics, t) ? 3 : 0) + (contains(body, t) ? 1 : 0), 0);
     return { course: c, score };
-  }).filter(x => x.score >= 3 && x.course.detail_access === 'public' && (!cohort || ids.includes(x.course.id)))
+  }).filter(x => x.score >= 3 && (x.course.detail_access === 'public' || queryTerms.some(t => contains(normalize(x.course.name), t))) && (!cohort || ids.includes(x.course.id)))
     .sort((a, b) => b.score - a.score || a.course.id.localeCompare(b.course.id));
   return { named: courseCatalog.courses.filter(c => ids.includes(c.id)), mentioned: specific.length > 0, ranked, full: full.length > 0, terms: queryTerms };
 }

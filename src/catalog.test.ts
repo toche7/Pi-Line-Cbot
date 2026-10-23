@@ -119,7 +119,7 @@ test('host rejects IDs outside retrieval, retains cohort warnings and answers gr
   let text = '';
   try {
     const client = core.client({ channel: 'line', scope: 'test:direct', user: 'A' });
-    for (const prompt of ['Excel ราคาเท่าไร', 'Canva ราคาเท่าไร']) {
+    for (const prompt of ['Excel รายละเอียด', 'Canva ราคาเท่าไร']) {
       text = ''; await client.send(prompt, { text: s => { text += s; }, status: () => {} });
       assert.match(text, /1,000 THB/); assert.match(text, /ข้อมูลสำเนา/);
     }

@@ -4,6 +4,10 @@
 
 ## ผล readiness ล่าสุด
 
+### แก้จาก LINE history จริง
+
+ตรวจrecent/summaryเฉพาะผู้ทดสอบพบตอบไม่ตรงคำถามเรื่องราคาแต่ละตัว จำนวนทั้งหมด และคำขอรายการเพิ่ม จึงเพิ่ม query operations และ persistent catalog context ที่ไม่หายเมื่อคุยเล่น แสดงรายการครั้งละ1–10ได้ ไม่จำกัด3วิชา ข้อความภาษาพูดให้โมเดลคืนvalidatedoperationแล้วhostค้น/นับ/เรียงจากsnapshot Tests32รายการและsignedLINEreplayผ่าน Restartแล้ว publichealth/signature/LINE Verifyผ่านactive=trueใช้endpointเดิม ผู้ใช้ลอง “มีหลักสูตร AI อะไรบ้าง” → “ขอราคาแต่ละตัวด้วย” และยืนยันokแล้ว Logok26ms/replied และok11ms/replied ตรวจmetadataเฉพาะidentityเดิมยืนยันURLsหลักสูตรในคำตอบราคาเหมือนรายการก่อนหน้าทุกตัว มีmatched12/shown3 ไม่พิมพ์ชื่อส่วนตัวหรือIDs หลักฐานและข้อจำกัดcoverageอยู่ใน [LINE_HISTORY_REVIEW.md](./LINE_HISTORY_REVIEW.md)
+
 ### Course catalog retrieval
 
 เชื่อม public metadata 19 หลักสูตร + 1 bundle แล้ว ใช้ runtime projection แยก ไม่แก้ research หรือ memory ค้นชื่อ/alias/หัวข้อและ rank ไม่เกิน 3 candidates ส่งให้โมเดลเลือก IDs แล้ว host แสดง facts/URL/เวลาเก็บ ไม่ส่ง catalog ทั้งหมดทุก turn ชื่อกำกวมถามเพิ่ม null ไม่ถือว่าฟรี ไม่อ้างราคา/เปิดรับสมัครสดหรือรุ่นใหม่จากวันเก่า/ปุ่ม Add to Cart รองรับ follow-up และ comparison สองหลักสูตร

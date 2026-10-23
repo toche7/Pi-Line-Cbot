@@ -5,7 +5,8 @@ import { publicAnswer, isTopicFollowup, renderKnowledge, topicForAnswer } from '
 import { runDialogue } from './dialogue.js';
 import { DemoFailure, rateLimitWaitMs, failureCategory } from './diagnostics.js';
 import { type Memory, type MemoryStore, type Summarizer, emptyMemory, memoryManager, learnProfile, safeText, compactMemory } from './memory.js';
-import { selectCatalog, renderCatalog, catalogTopicForAnswer } from './catalog.js';
+import { renderCatalog, catalogTopicForAnswer } from './catalog.js';
+import { routeCatalog, recoverCatalogState, executeCatalogQuery, parseCatalogQuery } from './catalog-query.js';
 
 export type Output = { text: (value: string) => void; status: (value: string) => void };
 export type Identity = { channel: 'terminal' | 'line'; scope: string; user: string };
@@ -79,21 +80,25 @@ export class CustomerCore {
               output.status('[ย่อบริบทเก่าอัตโนมัติ คงโปรไฟล์ สาระ และเรื่องค้างไว้]');
             }
             const orderId = prompt.match(/\bDEMO-[0-9]+\b/i)?.[0].toUpperCase();
-            const catalog = orderId ? undefined : selectCatalog(prompt, current.lastTopic, current.memory.profile.interests);
+            const previousCatalog = current.memory.catalog ?? recoverCatalogState(current.memory.recent);
+            let routed = orderId ? undefined : routeCatalog(prompt, previousCatalog,
+              current.lastTopic ?? (previousCatalog?.shownIds.length ? 'catalog:' + previousCatalog.shownIds.join(',') : undefined), current.memory.profile.interests);
+            const catalog = routed?.selection;
+            let nextCatalog = routed?.state ?? previousCatalog;
             let answer: string | undefined;
             let renderedAnswer = '';
             if (orderId) {
               const result = await orderTool.execute('core-mock', { orderId });
               answer = `${result.details.found ? `ออเดอร์จำลอง ${orderId}: shipped / DEMO-TRACK-001` : 'ไม่พบออเดอร์จำลองนี้'}\nเป็นข้อมูลสมมติ ไม่ใช่ข้อมูลผู้เรียน CBTU`;
-            } else answer = catalog ? (catalog.kind === 'found' ? undefined : renderCatalog(catalog)) : publicAnswer(prompt);
-            if (!catalog && answer === undefined && current.lastTopic && !current.lastTopic.startsWith('catalog:') && isTopicFollowup(prompt)) answer = renderKnowledge(current.lastTopic);
+            } else answer = routed ? routed.answer : publicAnswer(prompt);
+            if (!routed && answer === undefined && current.lastTopic && !current.lastTopic.startsWith('catalog:') && isTopicFollowup(prompt)) answer = renderKnowledge(current.lastTopic);
             if (answer !== undefined) {
               // Store host-grounded turns through Pi's supported history API for later conversational context.
               await session.sendCustomMessage({ customType: 'grounded-turn', content: `ข้อความผู้ใช้: ${prompt}\nคำตอบที่ระบบตรวจจากแหล่งสาธารณะ: ${answer}`, display: false });
               output.status(orderId ? '[ข้อมูลสมมติสำหรับทดสอบ]' : '[ตอบจากข้อมูลสาธารณะที่กำหนด]');
               output.text(answer + '\n');
               renderedAnswer = answer;
-              current.lastTopic = catalog?.topic ?? topicForAnswer(answer);
+              current.lastTopic = routed?.topic ?? catalog?.topic ?? topicForAnswer(answer);
             } else {
               if (!catalog && this.now() < this.modelCooldownUntil) {
                 throw new DemoFailure(`โมเดลถูกจำกัดการใช้งาน (429) รออีก ${Math.ceil((this.modelCooldownUntil - this.now()) / 1000)} วินาทีแล้วลองใหม่ ระหว่างนี้ FAQ ยังใช้ได้`);
@@ -101,7 +106,11 @@ export class CustomerCore {
               let reply: string;
               try {
                 reply = catalog && this.now() < this.modelCooldownUntil ? renderCatalog(catalog)
-                  : await runDialogue(session, prompt, this.timeoutMs, output, catalog);
+                  : await runDialogue(session, prompt, this.timeoutMs, output, catalog, { state: previousCatalog, resolve: plan => {
+                    routed = executeCatalogQuery(parseCatalogQuery(plan), previousCatalog);
+                    nextCatalog = routed.state ?? previousCatalog;
+                    return routed.answer!;
+                  } });
               } catch (error) {
                 if (error instanceof DemoFailure && /429/.test(error.message)) {
                   const last = [...session.messages].reverse().find(m => m.role === 'assistant');
@@ -116,11 +125,13 @@ export class CustomerCore {
               }
               output.text(reply + '\n');
               renderedAnswer = reply;
-              current.lastTopic = catalog ? catalogTopicForAnswer(reply, catalog) : topicForAnswer(reply);
+              current.lastTopic = catalog ? catalogTopicForAnswer(reply, catalog) : routed?.topic ?? topicForAnswer(reply);
+              if (catalog && nextCatalog && current.lastTopic?.startsWith('catalog:')) nextCatalog = { ...nextCatalog, shownIds: current.lastTopic.slice(8).split(',') };
             }
             // Persist rendered answers, never raw model JSON, reasoning, tool payloads or provider errors.
             current.memory.recent.push({ user: prompt.slice(0, 1000), assistant: safeText(renderedAnswer).slice(0, 1000), at: this.now() });
             current.memory.lastTopic = current.lastTopic;
+            current.memory.catalog = nextCatalog ? { ...nextCatalog, query: safeText(nextCatalog.query).slice(0, 200) } : undefined;
             current.memory.updatedAt = this.now();
             if (Buffer.byteLength(JSON.stringify(current.memory)) > 60000) current.memory = compactMemory(current.memory, this.summarizer);
             this.store?.save(key, current.memory);

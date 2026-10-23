@@ -4,6 +4,8 @@
 
 ## Catalog retrieval milestone ล่าสุด
 
+ปรับจากhistoryLINEจริงหลังmilestoneแรก: พบrecentตอบไม่ตรงเรื่องราคาแต่ละตัว/จำนวนทั้งหมดและsummaryมีคำขอดูเพิ่ม จึงเพิ่มtypedqueryoperations+semanticplanning พร้อมcatalogcontextแยกmatchset/page/offsetในstoreของแต่ละidentity คงchat/compaction/restartและล้างreset/forget แสดงได้หน้าละ1–10ไม่ใช่cap3 Tests32รายการรวมreplayคำถามจริง/signedLINE/dedupe/persistence/isolationผ่าน Livecoresemanticoperationหนึ่งคำถามผ่าน Restartserverแล้วpublic/LINE Verifyผ่าน ผู้ใช้ลองรายการAI→ราคาแต่ละตัวยืนยันokแล้ว Logปกติ26/11msและmetadataURLsราคาอ้างรายการเดิมตรงกันทั้งหมด matched12/shown3 หลักฐานอ่านhistoryมีขอบเขตและไม่ครอบคลุมfailedturnทั้งหมด ดู LINE_HISTORY_REVIEW.md
+
 เจ้าของอนุญาตใช้ public metadata 19 หลักสูตร+1 bundle จากชุด research แล้ว ตรวจ SOURCE_REPORT/validation/counts/provenance/URLs/flags/nulls และ unverified offers ก่อนสร้าง runtime projection แยก ไม่แก้ shared research ไม่ import บัญชีชำระเงิน/review_required หรือข้อมูล cohort เว็บย่อยที่ยังไม่ยืนยัน เก็บ hash source/report/validation และ field_sources ใน src/course-catalog.ts
 
 ค้นชื่อ/alias/หัวข้อไทยอังกฤษด้วย lexical ranking เลือกสูงสุด3 candidates ให้โมเดลเลือก IDs แล้ว host แสดง facts/citations เปรียบเทียบสองรายการ ถ้ากำกวมถามเพิ่ม ถ้า unknown/null ไม่เดาหรือเหมาว่าไม่มีจริง/ฟรี ถามความสนใจก่อนแนะนำ และใช้ profile ของ identity นั้นเมื่อขอแนะนำตามความสนใจ lastTopic เก็บลำดับที่แสดงเพื่อรองรับ follow-up ไม่ส่ง catalog ทั้งหมดทุก turn มี host fallback/cooldown เมื่อโมเดลล้ม คง memory/credentials/model/OA/tunnel เดิม

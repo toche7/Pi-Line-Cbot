@@ -3,10 +3,11 @@ import { mkdirSync, chmodSync, lstatSync, existsSync, readFileSync, writeFileSyn
 import { join } from 'node:path';
 import { SessionManager } from '@earendil-works/pi-coding-agent';
 import { DemoFailure } from './diagnostics.js';
+import { validCatalogState, type CatalogState } from './catalog-query.js';
 
 export type Profile = { name?: string; interests?: string; goals?: string };
 export type Summary = { notes: string[]; topics: string[]; pending: string[] };
-export type Memory = { version: 1; updatedAt: number; profile: Profile; longTerm: string[]; recent: { user: string; assistant: string; at: number }[]; summary: Summary; lastTopic?: string; compactions: number };
+export type Memory = { version: 1; updatedAt: number; profile: Profile; longTerm: string[]; recent: { user: string; assistant: string; at: number }[]; summary: Summary; lastTopic?: string; catalog?: CatalogState; compactions: number };
 export type Summarizer = (memory: Memory) => Summary;
 export const emptyMemory = (now: number): Memory => ({ version: 1, updatedAt: now, profile: {}, longTerm: [], recent: [], summary: { notes: [], topics: [], pending: [] }, compactions: 0 });
 
@@ -111,7 +112,7 @@ export class MemoryStore {
     if (data.version !== 1 || !Number.isFinite(data.updatedAt) || !validSummary(data.summary) || !Array.isArray(data.recent) || data.recent.length > 12
       || !data.recent.every((t: any) => typeof t.user === 'string' && typeof t.assistant === 'string' && safeText(t.user) === t.user && safeText(t.assistant) === t.assistant)
       || !Array.isArray(data.longTerm) || data.longTerm.length > 8 || data.longTerm.some((s: unknown) => typeof s !== 'string' || profileValue(s) !== s)
-      || !Number.isInteger(data.compactions) || data.compactions < 0
+      || !Number.isInteger(data.compactions) || data.compactions < 0 || (data.catalog !== undefined && (!validCatalogState(data.catalog) || safeText(data.catalog.query) !== data.catalog.query))
       || !data.profile || Object.keys(data.profile).some(k => !['name', 'interests', 'goals'].includes(k))
       || Object.values(data.profile).some(v => typeof v !== 'string' || profileValue(v) !== v)) throw new DemoFailure('Memory file invalid; preserved for manual recovery.');
     chmodSync(path, 0o600);

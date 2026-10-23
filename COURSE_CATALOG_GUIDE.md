@@ -2,6 +2,12 @@
 
 สถานะ 23 ตุลาคม 2026: เชื่อม 19 หลักสูตร + 1 bundle เข้ากับ CustomerCore เดียวกันสำหรับ Terminal/LINE ตามการอนุญาตของเจ้าของ ไม่มี vector DB หรือ dependency ใหม่ ไม่ใช้ข้อมูล Notion/ผู้เรียนจริง ไม่เปลี่ยนคีย์ โมเดล OA หรือ tunnel
 
+## แก้จาก history จริง: browsing และ context
+
+รุ่นปัจจุบันเพิ่ม host query operations list/count/price/sort_price/more/summary และ semantic plan จากโมเดลสำหรับภาษาพูด แยก full match set กับ shown page เก็บใน memory เฉพาะidentityนั้น รองรับ pagingครั้งละ1–10 ไม่จำกัดการดูทั้งหมดเพียง3รายการ รายการหลายตัวที่เป็นคำขอ browse จะแสดงรายการ; ชื่อเฉพาะที่กำกวมยังถามเลือกรุ่น ข้อมูลราคา/จำนวน/อันดับประมวลผลจากsnapshot ไม่ต้องให้โมเดลแต่ง
+
+คำอธิบาย max3 ด้านล่างใช้กับ candidate details ที่ส่งให้โมเดลเลือก ไม่ใช่จำนวนหลักสูตรที่ผู้ใช้ดูได้ Catalog contextคงผ่านchat/compaction/restartแต่ล้างด้วยreset/forget ราคาแต่ละตัวอ้างถึงหน้าที่แสดงก่อนหน้า ดูต่อ/นับใช้matchsetเต็ม จัดอันดับไม่รวมราคาnullและแจ้งข้อจำกัด Testsล่าสุด32รายการ รวมคำถามจริงและLINEsignedreplayผ่าน รายละเอียดหลักฐาน/coverageใน [LINE_HISTORY_REVIEW.md](./LINE_HISTORY_REVIEW.md)
+
 ## แหล่งข้อมูลและการนำเข้า
 
 อ่าน `research/cbtu-website/courses.json`, `SOURCE_REPORT.md` และ `validation.json` แบบ read-only ตรวจ JSON/counts, IDs/URLs ไม่ซ้ำ, canonical HTTPS ของ cbtumu.net, provenance/capture time/hash, source refs, flags/missing fields และ offer/availability verified=false ตรงกับรายงาน 19 courses + 1 bundle มีหน้ารายละเอียดล็อก 1 รายการ
