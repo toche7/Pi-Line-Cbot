@@ -10,7 +10,7 @@
 
 /memoryแสดงsnapshotแบบย่อเพื่อพอดีLINE /resetล้างrecent/summary/pending/lastTopicแต่คงprofile/long-term /forgetต้องchallenge60วินาทีที่ผูกuser/OA/adapterเดิม ข้อความหรือคำสั่งอื่นยกเลิกchallenge ไม่ให้โมเดลลบmemoryเอง ไม่เปิดกลุ่ม ไม่ส่งpush/broadcast ไม่มีrawerrors/tokens/IDsในlogs ประวัติRAMของLINEก่อนเปิดstoreไม่ได้ย้ายอัตโนมัติ
 
-Build/tests22รายการผ่าน รวมLINEsignedmemorypersist/restart/compaction, OA/user/channelisolation, Terminalคนละโปรเซส/storeเปิดพร้อมLINEได้, reset/forgetcancel/expiry/physicaldelete/no-revival และretention Local HTTPhealth200/signature401/200/dedupeหนึ่งmockreplyผ่าน Serverrestartแล้วเปิดpersistentstoreจริงและpublichealth/signature/LINE Verifyผ่านactive=trueใช้URLเดิม ผู้ใช้บอกชื่อผ่านLINEสำเร็จ(ok490ms/replied) ตรวจmetadatarecordมีชื่อและrecent1คู่/0600แล้วrestartอีกครั้งเพื่อยืนยันอ่านกลับ (รอผลผู้ใช้)
+Build/tests22รายการผ่าน รวมLINEsignedmemorypersist/restart/compaction, OA/user/channelisolation, Terminalคนละโปรเซส/storeเปิดพร้อมLINEได้, reset/forgetcancel/expiry/physicaldelete/no-revival และretention Local HTTPhealth200/signature401/200/dedupeหนึ่งmockreplyผ่าน Serverrestartแล้วเปิดpersistentstoreจริงและpublichealth/signature/LINE Verifyผ่านactive=trueใช้URLเดิม ผู้ใช้บอกชื่อผ่านLINEสำเร็จ(ok490ms/replied) ตรวจmetadatarecordมีชื่อและrecent1คู่/0600แล้วrestartอีกครั้ง ผู้ใช้ส่ง/memoryผ่านLINEและยืนยันว่าชื่อในprofileกับrecent1คู่ยังอยู่หลังrestart จึงยืนยันpersistentreloadผ่านLINEจริงแล้ว
 
 คำสั่งเริ่มใช้ค่า.envตามปกติ; โปรเซสทดสอบreplyปัจจุบันใช้ `LINE_DRY_RUN=false npm run server` โดยไม่แก้credentials/.env ระหว่างงานนี้ ต้องเปิดserver/tunnelค้างไว้ การpersistไม่ได้ทำให้คิว/dedupeเป็นdurableและไม่ได้แก้providerquota
 

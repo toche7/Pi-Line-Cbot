@@ -24,7 +24,7 @@ LINE storeยังเป็นlocalJSONที่ไม่เข้ารหั�
 
 Build/tests22รายการผ่าน รวมsignedLINEevents/profile/summary/>32turn/compaction/restart/fake-next-day, OA/user/channel isolation, TerminalอีกโปรเซสเปิดstoreแยกขณะLINEถือlock, resetคงprofile/long-termแต่ล้างpending, forgetcancel/expiry/confirmationข้ามuser/OA/adapterrestartไม่ได้, physicaldelete/no-revival และretentionจากmemoryread คงsignature/mockreply/dedupe/privacyเดิม Testsใช้tempstores/mockIDsและmockprovider ไม่ลบหรืออ่านเนื้อหาTerminalmemoryจริง
 
-LINEจริง: ผู้ใช้ส่งชื่อเข้าDemoB1แล้ว logok490ms/replied ตรวจmetadataว่าrecordบนดิสก์มีprofile nameและrecent1คู่ permission0600 โดยไม่พิมพ์ค่า identity/name จากนั้นrestartserverเพื่อทดสอบอ่านข้ามโปรเซส ผลยืนยันหลังrestartบันทึกในLINE_SETUP.md
+LINEจริง: ผู้ใช้ส่งชื่อเข้าDemoB1แล้ว logok490ms/replied ตรวจmetadataว่าrecordบนดิสก์มีprofile nameและrecent1คู่ permission0600 โดยไม่พิมพ์ค่า identity/name จากนั้นrestartserver ผู้ใช้ส่ง/memoryผ่านLINEและยืนยันว่าprofile nameกับrecent1คู่ยังอยู่หลังrestart จึงยืนยันอ่านข้ามโปรเซสผ่านLINEจริงแล้ว ไม่มีการลบข้อมูลจริงเพื่อทดสอบ
 
 ## เริ่มใช้งาน
 
