@@ -2,6 +2,23 @@
 
 สถานะ 23 ตุลาคม 2026: มี local adapter และ tests แบบ mock แล้ว ยังไม่ได้ส่ง LINE จริง, ตั้ง tunnel หรือ deploy ชื่อใช้ภาษาไทย “ซีบอต” จนกว่าจะยืนยัน spelling อังกฤษ
 
+## ผล readiness ล่าสุด
+
+หลัง Terminal memory milestone `c7eb825`: ตรวจเฉพาะ presence ใน .env พบ LINE_CHANNEL_ID, LINE_CHANNEL_SECRET, LINE_CHANNEL_ACCESS_TOKEN, LINE_ALLOWED_USER_IDS และ PUBLIC_BASE_URL ยังไม่ตั้ง; dry run=true, tester count=0 ตรวจ port3000 ไม่พบ listener และ `npm run server` หยุดเพราะไม่มี secret ตามคาด ยังระบุ OA/ผู้รับจริงไม่ได้ จึงไม่มี external reply
+
+สิ่งที่ต้องเติมบนเครื่องขั้นต่ำ: ID/secret/token ของ **OA ทดสอบเดียวกัน**, user ID ของผู้ทดสอบ 1:1 และเลือก HTTPS hosting/base URL ที่ต้องการใช้ ไม่มีการสร้าง tunnel/deploy ให้เองและไม่มีการเขียนทับ .env
+
+ตรวจซ้ำโดยไม่แสดงค่า secrets:
+
+```sh
+npm run build
+npm run line:check
+```
+
+Exit code1 หมายถึงข้อมูลขาดหรือ URL syntax ไม่ครบ ไม่ใช่ server crash คำสั่งนี้ไม่เรียก LINE API และไม่พิสูจน์ token validity/endpoint reachability แม้แสดง configured ครบ ก่อนเปิด reply จริงต้องตรวจ OA เป้าหมายและรายชื่อผู้ทดสอบกับเจ้าของอีกครั้ง
+
+LINE server **ยังไม่ต่อ persistent store**: memory ถาวรใน `.customer-memory/` ถูกเปิดโดย Terminal เท่านั้น งานถัดไปหลังยืนยัน OA/hosting คือใช้ store แยกสำหรับ LINE, key แยก OA/direct/user, lifecycle เปิด/ปิด store และคำสั่ง reset/forget ที่ยืนยันได้ต่อผู้ใช้ คง Terminal เดิมและทดสอบ restart/isolation/no data revival ก่อนอ้างว่า LINE จำข้ามวันได้
+
 ## ทดลอง Terminal ก่อน
 
 ```sh
@@ -62,8 +79,8 @@ URL บนเครื่องคือ `http://127.0.0.1:3000/webhook/line` �
 - ACK 200 ก่อนเรียก core แล้วประมวลผลในคิวหน่วยความจำ; body ไม่เกิน 256 KiB, events ไม่เกิน 20, pending queue ไม่เกิน 32
 - รับเฉพาะ text ในแชต 1:1 จาก allowlist แชต group/room และ media ถูกข้าม เพื่อไม่เผยบริบทส่วนตัวในห้องรวม “กลุ่มทดสอบ” หมายถึงรายชื่อผู้ทดสอบที่คุย 1:1
 - แยก Pi session ด้วย channel + OA/direct scope + user ID ไม่รวม Terminal กับ LINE อัตโนมัติ ข้อความที่อ้างว่าเป็นอีกคนไม่เปลี่ยน identity
-- Session อยู่ใน memory, idle expiry 30 นาทีเมื่อมี request ถัดไป, สูงสุด 100 sessions, 20 turns/session, input 2000 ตัวอักษร, คิวต่อ session 3 ข้อความ; หลัง restart ลืมประวัติ
-- Pi จำกัด output 800 tokens/request, model/tool calls ไม่เกิน 4 ต่อ turn, จำกัดการเริ่ม turn ใหม่เมื่อ usage สะสมถึง 100000 tokens และ 20 คำตอบสำเร็จ/session; ไม่ใช่ระบบ hard billing cap แบบเงิน งบรายวัน/การกระจายหลายเครื่องยังไม่ได้ทำ โหมด Terminal มี /reset; บทสนทนาใช้ structured dialogue ที่ไม่เปิด tools ระหว่างเลือก intent และคืนสิทธิ์ tools หลังจบ
+- LINE session ยังอยู่ใน memory, idle expiry 30 นาทีเมื่อมี request ถัดไป, สูงสุด 100 sessions, input 2000 ตัวอักษร, คิวต่อ session 3 ข้อความ; หลัง restart ลืมประวัติ ส่วน core ใช้ auto compaction แทน cap20turnแล้ว
+- Pi จำกัด output 800 tokens/request, model/tool calls ไม่เกิน 4 ต่อ turn; ไม่ใช่ระบบ hard billing cap แบบเงิน งบรายวัน/การกระจายหลายเครื่องยังไม่ได้ทำ โหมด Terminal มี /reset/forget และ persistent store ตาม MEMORY_GUIDE.md; LINE ยังไม่เปิด controls เหล่านี้ผ่าน adapter
 - Dedupe webhookEventId ใน memory 24 ชั่วโมง สูงสุด 10000 IDs; คิวเกิน capacity ตอบ 503, งานรอเกิน 20 วินาทีถูกข้าม, reply ที่ล่าช้าเกิน 50 วินาทีไม่ส่ง ไม่ retry reply ที่ล้มเหลวเองเพราะผลอาจกำกวม
 - คิวและ dedupe **ยังไม่ durable**: server restart อาจทำให้งานที่ ACK แล้วหายหรือ redelivery ถูกประมวลผลใหม่ ต้องเพิ่ม durable queue/store ก่อนใช้งานจริงที่ต้องรับประกัน delivery
 - Log server มี request ID, channel, outcome และ latency ไม่มี raw body, user ID, reply token, authorization headers หรือ secrets ไม่มีการเก็บประวัติลงดิสก์ แต่ประวัติใน memory ยังคงเป็นข้อมูลที่ต้องดูแล

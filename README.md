@@ -42,6 +42,8 @@ FAQ ที่ระบุหัวข้อตอบจาก snapshot พร้
 
 ## LINE local
 
+ตรวจ config โดยไม่แสดงค่า secrets: `npm run line:check` (หลัง build) ผลล่าสุดยังขาด channel ID/secret/token, tester IDs และ HTTPS base URL จึงยังไม่ต่อ OA จริง อ่าน [สถานะ readiness และขั้นต่อไป](./LINE_SETUP.md)
+
 เติม LINE_CHANNEL_SECRET และค่าทดสอบตาม [LINE_SETUP.md](./LINE_SETUP.md) แล้ว:
 
 ```sh

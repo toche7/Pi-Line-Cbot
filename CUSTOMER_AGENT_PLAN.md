@@ -99,6 +99,12 @@ Build/tests ล่าสุด18รายการผ่าน รวม >32turn
 
 ข้อจำกัดและ retention implementation: [MEMORY_GUIDE.md](./MEMORY_GUIDE.md) Summary คัดข้อความแบบมีขอบเขตสูญรายละเอียดได้ ไม่ใช่ semantic task manager, filtering เป็น heuristic, disk ไม่เข้ารหัส และ CLI --user ไม่ใช่ customer authentication
 
+## LINE readiness หลังได้รับอนุญาตให้เชื่อมต่อ
+
+ตรวจ .env แบบ presence-only: Channel ID/secret/access token, tester allowlist และ HTTPS base URL ยังขาด, dry run=true, tester0คน ตรวจไม่พบ listener ที่ port3000 และ serverหยุดเมื่อไม่มี secret ตามคาด Build/tests18รายการผ่าน ตรวจ HTTP loopback ด้วย fixtures ผ่าน health200/invalid401/valid200/duplicateหนึ่งmockreply ไม่มีการส่ง LINE จริงหรือเลือก hosting/tunnel
+
+เพิ่ม `npm run line:check` สำหรับตรวจ readiness ที่ไม่แสดงค่า secrets และปรับ LINE_SETUP ให้ตรงกับ core ล่าสุด ยังไม่ต่อ persistent store ให้ LINE ต้องกำหนด OA/HTTPS ก่อนและวาง store แยกพร้อม lifecycle/isolation/reset/forget controls ให้ครบ ไม่อ้างว่า Terminal memory milestone ทำให้ LINE จำข้าม restartแล้ว ขั้นที่ต้องใช้เจ้าของคือเติม config บนเครื่องและเลือก HTTPS hosting; ไม่ส่ง keys ผ่านแชต
+
 ## ผลทดสอบ Terminal ก่อน LINE เพิ่มเติม
 
 ทดสอบ `npm run chat` รุ่น CBTU ผ่าน PTY จริงครบสมัครสมาชิก, ข้อขัดแย้งการเข้าเรียนหลังจ่าย, certificate, ติดต่อเจ้าหน้าที่ และไม่พบข้อมูล ทั้งหมดผ่านพร้อม source/time ตามกติกา ทดสอบความจำผ่านโมเดลจริงสอง turn ในโปรเซสเดียวแล้วตอบชื่อทดสอบตรงกัน (476/441 ms) และ `/exit` ออกด้วย code 0 ไม่มีการเปลี่ยน config หรือเรียก LINE ในรอบนี้ รายละเอียด: [TERMINAL_TEST_RESULTS.md](./TERMINAL_TEST_RESULTS.md)
