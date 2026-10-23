@@ -46,7 +46,7 @@ export class LineConversations {
     const command = prompt.trim();
     if (command === '/forget' && client.requestForget) {
       entry.forgetToken = await client.requestForget();
-      output.text('จะลบข้อความ สรุป เรื่องค้าง โปรไฟล์ และข้อมูลระยะยาวของคุณเฉพาะ LINE OA นี้จากเครื่อง พิมพ์ /confirm-forget ภายใน 60 วินาทีเพื่อยืนยัน หรือ /cancel เพื่อยกเลิก ข้อมูล Terminal และคนอื่นไม่ถูกเปลี่ยน');
+      output.text(`จะลบข้อความ สรุป เรื่องค้าง โปรไฟล์ และข้อมูลระยะยาว${client.requestsEnabled ? ' รวมถึงคำขอในระบบกลาง' : ''}ของคุณเฉพาะ LINE OA นี้จากเครื่อง พิมพ์ /confirm-forget ภายใน 60 วินาทีเพื่อยืนยัน หรือ /cancel เพื่อยกเลิก ข้อมูล Terminal และคนอื่นไม่ถูกเปลี่ยน`);
       return;
     }
     if (command === '/confirm-forget') {

@@ -66,6 +66,9 @@ export function renderDialogue(raw: string, query?: string): string {
     throw new Error('Invalid dialogue response');
   }
   // Persistence acknowledgements are rendered only after a successful host commit.
+  if (/จอง.{0,12}(?:แล้ว|สำเร็จ|เรียบร้อย)|(?:ส่ง|เปิด|บันทึก).{0,12}(?:คำขอ|เรื่อง|เคส).{0,12}(?:แล้ว|สำเร็จ|เรียบร้อย)/i.test(plan.reply)) {
+    return 'ยังไม่ได้ยืนยันการจองหรือส่งเรื่องให้ทีมงานครับ ต้องตรวจสรุปคำขอและยืนยันผ่านระบบก่อน';
+  }
   if (/จะจำ|จำ.{0,24}(?:ไว้|แล้ว)|(?:บันทึก|เก็บ|จด).{0,24}(?:ไว้|แล้ว|เรียบร้อย)|i(?:'ll| will) remember|\b(?:saved|stored|noted)\b/i.test(plan.reply)) {
     return 'ยังไม่ได้บันทึกข้อมูลเพิ่มครับ หากต้องการให้จำ กรุณาระบุข้อมูลและขอให้บันทึกได้';
   }

@@ -4,6 +4,7 @@ import { LineAdapter, lineReply, webhookHandler } from './line.js';
 import { requestTimeout } from './diagnostics.js';
 import { MemoryStore } from './memory.js';
 import { resolve } from 'node:path';
+import { CourseRequestStore, CourseRequests } from './course-requests.js';
 
 function start() {
   const secret = process.env.LINE_CHANNEL_SECRET || '';
@@ -20,7 +21,8 @@ function start() {
   const log = (record: object) => console.log(JSON.stringify(record));
   const timeout = Math.min(requestTimeout(process.env.PI_TIMEOUT_MS), 25000);
   const store = new MemoryStore(resolve('.line-memory'));
-  const core = new CustomerCore(undefined, timeout, log, undefined, store);
+  const requests = new CourseRequests(new CourseRequestStore(resolve('runtime/course-requests')));
+  const core = new CustomerCore(undefined, timeout, log, undefined, store, undefined, requests);
   const adapter = new LineAdapter({ secret, account: process.env.LINE_CHANNEL_ID || 'test-oa', allowedUsers, dryRun, core, reply: lineReply(token), log });
   const server = createServer(webhookHandler(adapter));
   server.requestTimeout = 10000;

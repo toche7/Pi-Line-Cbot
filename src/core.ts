@@ -1,17 +1,18 @@
 import { randomUUID } from 'node:crypto';
 import { type AgentSession, type SessionManager } from '@earendil-works/pi-coding-agent';
 import { createDemo, orderTool } from './agent.js';
-import { publicAnswer, isTopicFollowup, renderKnowledge, topicForAnswer } from './knowledge.js';
+import { publicAnswer, isTopicFollowup, renderKnowledge, topicForAnswer, identityAnswer } from './knowledge.js';
 import { runDialogue } from './dialogue.js';
 import { DemoFailure, rateLimitWaitMs, failureCategory } from './diagnostics.js';
 import { type Memory, type MemoryStore, type Summarizer, emptyMemory, memoryManager, learnProfile, safeText, compactMemory } from './memory.js';
 import { renderCatalog, catalogTopicForAnswer } from './catalog.js';
 import { routeCatalog, recoverCatalogState, executeCatalogQuery, parseCatalogQuery } from './catalog-query.js';
 import { safeMemoryInput, mayRequestMemory, canLearnDirectly, canResumeMemory, decideMemory, applyMemoryChanges, memoryConfirmation, MemoryCapacityError } from './memory-request.js';
+import type { CourseRequests } from './course-requests.js';
 
 export type Output = { text: (value: string) => void; status: (value: string) => void };
 export type Identity = { channel: 'terminal' | 'line'; scope: string; user: string };
-export type ChatClient = { send: (prompt: string, output: Output) => Promise<void>; abort: () => Promise<void>; reset?: () => Promise<void>; memory?: () => Promise<string>; requestForget?: () => Promise<string>; forget?: (token: string) => Promise<void>; cancelForget?: () => void };
+export type ChatClient = { send: (prompt: string, output: Output) => Promise<void>; abort: () => Promise<void>; reset?: () => Promise<void>; memory?: () => Promise<string>; requestForget?: () => Promise<string>; forget?: (token: string) => Promise<void>; cancelForget?: () => void; requestsEnabled?: boolean };
 type Entry = { session: Promise<AgentSession>; tail: Promise<void>; pending: number; touched: number; lastTopic?: string; memory: Memory; memoryClarificationExpires?: number };
 
 export class CustomerCore {
@@ -25,6 +26,7 @@ export class CustomerCore {
     private now = () => Date.now(),
     private store?: MemoryStore,
     private summarizer?: Summarizer,
+    private courseRequests?: CourseRequests,
   ) {}
 
   client(identity: Identity): ChatClient {
@@ -37,10 +39,15 @@ export class CustomerCore {
       return this.entries.get(key)?.memory ?? this.store?.load(key) ?? emptyMemory(this.now());
     };
     return {
+      requestsEnabled: !!this.courseRequests,
       send: async (prompt, output) => {
         forgetChallenge = undefined; // A normal message cancels a pending destructive operation.
         if (this.closed) throw new DemoFailure('Chat service closed.');
         if (!prompt.trim() || prompt.length > 2000) throw new DemoFailure('ข้อความต้องยาว 1–2000 ตัวอักษร');
+        const isRequestCommand = /^\/(?:book|contact|request-note|confirm-request|cancel-request|requests)(?:\s|$)/.test(prompt.trim());
+        const requestAnswer = this.courseRequests && (isRequestCommand || !mayRequestMemory(prompt))
+          ? this.courseRequests.handle(identity, prompt, getMemory().catalog) : undefined;
+        if (requestAnswer !== undefined) { output.text(requestAnswer + '\n'); return; }
         const filtered = safeMemoryInput(prompt);
         if (filtered !== prompt) output.status('[ตัดข้อมูลลับ/อ่อนไหวออกก่อนส่งและบันทึก]');
         prompt = filtered;
@@ -113,6 +120,9 @@ export class CustomerCore {
                 && ['certificate', 'courses'].includes(topicForAnswer(answer) ?? '')) answer = undefined;
             }
             if (!memoryRequest && !routed && answer === undefined && current.lastTopic && !current.lastTopic.startsWith('catalog:') && isTopicFollowup(prompt)) answer = renderKnowledge(current.lastTopic);
+            if (this.courseRequests && answer === identityAnswer) answer = identityAnswer.replace('และยังเข้าถึงข้อมูลผู้เรียนจริงหรือส่งเรื่องให้เจ้าหน้าที่ไม่ได้',
+              'ฝากคำขอจองด้วย /book ชื่อคอร์ส หรือฝากเรื่องด้วย /contact ข้อความ ได้ โดยเก็บในระบบกลางหลังคุณยืนยัน ยังไม่ส่งต่อหรือยืนยันที่นั่ง และยังเข้าถึงข้อมูลผู้เรียนจริงไม่ได้');
+            if (this.courseRequests && answer && topicForAnswer(answer) === 'contact') answer = 'ฝากเรื่องให้ทีมงานได้ด้วย /contact ตามด้วยเรื่องที่ต้องการครับ ระบบจะแสดงสรุปให้ยืนยันก่อนเก็บในระบบกลาง ยังไม่ส่งอีเมลหรือ LINE ให้ทีมงาน\nหากต้องการช่องทางติดต่อโดยตรง ดู https://cbtumu.net/faq/ ข้อมูลอีเมลในเว็บบางส่วนต่างกัน จึงยังไม่เลือกยืนยันอีเมลให้';
             if (answer !== undefined) {
               hostTurn = true;
               output.status(memoryHandled ? '[กำลังตรวจคำขอความจำ]' : orderId ? '[ข้อมูลสมมติสำหรับทดสอบ]' : '[ตอบจากข้อมูลสาธารณะที่กำหนด]');
@@ -201,6 +211,7 @@ export class CustomerCore {
         this.store?.save(key, memory);
         this.entries.delete(key);
         if (entry) (await entry.session).dispose();
+        this.courseRequests?.cancel(identity);
         // Without a disk store, retain the profile in a fresh in-memory Pi session too.
         if (!this.store) this.entries.set(key, { session: this.factory(memoryManager(memory)), tail: Promise.resolve(), pending: 0, touched: this.now(), memory });
       },
@@ -217,6 +228,7 @@ export class CustomerCore {
         forgetChallenge = undefined;
         const entry = this.entries.get(key);
         if (entry?.pending) throw new DemoFailure('กรุณารอข้อความก่อนหน้าจบก่อนลืมทั้งหมด');
+        this.courseRequests?.forget(identity);
         this.store?.delete(key);
         this.entries.delete(key);
         if (entry) (await entry.session).dispose();

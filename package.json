@@ -7,6 +7,7 @@
     "start": "node --env-file-if-exists=.env dist/main.js",
     "chat": "node --env-file-if-exists=.env dist/main.js --chat",
     "server": "node --env-file-if-exists=.env dist/server.js",
+    "requests:admin": "node dist/requests-admin-main.js",
     "line:check": "node --env-file-if-exists=.env dist/line-readiness.js",
     "check": "node --env-file-if-exists=.env dist/main.js --check",
     "test": "node --test dist/*.test.js",

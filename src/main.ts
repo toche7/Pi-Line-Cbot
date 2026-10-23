@@ -4,6 +4,7 @@ import { runChat } from './chat.js';
 import { CustomerCore } from './core.js';
 import { MemoryStore } from './memory.js';
 import { resolve } from 'node:path';
+import { CourseRequestStore, CourseRequests } from './course-requests.js';
 
 async function main() {
   const timeoutMs = requestTimeout(process.env.PI_TIMEOUT_MS);
@@ -18,7 +19,8 @@ async function main() {
       return;
     }
     const store = new MemoryStore(resolve('.customer-memory'));
-    const core = new CustomerCore(async manager => (await createDemo({ sessionManager: manager })).session, timeoutMs, undefined, undefined, store);
+    const requests = new CourseRequests(new CourseRequestStore(resolve('runtime/course-requests')));
+    const core = new CustomerCore(async manager => (await createDemo({ sessionManager: manager })).session, timeoutMs, undefined, undefined, store, undefined, requests);
     try {
       const userIndex = process.argv.indexOf('--user');
       const user = userIndex >= 0 ? process.argv[userIndex + 1] || '' : 'tester';

@@ -34,6 +34,7 @@ export async function runChat(
       if (prompt === '/exit' || prompt === '/quit') break;
       if (prompt === '/forget' && 'requestForget' in session && session.requestForget) {
         forgetToken = await session.requestForget();
+        if ('requestsEnabled' in session && session.requestsEnabled) output.write('[การยืนยันนี้จะลบคำขอของคุณในระบบกลางด้วย]\n');
         output.write('[จะลบข้อความ สรุป เรื่องค้าง และโปรไฟล์ของคุณทั้งหมดจาก memory บนเครื่อง พิมพ์ /confirm-forget ภายใน 60 วินาทีเพื่อยืนยัน หรือ /cancel เพื่อยกเลิก]\n');
         if (terminal) rl.prompt();
         continue;
