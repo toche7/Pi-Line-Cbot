@@ -32,7 +32,7 @@ npm start -- "ตรวจ DEMO-1001"
 
 Terminal จำข้าม restart แล้ว: เก็บ recent context + สรุป + โปรไฟล์จากที่บอกชัดเจนไว้ใน `.customer-memory/` (ignore ใน Git) ไม่มีการบังคับ reset ทุก 20 ข้อความ เมื่อบริบทยาวจะย่ออัตโนมัติ ดูรายละเอียดและข้อจำกัดใน [MEMORY_GUIDE.md](./MEMORY_GUIDE.md)
 
-`/memory` ดูสิ่งที่จำ; `/reset` ล้างบทสนทนา/สรุป/เรื่องค้าง แต่คงโปรไฟล์และ long-term preferences; `/forget` ตามด้วย `/confirm-forget` เพื่อลบทั้งหมด หรือ `/cancel` เพื่อยกเลิก; `/exit`, `/quit`, Ctrl-C ออกโดยคง memory ที่บันทึกแล้ว ผู้ทดสอบ local เริ่มต้นคือ tester; แยกอีกคนด้วย `npm run chat -- --user alice` (ไม่ใช่การยืนยันตัวตนจริง) LINE adapter/config ไม่เปลี่ยนใน milestone memory และ server ยังไม่เปิด persistent store
+`/memory` ดูสิ่งที่จำ; `/reset` ล้างบทสนทนา/สรุป/เรื่องค้าง แต่คงโปรไฟล์และ long-term preferences; `/forget` ตามด้วย `/confirm-forget` เพื่อลบทั้งหมด หรือ `/cancel` เพื่อยกเลิก; `/exit`, `/quit`, Ctrl-C ออกโดยคง memory ที่บันทึกแล้ว ผู้ทดสอบ local เริ่มต้นคือ tester; แยกอีกคนด้วย `npm run chat -- --user alice` (ไม่ใช่การยืนยันตัวตนจริง) LINE มีคำสั่ง memory/reset/forgetชุดเดียวกันแล้ว ใช้ `.line-memory/` แยกไฟล์/lockจากTerminal
 
 FAQ ที่ระบุหัวข้อตอบจาก snapshot พร้อม URL/เวลาเก็บ ส่วนข้อความอื่นเข้า Pi dialogue layer ให้ตีความบทสนทนา/ความจำ/follow-up เป็น structured intent ไม่ใช้ whitelist คำ small talk ที่เหลือถูกปัดเป็น FAQ ไม่พบอีกแล้ว Core จำหัวข้อ FAQ ล่าสุดสำหรับคำอ้างทันที และ render ข้อมูล CBTU/ตัวตน/ลิงก์จากข้อมูลที่กำหนด ตรวจ domain/ชื่อสถาบันที่โมเดลพยายามแต่งเอง คำถามข้อเท็จจริงที่ไม่รองรับตอบไม่ทราบ ไม่ตีความ mock order เป็นข้อมูลผู้เรียนจริง
 
@@ -52,6 +52,8 @@ npm run server
 
 ค่าเริ่มต้น bind `127.0.0.1:3000`, POST `/webhook/line`, GET `/health`; dry run เป็นค่าเริ่มต้น รอบทดสอบปัจจุบันได้รับอนุญาตให้เปิด tunnel และตั้ง dry run false แล้ว ต้องเปิด server/tunnel ค้างไว้ กลุ่ม/room ถูกข้าม รับเฉพาะ 1:1 กับผู้ทดสอบ
 
+LINE persistent memory เปิดแล้ว: `.line-memory/` แยกจากTerminal, key=line/OA/direct/user, retention90วันและcompactionค่าเดียวกัน ใช้ `/memory`, `/reset`, `/forget`→`/confirm-forget` หรือ `/cancel` ในแชต1:1 จากallowlist รายละเอียด [MEMORY_GUIDE.md](./MEMORY_GUIDE.md) ประวัติRAMก่อนเปิดstoreไม่ได้ย้ายอัตโนมัติ
+
 ## โครงสร้างและผลตรวจ
 
 - `src/core.ts`: แยก session/channel/customer, คิวรายลูกค้า, idle TTL, auto compaction และ memory controls
@@ -59,13 +61,13 @@ npm run server
 - `src/agent.ts`: สร้าง Pi session, provider config, tool allowlist ไม่มี shell/file tools; Qwen ใช้ system role แทน developer role
 - `src/knowledge.ts`: แหล่งความรู้สาธารณะ กติกา conflict/unknown, read-only knowledge tool และ persona ซีบอต
 - `src/chat.ts`, `src/main.ts`: Terminal adapters; `src/conversation.ts`: model streaming/progress/timeout/call limits
-- `src/line.ts`, `src/server.ts`: raw-body signature verification, async queue, dedupe, allowlist, bounded reply client และ safe operational logs
+- `src/line.ts`, `src/line-memory.ts`, `src/server.ts`: raw-body signature verification, async queue, dedupe, allowlist, bounded reply client และ safe operational logs
 
-Build และ tests ล่าสุด 18 รายการผ่าน รวม persistence/restart, >20 turn/compaction, reset/forget confirm/cancel/physical deletion, isolation, safe memory และ failed summary/429 recovery เพิ่มจาก tests dialogue/FAQ/LINE จำลองเดิม หาก dialogue ผิดรูปแบบ/ถูกตัด/ว่าง จะขอซ่อมได้หนึ่งครั้งภายใน deadline เดิม Tests ไม่เรียก LINE จริง
+Build และ tests ล่าสุด 22 รายการผ่าน รวม persistence/restart, >20 turn/compaction, reset/forget confirm/cancel/physical deletion, isolation, safe memory และ failed summary/429 recovery เพิ่มจาก tests dialogue/FAQ/LINE จำลองเดิม หาก dialogue ผิดรูปแบบ/ถูกตัด/ว่าง จะขอซ่อมได้หนึ่งครั้งภายใน deadline เดิม Tests ไม่เรียก LINE จริง
 
 ทดสอบ `npm run chat` ผ่าน PTY จริงหลายรอบและหลาย turn แบบผสมแล้ว พบและแก้ routing ที่วน FAQ fallback และการแต่งตัวตน/เว็บ ไม่พบ process crash ในรอบที่ reproduce แต่พบ provider 429 จริงด้วย จึงแยกผล functional กับข้อจำกัด provider ไว้ใน TERMINAL_TEST_RESULTS.md การทดสอบ 2 turn เดิมไม่เพียงพอยืนยัน small talk หรือความเสถียรแชตยาว LINE OA/HTTPS ตรวจ Verify และ signature จริงผ่านแล้ว และ LINE reply API ยอมรับ reply จริง 7 ครั้งแล้ว (ยังไม่ได้ตรวจหน้าจอผู้รับ)
 
-สำหรับบริการจริงยังต้องเพิ่ม durable queue/dedupe และ persistence สำหรับ LINE หลังตกลง retention/access, customer verification ก่อนข้อมูลจริง, การประเมินคำตอบกว้างขึ้น และ cost monitoring แบบเงิน Local Terminal store มี idle retention 90 วันและสิทธิ์ไฟล์จำกัด แต่ยังไม่ใช่ระบบหลายเครื่องหรือฐานข้อมูลเข้ารหัส ไม่มีการส่งต่อเจ้าหน้าที่หรือ action เปลี่ยนข้อมูลในรุ่นนี้
+สำหรับบริการจริงยังต้องเพิ่ม durable queue/dedupe และ customer verification ก่อนข้อมูลจริง, การประเมินคำตอบกว้างขึ้น และ cost monitoring แบบเงิน Local Terminal/LINE stores มี idle retention 90 วันและสิทธิ์ไฟล์จำกัด แต่ยังไม่ใช่ระบบหลายเครื่องหรือฐานข้อมูลเข้ารหัส ไม่มีการส่งต่อเจ้าหน้าที่หรือ action เปลี่ยนข้อมูลในรุ่นนี้
 
 ## แหล่งข้อมูล
 

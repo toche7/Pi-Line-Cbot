@@ -30,6 +30,7 @@ export class CustomerCore {
     let forgetChallenge: { token: string; expires: number } | undefined;
     const getMemory = () => {
       if (this.closed) throw new DemoFailure('Chat service closed.');
+      this.expire(); // Reads also honor idle eviction, then the store's 90-day retention.
       return this.entries.get(key)?.memory ?? this.store?.load(key) ?? emptyMemory(this.now());
     };
     return {

@@ -4,6 +4,16 @@
 
 ## ผล readiness ล่าสุด
 
+### LINE persistent memory (สถานะปัจจุบัน)
+
+ได้รับอนุญาตให้ใช้ค่าmemoryเดียวกับTerminalแล้ว LINEserverเปิดstoreที่ `.line-memory/` แยกdirectory/lockจาก `.customer-memory/` และkeyแยกchannel+OA/direct+user ไม่เชื่อมประวัติข้ามช่องทาง ใช้profile/explicitlong-term/recent/summary/lastTopic และcompaction/retention90วัน/limitsเดิม คำสั่ง `/memory`, `/reset`, `/forget`, `/confirm-forget`, `/cancel` ใช้ใน1:1allowlistเท่านั้น ดูรายละเอียดและข้อจำกัดใน MEMORY_GUIDE.md
+
+/memoryแสดงsnapshotแบบย่อเพื่อพอดีLINE /resetล้างrecent/summary/pending/lastTopicแต่คงprofile/long-term /forgetต้องchallenge60วินาทีที่ผูกuser/OA/adapterเดิม ข้อความหรือคำสั่งอื่นยกเลิกchallenge ไม่ให้โมเดลลบmemoryเอง ไม่เปิดกลุ่ม ไม่ส่งpush/broadcast ไม่มีrawerrors/tokens/IDsในlogs ประวัติRAMของLINEก่อนเปิดstoreไม่ได้ย้ายอัตโนมัติ
+
+Build/tests22รายการผ่าน รวมLINEsignedmemorypersist/restart/compaction, OA/user/channelisolation, Terminalคนละโปรเซส/storeเปิดพร้อมLINEได้, reset/forgetcancel/expiry/physicaldelete/no-revival และretention Local HTTPhealth200/signature401/200/dedupeหนึ่งmockreplyผ่าน Serverrestartแล้วเปิดpersistentstoreจริงและpublichealth/signature/LINE Verifyผ่านactive=trueใช้URLเดิม ผู้ใช้บอกชื่อผ่านLINEสำเร็จ(ok490ms/replied) ตรวจmetadatarecordมีชื่อและrecent1คู่/0600แล้วrestartอีกครั้งเพื่อยืนยันอ่านกลับ (รอผลผู้ใช้)
+
+คำสั่งเริ่มใช้ค่า.envตามปกติ; โปรเซสทดสอบreplyปัจจุบันใช้ `LINE_DRY_RUN=false npm run server` โดยไม่แก้credentials/.env ระหว่างงานนี้ ต้องเปิดserver/tunnelค้างไว้ การpersistไม่ได้ทำให้คิว/dedupeเป็นdurableและไม่ได้แก้providerquota
+
 ### แก้ provider JSON generation failure หลังเปลี่ยนคีย์
 
 ผู้ใช้เปลี่ยนคีย์บนเครื่องแล้วทดสอบหนึ่ง model turnสำเร็จ และรับreplyปกติในLINE404ms ต่อมามีภาพfallbackซ้ำ ตรวจlogพบcore_failure (จึงไม่สรุปว่าเป็น429) ทำซ้ำบทสนทนาในcoreชั่วคราวพบ provider error “Failed to generate JSON” โดยไม่เก็บหรือแสดงraw error/failed generation การย่อบริบทหลังFAQ6turnทดสอบแยกแล้วผ่าน จึงยังไม่มีหลักฐานว่าcompactionเป็นต้นเหตุ
@@ -24,7 +34,7 @@ Build/tests20รายการผ่าน รวม429fallback/FAQถัดไ
 
 ตอนตรวจรอบนี้ `.env` มี LINE_DRY_RUN=true แต่โปรเซสเดิมทำงานfalseอยู่ จึงคงไฟล์เดิมและเริ่มโปรเซสใหม่ด้วย `LINE_DRY_RUN=false npm run server` เพื่อคงการทดสอบreplyเฉพาะallowlistตามที่อนุญาต หากเริ่มด้วย `npm run server` ธรรมดาจะใช้ค่าใน.env และไม่ส่งreply; ต้องเลือกโหมดให้ตรงเจตนา LINE sessionถูกล้างตามปกติเมื่อrestartเพราะยังephemeral Terminal memoryไม่เปลี่ยน
 
-### HTTPS tunnel และการเปลี่ยน webhook (ล่าสุด)
+### HTTPS tunnel และการเปลี่ยน webhook (ประวัติการเชื่อมต่อ)
 
 เจ้าของอนุญาต tunnel ชั่วคราวและเปลี่ยน webhook โดยตรงแล้ว ใช้ ngrok ที่มี config อยู่ อัปเดตจาก 3.6.0 เป็น 3.39.12 เพราะบริการปฏิเสธเวอร์ชันเก่า เปิดเฉพาะ upstream `http://127.0.0.1:3000` และปิด request inspector (`--inspect=false`) ไม่ได้เปิดบริการอื่น
 
@@ -61,7 +71,7 @@ node --env-file=.env scripts/line-webhook-admin.mjs rollback
 
 `scripts/line-webhook-admin.mjs prepare` ใช้ตรวจ tunnel และบันทึก rollback ครั้งแรกเท่านั้น จะไม่เขียนทับ backup ที่มีอยู่; `switch` ต้องมี backup และผ่าน identity/public signature/LINE Verify ก่อนเปลี่ยน ส่วนการเปิด Use webhook หากปิดอยู่ต้องตั้งใน Console งานนี้อ่านกลับแล้วเปิดอยู่ ไม่มี secrets ใน script
 
-LINE memory ยังคง ephemeral แยกจาก Terminal persistent store เดิม ไม่ได้เพิ่ม persistence/control commands สำหรับ LINE ในรอบนี้
+ในรอบเปิดtunnelเดิม LINEยังephemeral; milestoneปัจจุบันเปิดstoreแยกและmemorycontrolsแล้วตามด้านบน
 
 ### หลังผู้ใช้เติม OA config (ประวัติก่อนเปิด tunnel)
 
@@ -73,7 +83,7 @@ PUBLIC_BASE_URL ยังว่าง และ LINE รายงานว่า
 
 สิ่งที่ยังต้องตัดสินใจคือใช้ n8n เดิมเป็นตัวรับแล้วส่ง raw body/signatureต่อไปยังซีบอตที่เข้าถึงได้ หรือกำหนด HTTPS hostingอื่นให้ซีบอต เจ้าของต้องเลือก/ระบุปลายทางก่อน ไม่ส่งข้อความทดสอบไป workflowเดิมโดยเดาทาง เมื่อเส้นทางพร้อมจึงทดสอบ Verify/dry runผ่าน HTTPS แล้วเปิด replyเฉพาะallowlistเพื่อให้ผู้ใช้ส่งข้อความเข้าDemoB1 ไม่มี push/broadcast/handoff
 
-Server localที่เปิดไว้เป็นเพียงโปรเซสชั่วคราว หากปิดแล้วเริ่มใหม่ด้วย `npm run server` ความจำ LINE ยัง ephemeral และแยกจาก persistent store ของ Terminal
+Server localเป็นโปรเซสชั่วคราว ต้องเปิดserver/tunnelไว้ ความจำLINEปัจจุบันเปิดใหม่แล้วอ่านstoreของLINEกลับมาได้ตามmilestoneด้านบน
 
 ### สถานะเริ่มต้นก่อนเติม config (เก็บเป็นประวัติ)
 
@@ -90,7 +100,7 @@ npm run line:check
 
 Exit code1 หมายถึงข้อมูลขาดหรือ URL syntax ไม่ครบ ไม่ใช่ server crash คำสั่งนี้ไม่เรียก LINE API และไม่พิสูจน์ token validity/endpoint reachability แม้แสดง configured ครบ ก่อนเปิด reply จริงต้องตรวจ OA เป้าหมายและรายชื่อผู้ทดสอบกับเจ้าของอีกครั้ง
 
-LINE server **ยังไม่ต่อ persistent store**: memory ถาวรใน `.customer-memory/` ถูกเปิดโดย Terminal เท่านั้น งานถัดไปหลังยืนยัน OA/hosting คือใช้ store แยกสำหรับ LINE, key แยก OA/direct/user, lifecycle เปิด/ปิด store และคำสั่ง reset/forget ที่ยืนยันได้ต่อผู้ใช้ คง Terminal เดิมและทดสอบ restart/isolation/no data revival ก่อนอ้างว่า LINE จำข้ามวันได้
+ประวัติreadinessก่อนmilestoneLINEmemory: LINE server **ยังไม่ต่อ persistent store**: memory ถาวรใน `.customer-memory/` ถูกเปิดโดย Terminal เท่านั้น งานถัดไปหลังยืนยัน OA/hosting คือใช้ store แยกสำหรับ LINE, key แยก OA/direct/user, lifecycle เปิด/ปิด store และคำสั่ง reset/forget ที่ยืนยันได้ต่อผู้ใช้ คง Terminal เดิมและทดสอบ restart/isolation/no data revival ก่อนอ้างว่า LINE จำข้ามวันได้
 
 ## ทดลอง Terminal ก่อน
 
@@ -152,8 +162,8 @@ URL บนเครื่องคือ `http://127.0.0.1:3000/webhook/line` �
 - ACK 200 ก่อนเรียก core แล้วประมวลผลในคิวหน่วยความจำ; body ไม่เกิน 256 KiB, events ไม่เกิน 20, pending queue ไม่เกิน 32
 - รับเฉพาะ text ในแชต 1:1 จาก allowlist แชต group/room และ media ถูกข้าม เพื่อไม่เผยบริบทส่วนตัวในห้องรวม “กลุ่มทดสอบ” หมายถึงรายชื่อผู้ทดสอบที่คุย 1:1
 - แยก Pi session ด้วย channel + OA/direct scope + user ID ไม่รวม Terminal กับ LINE อัตโนมัติ ข้อความที่อ้างว่าเป็นอีกคนไม่เปลี่ยน identity
-- LINE session ยังอยู่ใน memory, idle expiry 30 นาทีเมื่อมี request ถัดไป, สูงสุด 100 sessions, input 2000 ตัวอักษร, คิวต่อ session 3 ข้อความ; หลัง restart ลืมประวัติ ส่วน core ใช้ auto compaction แทน cap20turnแล้ว
-- Pi จำกัด output 800 tokens/request, model/tool calls ไม่เกิน 4 ต่อ turn; ไม่ใช่ระบบ hard billing cap แบบเงิน งบรายวัน/การกระจายหลายเครื่องยังไม่ได้ทำ โหมด Terminal มี /reset/forget และ persistent store ตาม MEMORY_GUIDE.md; LINE ยังไม่เปิด controls เหล่านี้ผ่าน adapter
+- LINE active Pi sessionอยู่ในRAM idle expiry30นาทีและสูงสุด100sessions input2000ตัวอักษร คิวต่อsession3ข้อความ; persistentrecordอยู่ใน.line-memoryและอ่านคืนหลังrestart มีauto compaction/retention90วันเหมือนTerminal
+- Pi จำกัด output 800 tokens/request, model/tool calls ไม่เกิน 4 ต่อ turn; ไม่ใช่ระบบ hard billing cap แบบเงิน งบรายวัน/การกระจายหลายเครื่องยังไม่ได้ทำ Terminal และ LINE มี /memory, /reset, /forget พร้อมconfirmation และ persistent storeแยกกัน ตาม MEMORY_GUIDE.md
 - Dedupe webhookEventId ใน memory 24 ชั่วโมง สูงสุด 10000 IDs; คิวเกิน capacity ตอบ 503, งานรอเกิน 20 วินาทีถูกข้าม, reply ที่ล่าช้าเกิน 50 วินาทีไม่ส่ง ไม่ retry reply ที่ล้มเหลวเองเพราะผลอาจกำกวม
 - คิวและ dedupe **ยังไม่ durable**: server restart อาจทำให้งานที่ ACK แล้วหายหรือ redelivery ถูกประมวลผลใหม่ ต้องเพิ่ม durable queue/store ก่อนใช้งานจริงที่ต้องรับประกัน delivery
 - Log server มี request ID, channel, outcome และ latency ไม่มี raw body, user ID, reply token, authorization headers หรือ secrets ไม่มีการเก็บประวัติลงดิสก์ แต่ประวัติใน memory ยังคงเป็นข้อมูลที่ต้องดูแล

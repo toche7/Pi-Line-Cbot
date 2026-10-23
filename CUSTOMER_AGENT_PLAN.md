@@ -26,7 +26,7 @@
 | PARTIAL | Logging/cost control | safe metadata และ token/call limits มีแล้ว; ยังไม่มี dashboard, monetary/daily budget หรือ billing reconciliation |
 | PARTIAL | การประเมินคุณภาพ | tests 10 รายการผ่าน รวมชุด FAQ 11 คำถาม แต่ยังไม่ใช่การประเมินทุกคำถาม/ทุกภาษา/ทุก prompt injection |
 | TODO | LINE end-to-end จริง | ผู้ใช้ต้องเติม test OA credentials/allowlist และมี HTTPS hosting; ยังไม่ deploy, ตั้ง tunnel หรือส่ง reply จริง |
-| DONE สำหรับ Terminal | Persistent memory | local JSON store 0700/0600, idle retention 90 วัน, profile/recent/summary/long-term, reset คง profile และ forget มี confirmation; LINE server ยังไม่เปิด store และ production retention ยังต้องทบทวน |
+| DONE สำหรับ Terminal และ LINE local | Persistent memory | stores/locksแยกdirectory, keyแยกchannel/OA/direct/user, 0700/0600, retention90วัน, profile/recent/summary/long-term, resetคงprofile และforgetมีconfirmation; ยังไม่ใช่multi-hoststore |
 | TODO | Durable queue/dedupe | ปัจจุบัน restart อาจสูญงานที่ ACK หรือประมวลผล redelivery ใหม่; ยังไม่ production delivery guarantee |
 | TODO | Customer verification/ข้อมูลจริง | LINE identity ไม่เท่ากับสิทธิ์ข้อมูลผู้เรียน; ต้อง map/verify/check ownership ก่อนเพิ่ม real-data tools |
 | TODO | Handoff จริง | ยังไม่มี case store/destination/recipient/authorization; แนะนำช่องทางเท่านั้น |
@@ -126,3 +126,10 @@ local dry-run serverเริ่มได้แล้ว: health200, unsigned401
 ## LINE fallback / provider429
 
 หลังผู้ใช้พบfallback ตรวจcoreจริงพบ Groq HTTP429 ทำซ้ำได้ (modelturnแรกผ่าน แต่followupติดquota; FAQผ่านทันที) ไม่ใช่หลักฐานkey/networkผิด แก้adapterให้บอกquota/FAQและtimeoutอย่างปลอดภัย เพิ่มcategorylogและแยกreplied_fallbackจากreplied ไม่ส่งrawerror ไม่มีproviderretryเพิ่ม ไม่แตะcredentials/model/Terminal store Build/tests20รายการรวมregressionผ่าน Local HTTPและpublicsignature/LINE Verifyผ่าน หลังrestartรับinboundจริงlogmodel_rate_limit/fallbackตามคาด แล้วFAQok2ms/replied ผู้ใช้ยืนยันว่าได้รับFAQแล้ว บทสนทนาผ่านโมเดลยังอาจติดquotaจนproviderปลดข้อจำกัด LINE memoryยังephemeral รายละเอียดstartupoverrideและrollbackใน LINE_SETUP.md
+
+
+## LINE persistent memory แยกจาก Terminal
+
+ตามการอนุญาตล่าสุด LINEserverใช้MemoryStoreค่าเดียวกับTerminalใน.line-memory แยกdirectory/lockและtrustedidentity ไม่แตะTerminalstoreหรือconfigcredentials เพิ่มLineConversationsเก็บclient/challengeเฉพาะuser/OA/adapter มีidle30นาที/cap100 และmemorycommandsที่ไม่เรียกโมเดล /memoryเป็นsnapshotย่อ /resetคงprofile/long-termล้างpending /forgetต้องconfirm60วินาทีและcancel/ข้อความอื่นยกเลิก ไม่ให้confirmข้ามคน/OA/restart
+
+Build/tests22รายการผ่าน รวมsignedadapter→persistentstore/restart/profile/summary/compaction32turn, OA/user/channelisolation, Terminalอีกprocess/storeเปิดพร้อมLINE, resetpreservesfacts, forgetcancel/expiry/physicaldelete/no-revival/retention และregressionเดิม LocalHTTPmockผ่าน ไม่ใช้ข้อมูลจริงเพื่อdelete tests ServerเปิดstoreจริงและLINE Verifyผ่านหลังrestart ผู้ใช้ส่งชื่อสำเร็จและมีrecord0600จริง จากนั้นrestartเพื่อให้ผู้ใช้ตรวจ/memoryซ้ำ ประวัติRAMก่อนเปิดstoreไม่ได้ย้ายอัตโนมัติ คิว/dedupeยังไม่durable

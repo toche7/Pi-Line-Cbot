@@ -4,6 +4,7 @@ dist/
 !.env.example
 .pi-runtime/
 .customer-memory/
+.line-memory/
 .pi/
 .npmrc
 .DS_Store

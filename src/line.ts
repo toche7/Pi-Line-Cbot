@@ -2,6 +2,7 @@ import { createHmac, timingSafeEqual, randomUUID } from 'node:crypto';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { CustomerCore } from './core.js';
 import { failureCategory, lineFailureReply } from './diagnostics.js';
+import { LineConversations } from './line-memory.js';
 
 export function validSignature(raw: Buffer, signature: string | undefined, secret: string): boolean {
   if (!secret || !signature || !/^[A-Za-z0-9+/]{43}=$/.test(signature)) return false;
@@ -34,9 +35,10 @@ export class LineAdapter {
   private tasks = new Set<Promise<void>>();
   private tail: Promise<void> = Promise.resolve();
   private closed = false;
-  constructor(private options: LineOptions) {}
+  private conversations: LineConversations;
+  constructor(private options: LineOptions) { this.conversations = new LineConversations(options.core); }
   async drain() { await Promise.allSettled([...this.tasks]); }
-  close() { this.closed = true; }
+  close() { this.closed = true; this.conversations.close(); }
 
   // Called only with the untouched bytes collected by the HTTP adapter.
   accept(raw: Buffer, signature: string | undefined): number {
@@ -66,8 +68,8 @@ export class LineAdapter {
         let text = '';
         let fallback = false;
         try {
-          const client = this.options.core.client({ channel: 'line', scope: `${this.options.account}:direct`, user: event.source.userId });
-          await client.send(event.message.text, { text: value => { text += value; }, status: () => {} });
+          await this.conversations.send({ channel: 'line', scope: `${this.options.account}:direct`, user: event.source.userId },
+            event.message.text, { text: value => { text += value; }, status: () => {} });
         } catch (error) {
           fallback = true;
           record('core_failed', failureCategory(error));

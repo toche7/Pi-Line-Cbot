@@ -12,7 +12,7 @@ if (process.env.PUBLIC_BASE_URL?.trim()) {
   } catch { /* Invalid URL: do not echo supplied value. */ }
 }
 console.log(`HTTPS base URL valid (syntax only): ${endpointValid}`);
-console.log('LINE persistence: not connected; Terminal persistence remains separate.');
+console.log('LINE server persistence: .line-memory; separate directory/lock from Terminal .customer-memory; retention 90 days.');
 console.log('No API request, deployment or LINE message was sent; configured does not prove credentials are valid.');
 if (missing.length || !endpointValid) {
   console.log('Not ready for OA test. Fill missing fields locally and choose HTTPS hosting.');
