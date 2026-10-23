@@ -1,0 +1,31 @@
+node_modules/
+dist/
+.env*
+!.env.example
+.pi-runtime/
+.pi/
+.npmrc
+.DS_Store
+
+# Credentials and private material
+auth.json
+credentials*
+secrets*
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Runtime logs, conversation history and customer data
+logs/
+*.log
+sessions/
+history/
+conversations/
+customer-data/
+data/
+runtime/
+*.jsonl
+*.sqlite*
+*.db
+coverage/

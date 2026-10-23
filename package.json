@@ -1,0 +1,24 @@
+{
+  "name": "pi-sdk-customer-demo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node --env-file-if-exists=.env dist/main.js",
+    "chat": "node --env-file-if-exists=.env dist/main.js --chat",
+    "check": "node --env-file-if-exists=.env dist/main.js --check",
+    "test": "node --test dist/*.test.js"
+  },
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "dependencies": {
+    "@earendil-works/pi-ai": "1.4.0",
+    "@earendil-works/pi-coding-agent": "1.4.0",
+    "@sinclair/typebox": "0.34.52"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.5",
+    "typescript": "7.0.2"
+  }
+}
