@@ -105,6 +105,12 @@ Build/tests ล่าสุด18รายการผ่าน รวม >32turn
 
 เพิ่ม `npm run line:check` สำหรับตรวจ readiness ที่ไม่แสดงค่า secrets และปรับ LINE_SETUP ให้ตรงกับ core ล่าสุด ยังไม่ต่อ persistent store ให้ LINE ต้องกำหนด OA/HTTPS ก่อนและวาง store แยกพร้อม lifecycle/isolation/reset/forget controls ให้ครบ ไม่อ้างว่า Terminal memory milestone ทำให้ LINE จำข้าม restartแล้ว ขั้นที่ต้องใช้เจ้าของคือเติม config บนเครื่องและเลือก HTTPS hosting; ไม่ส่ง keys ผ่านแชต
 
+### อัปเดตหลังเติม config
+
+ยืนยันผ่าน read-only LINE APIว่า OAชื่อ DemoB1, tokenใช้ได้และchannelตรงกับ.env, allowlist1คนformatถูกต้อง PUBLIC_BASE_URLยังขาด และมีwebhookเดิมactiveบนn8n ไม่ได้ชี้มาที่localserverโดยหลักฐานที่มี จึงยังไม่เปลี่ยนปลายทางหรือเปิดreply
+
+local dry-run serverเริ่มได้แล้ว: health200, unsigned401, signed events=[]200 ไม่ส่งuser event/LINE message ต้องเจ้าของเลือกเส้นทางผ่านn8nเดิมหรือHTTPS hostingก่อนตรวจLINE E2Eและreplyจริง ไม่มีการเปลี่ยนcredentialsหรือTerminal memory
+
 ## ผลทดสอบ Terminal ก่อน LINE เพิ่มเติม
 
 ทดสอบ `npm run chat` รุ่น CBTU ผ่าน PTY จริงครบสมัครสมาชิก, ข้อขัดแย้งการเข้าเรียนหลังจ่าย, certificate, ติดต่อเจ้าหน้าที่ และไม่พบข้อมูล ทั้งหมดผ่านพร้อม source/time ตามกติกา ทดสอบความจำผ่านโมเดลจริงสอง turn ในโปรเซสเดียวแล้วตอบชื่อทดสอบตรงกัน (476/441 ms) และ `/exit` ออกด้วย code 0 ไม่มีการเปลี่ยน config หรือเรียก LINE ในรอบนี้ รายละเอียด: [TERMINAL_TEST_RESULTS.md](./TERMINAL_TEST_RESULTS.md)

@@ -4,6 +4,20 @@
 
 ## ผล readiness ล่าสุด
 
+### หลังผู้ใช้เติม OA config (ผลล่าสุด แทนสถานะเริ่มต้นด้านล่าง)
+
+อ่าน LINE metadata ด้วย token จาก .env เท่านั้น: bot info HTTP200 ยืนยันชื่อ OA **DemoB1**, token metadata HTTP200 และ channel ID ตรงกับ config, tester allowlist 1คนมีรูปแบบถูกต้อง ไม่แสดง token หรือ user ID เต็ม ไม่เปลี่ยนค่า config
+
+PUBLIC_BASE_URL ยังว่าง และ LINE รายงานว่ามี webhook เดิม active อยู่บน `maieg.app.n8n.cloud` ซึ่งไม่ใช่หลักฐานว่า route มาซีบอตบนเครื่องนี้แล้ว ไม่แก้/ทับ webhook เดิม ไม่ตั้ง tunnel หรือเลือก hosting แทนเจ้าของ
+
+เริ่ม local server ที่127.0.0.1:3000ด้วย configปัจจุบันและ dry run=trueแล้ว ตรวจจริง: GET /health→200, POST unsigned→401, signed events=[]→200 ไม่มี user event หรือ replyส่งออก การทดสอบนี้ยืนยันเฉพาะ local HTTP/signature ไม่ใช่ LINE HTTPS E2E
+
+สิ่งที่ยังต้องตัดสินใจคือใช้ n8n เดิมเป็นตัวรับแล้วส่ง raw body/signatureต่อไปยังซีบอตที่เข้าถึงได้ หรือกำหนด HTTPS hostingอื่นให้ซีบอต เจ้าของต้องเลือก/ระบุปลายทางก่อน ไม่ส่งข้อความทดสอบไป workflowเดิมโดยเดาทาง เมื่อเส้นทางพร้อมจึงทดสอบ Verify/dry runผ่าน HTTPS แล้วเปิด replyเฉพาะallowlistเพื่อให้ผู้ใช้ส่งข้อความเข้าDemoB1 ไม่มี push/broadcast/handoff
+
+Server localที่เปิดไว้เป็นเพียงโปรเซสชั่วคราว หากปิดแล้วเริ่มใหม่ด้วย `npm run server` ความจำ LINE ยัง ephemeral และแยกจาก persistent store ของ Terminal
+
+### สถานะเริ่มต้นก่อนเติม config (เก็บเป็นประวัติ)
+
 หลัง Terminal memory milestone `c7eb825`: ตรวจเฉพาะ presence ใน .env พบ LINE_CHANNEL_ID, LINE_CHANNEL_SECRET, LINE_CHANNEL_ACCESS_TOKEN, LINE_ALLOWED_USER_IDS และ PUBLIC_BASE_URL ยังไม่ตั้ง; dry run=true, tester count=0 ตรวจ port3000 ไม่พบ listener และ `npm run server` หยุดเพราะไม่มี secret ตามคาด ยังระบุ OA/ผู้รับจริงไม่ได้ จึงไม่มี external reply
 
 สิ่งที่ต้องเติมบนเครื่องขั้นต่ำ: ID/secret/token ของ **OA ทดสอบเดียวกัน**, user ID ของผู้ทดสอบ 1:1 และเลือก HTTPS hosting/base URL ที่ต้องการใช้ ไม่มีการสร้าง tunnel/deploy ให้เองและไม่มีการเขียนทับ .env
