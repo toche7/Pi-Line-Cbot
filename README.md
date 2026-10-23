@@ -1,6 +1,6 @@
 # ซีบอต — CBTU Customer Agent ทดลอง
 
-ใช้ Pi SDK core เดียวสำหรับ Terminal และ LINE adapter ชื่ออังกฤษยังไม่ยืนยัน ใช้เฉพาะข้อมูลเว็บไซต์ CBTU สาธารณะ ไม่มี Notion ภายใน ไม่มีข้อมูลผู้เรียนจริง และยังไม่ deploy หรือส่ง LINE จริง
+ใช้ Pi SDK core เดียวสำหรับ Terminal และ LINE adapter ชื่ออังกฤษยังไม่ยืนยัน ใช้เฉพาะข้อมูลเว็บไซต์ CBTU สาธารณะ ไม่มี Notion ภายใน ไม่มีข้อมูลผู้เรียนจริง และใช้ LINE ผ่าน tunnel ชั่วคราวสำหรับผู้ทดสอบ (LINE reply API ยอมรับข้อความจริงแล้ว)
 
 - [แผนและสถานะงาน](./CUSTOMER_AGENT_PLAN.md)
 - [ผลทดสอบ Terminal จริง รวมความจำผ่านโมเดล](./TERMINAL_TEST_RESULTS.md)
@@ -42,7 +42,7 @@ FAQ ที่ระบุหัวข้อตอบจาก snapshot พร้
 
 ## LINE local
 
-ตรวจ config โดยไม่แสดงค่า secrets: `npm run line:check` (หลัง build) ผลล่าสุดยืนยัน OA **DemoB1** และ token/channel/allowlistแล้ว แต่ HTTPS base URLยังขาดและOAมีwebhook n8nเดิม activeอยู่ Local dry-runผ่านแล้ว ยังไม่routeเข้าLINEหรือส่งreplyจริง อ่าน [สถานะ readiness และขั้นต่อไป](./LINE_SETUP.md)
+ตรวจ config โดยไม่แสดงค่า secrets: `npm run line:check` (หลัง build) ผลล่าสุดยืนยัน OA **DemoB1**, token/channel และ allowlist 1คน เปิด ngrok เฉพาะพอร์ต3000แล้ว Public signature checks และ LINE Verify ผ่าน เปลี่ยน webhook/readback active=true และเริ่มโหมด reply จริงเฉพาะ allowlist แล้ว รับ inbound จริงและ LINE reply API ยอมรับ reply 7 ครั้งแล้ว อ่าน [สถานะและวิธีหยุด/rollback](./LINE_SETUP.md)
 
 เติม LINE_CHANNEL_SECRET และค่าทดสอบตาม [LINE_SETUP.md](./LINE_SETUP.md) แล้ว:
 
@@ -50,7 +50,7 @@ FAQ ที่ระบุหัวข้อตอบจาก snapshot พร้
 npm run server
 ```
 
-ค่าเริ่มต้น bind `127.0.0.1:3000`, POST `/webhook/line`, GET `/health`; dry run เปิดอยู่ ไม่มี public endpoint ที่สร้างให้อัตโนมัติ ต้องมี HTTPS hosting และตั้ง Console เองก่อน LINE เข้าถึงได้ การส่งจริงต้องเติม token/allowlist และตั้ง dry run false เอง กลุ่ม/room ถูกข้าม รับเฉพาะ 1:1 กับผู้ทดสอบ
+ค่าเริ่มต้น bind `127.0.0.1:3000`, POST `/webhook/line`, GET `/health`; dry run เป็นค่าเริ่มต้น รอบทดสอบปัจจุบันได้รับอนุญาตให้เปิด tunnel และตั้ง dry run false แล้ว ต้องเปิด server/tunnel ค้างไว้ กลุ่ม/room ถูกข้าม รับเฉพาะ 1:1 กับผู้ทดสอบ
 
 ## โครงสร้างและผลตรวจ
 
@@ -63,7 +63,7 @@ npm run server
 
 Build และ tests ล่าสุด 18 รายการผ่าน รวม persistence/restart, >20 turn/compaction, reset/forget confirm/cancel/physical deletion, isolation, safe memory และ failed summary/429 recovery เพิ่มจาก tests dialogue/FAQ/LINE จำลองเดิม หาก dialogue ผิดรูปแบบ/ถูกตัด/ว่าง จะขอซ่อมได้หนึ่งครั้งภายใน deadline เดิม Tests ไม่เรียก LINE จริง
 
-ทดสอบ `npm run chat` ผ่าน PTY จริงหลายรอบและหลาย turn แบบผสมแล้ว พบและแก้ routing ที่วน FAQ fallback และการแต่งตัวตน/เว็บ ไม่พบ process crash ในรอบที่ reproduce แต่พบ provider 429 จริงด้วย จึงแยกผล functional กับข้อจำกัด provider ไว้ใน TERMINAL_TEST_RESULTS.md การทดสอบ 2 turn เดิมไม่เพียงพอยืนยัน small talk หรือความเสถียรแชตยาว ยังไม่ได้ทดสอบ LINE OA/HTTPS จริง
+ทดสอบ `npm run chat` ผ่าน PTY จริงหลายรอบและหลาย turn แบบผสมแล้ว พบและแก้ routing ที่วน FAQ fallback และการแต่งตัวตน/เว็บ ไม่พบ process crash ในรอบที่ reproduce แต่พบ provider 429 จริงด้วย จึงแยกผล functional กับข้อจำกัด provider ไว้ใน TERMINAL_TEST_RESULTS.md การทดสอบ 2 turn เดิมไม่เพียงพอยืนยัน small talk หรือความเสถียรแชตยาว LINE OA/HTTPS ตรวจ Verify และ signature จริงผ่านแล้ว และ LINE reply API ยอมรับ reply จริง 7 ครั้งแล้ว (ยังไม่ได้ตรวจหน้าจอผู้รับ)
 
 สำหรับบริการจริงยังต้องเพิ่ม durable queue/dedupe และ persistence สำหรับ LINE หลังตกลง retention/access, customer verification ก่อนข้อมูลจริง, การประเมินคำตอบกว้างขึ้น และ cost monitoring แบบเงิน Local Terminal store มี idle retention 90 วันและสิทธิ์ไฟล์จำกัด แต่ยังไม่ใช่ระบบหลายเครื่องหรือฐานข้อมูลเข้ารหัส ไม่มีการส่งต่อเจ้าหน้าที่หรือ action เปลี่ยนข้อมูลในรุ่นนี้
 

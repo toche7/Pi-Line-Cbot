@@ -114,3 +114,10 @@ local dry-run serverเริ่มได้แล้ว: health200, unsigned401
 ## ผลทดสอบ Terminal ก่อน LINE เพิ่มเติม
 
 ทดสอบ `npm run chat` รุ่น CBTU ผ่าน PTY จริงครบสมัครสมาชิก, ข้อขัดแย้งการเข้าเรียนหลังจ่าย, certificate, ติดต่อเจ้าหน้าที่ และไม่พบข้อมูล ทั้งหมดผ่านพร้อม source/time ตามกติกา ทดสอบความจำผ่านโมเดลจริงสอง turn ในโปรเซสเดียวแล้วตอบชื่อทดสอบตรงกัน (476/441 ms) และ `/exit` ออกด้วย code 0 ไม่มีการเปลี่ยน config หรือเรียก LINE ในรอบนี้ รายละเอียด: [TERMINAL_TEST_RESULTS.md](./TERMINAL_TEST_RESULTS.md)
+
+
+## เชื่อม DemoB1 ผ่าน HTTPS tunnel
+
+23 ตุลาคม 2026: หลังเจ้าของอนุญาตให้เปิด tunnel/เปลี่ยน webhook ใช้ ngrok ที่ติดตั้งและมี configอยู่ อัปเดตโปรแกรมเป็น3.39.12 เปิดเฉพาะซีบอตพอร์ต3000และปิดrequest inspector ตรวจ public health200/unsigned401/signed-empty200 และ LINE Verify success=true สำรอง webhookเดิมในruntimeที่ignoredและmode0600 แล้วเปลี่ยนปลายทาง อ่านกลับ active=true/URLตรงกัน จากนั้นเปิดreplyจริงเฉพาะallowlist1คนและrestart ตรวจpublic/LINE Verifyซ้ำผ่าน ต่อมารับinboundจริงและlogยืนยันoutcome=replied7ครั้งหลังLINE reply APIสำเร็จ ยังไม่ได้ตรวจหน้าจอผู้รับ ไม่ส่งpush/broadcast ไม่แตะn8nworkflowหรือTerminal memory และLINE memoryยังephemeral
+
+เพิ่ม script สำหรับตรวจ/เปลี่ยน/rollback โดยไม่แสดงsecretsและไม่ทับbackupเดิม วิธีหยุดและคืนปลายทางใน LINE_SETUP.md เครื่อง/server/tunnelต้องเปิดอยู่และURLอาจเปลี่ยน ยังไม่ใช่hostingถาวร

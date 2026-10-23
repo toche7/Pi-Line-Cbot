@@ -1,10 +1,49 @@
 # ตั้งค่าซีบอต CBTU สำหรับ LINE กลุ่มทดสอบ
 
-สถานะ 23 ตุลาคม 2026: มี local adapter และ tests แบบ mock แล้ว ยังไม่ได้ส่ง LINE จริง, ตั้ง tunnel หรือ deploy ชื่อใช้ภาษาไทย “ซีบอต” จนกว่าจะยืนยัน spelling อังกฤษ
+สถานะ 23 ตุลาคม 2026: OA **DemoB1** เชื่อมกับซีบอตบนเครื่องผ่าน ngrok HTTPS tunnel แล้ว LINE Verify ผ่านและ webhook active=true โหมด reply จริงเปิดเฉพาะ allowlist 1 คน ได้รับ inbound จาก LINE และ API ยอมรับ reply จริงแล้ว 7 ครั้ง ชื่อใช้ภาษาไทย “ซีบอต” จนกว่าจะยืนยัน spelling อังกฤษ
 
 ## ผล readiness ล่าสุด
 
-### หลังผู้ใช้เติม OA config (ผลล่าสุด แทนสถานะเริ่มต้นด้านล่าง)
+### HTTPS tunnel และการเปลี่ยน webhook (ล่าสุด)
+
+เจ้าของอนุญาต tunnel ชั่วคราวและเปลี่ยน webhook โดยตรงแล้ว ใช้ ngrok ที่มี config อยู่ อัปเดตจาก 3.6.0 เป็น 3.39.12 เพราะบริการปฏิเสธเวอร์ชันเก่า เปิดเฉพาะ upstream `http://127.0.0.1:3000` และปิด request inspector (`--inspect=false`) ไม่ได้เปิดบริการอื่น
+
+Public webhook ทดสอบปัจจุบัน: `https://2d34-2405-9800-b651-6936-fc30-29a7-345-362e.ngrok-free.app/webhook/line` URL อาจเปลี่ยนเมื่อเริ่ม tunnel ใหม่; ค่าปัจจุบันอยู่ใน `.env` เป็น PUBLIC_BASE_URL
+
+ตรวจ OA DemoB1 และ token/channel ตรงกันก่อนเปลี่ยน ผ่าน public health200 / unsigned401 / signed events=[]200 และ LINE webhook test success=true ทั้งก่อนและหลังเปลี่ยน อ่านกลับแล้ว endpoint ตรงกับ tunnel และ active=true จากนั้นตั้ง LINE_DRY_RUN=false และ restart server ตรวจซ้ำผ่าน ไม่มีการส่ง push/broadcast และต่อมารับ inbound จริงและ log outcome=replied จำนวน 7 ครั้ง ซึ่งเกิดหลัง LINE reply API ตอบ success ไม่มี raw body/user ID/reply token ใน log; เป็นหลักฐานฝั่ง API ไม่ใช่การตรวจหน้าจอผู้รับ
+
+สำรอง webhook เดิมไว้ใน `runtime/line-webhook-rollback.json` (ignored, mode0600, directory0700) ไม่แสดง URL เดิมซึ่งอาจมีข้อมูลส่วนตัว ไม่แก้ workflow หรือบริการ n8n อื่น **อย่า commit หรือส่งไฟล์นี้ในแชต** เก็บไว้จนเลิกทดสอบ
+
+### เปิดต่อ หยุด และ rollback
+
+เปิด terminal แยกสองหน้าที่โฟลเดอร์โปรเจกต์:
+
+```sh
+npm run server
+ngrok http http://127.0.0.1:3000 --inspect=false --log stdout --log-format json --log-level warn
+```
+
+หากโปรเซสเดิมยังทำงานอยู่ไม่ต้องเปิดซ้ำ ปิดด้วย Ctrl-C ใน terminal ของแต่ละโปรเซส การปิดเครื่อง/server/tunnel จะทำให้ LINE เรียกซีบอตไม่ได้ ควร rollback ก่อนหยุดทดสอบ ไม่ใช่บริการที่ทำงานถาวร
+
+อ่านสถานะและทดสอบ events ว่างโดยไม่มีข้อความออก:
+
+```sh
+node --env-file=.env scripts/line-webhook-admin.mjs verify
+```
+
+คืน webhook เดิมจากไฟล์ส่วนตัว (ตรวจ channel/ปลายทางปัจจุบันก่อนเปลี่ยน):
+
+```sh
+node --env-file=.env scripts/line-webhook-admin.mjs rollback
+```
+
+คำสั่งคืน URL เดิม อ่านกลับเพื่อยืนยัน และตั้ง LINE_DRY_RUN=true ใน .env จากนั้น restart server ให้รับค่าใหม่ หรือหยุด server/tunnel ด้วย Ctrl-C หากมีผู้อื่นเปลี่ยน webhook ไปแล้ว คำสั่งจะหยุดแทนการทับปลายทางที่ไม่ตรง
+
+`scripts/line-webhook-admin.mjs prepare` ใช้ตรวจ tunnel และบันทึก rollback ครั้งแรกเท่านั้น จะไม่เขียนทับ backup ที่มีอยู่; `switch` ต้องมี backup และผ่าน identity/public signature/LINE Verify ก่อนเปลี่ยน ส่วนการเปิด Use webhook หากปิดอยู่ต้องตั้งใน Console งานนี้อ่านกลับแล้วเปิดอยู่ ไม่มี secrets ใน script
+
+LINE memory ยังคง ephemeral แยกจาก Terminal persistent store เดิม ไม่ได้เพิ่ม persistence/control commands สำหรับ LINE ในรอบนี้
+
+### หลังผู้ใช้เติม OA config (ประวัติก่อนเปิด tunnel)
 
 อ่าน LINE metadata ด้วย token จาก .env เท่านั้น: bot info HTTP200 ยืนยันชื่อ OA **DemoB1**, token metadata HTTP200 และ channel ID ตรงกับ config, tester allowlist 1คนมีรูปแบบถูกต้อง ไม่แสดง token หรือ user ID เต็ม ไม่เปลี่ยนค่า config
 
@@ -80,7 +119,7 @@ URL บนเครื่องคือ `http://127.0.0.1:3000/webhook/line` �
 
 ## ตั้ง webhook หลังมี HTTPS hosting
 
-1. จัดเตรียม HTTPS endpoint ที่เจ้าของระบบดูแลและ route POST `/webhook/line` ถึง server โดยคง raw request body ไม่ parse/reformat ก่อนตรวจ signature; ยังไม่มี hosting/tunnel ที่สร้างในงานนี้
+1. จัดเตรียม HTTPS endpoint ที่เจ้าของระบบดูแลและ route POST `/webhook/line` ถึง server โดยคง raw request body ไม่ parse/reformat ก่อนตรวจ signature; สำหรับทางเลือก hosting ถาวรนอกเหนือจาก tunnel ทดสอบด้านบน
 2. เติม PUBLIC_BASE_URL ใน .env เพื่อบันทึกปลายทาง แล้วเข้า Messaging API tab ใน Console ตั้ง Webhook URL เป็น `https://<โดเมนของคุณ>/webhook/line` ด้วยตนเอง localhost ใช้รับ webhook จาก LINE โดยตรงไม่ได้
 3. กด Verify: request ที่มี signature ถูกต้องและ events=[] ต้องตอบ 200; signature ไม่ถูกต้องต้องได้ 401
 4. เปิด Use webhook และตรวจ response settings ของ OA เพื่อไม่ให้ auto-reply/greeting ที่ตั้งไว้ชนกับบอต ปรับเฉพาะ OA ทดสอบตามต้องการ
