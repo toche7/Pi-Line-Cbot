@@ -4,6 +4,7 @@ export class DemoFailure extends Error {}
 export function failureCategory(error: unknown): string {
   if (!(error instanceof DemoFailure)) return 'internal';
   const message = error.message;
+  if (/Memory บันทึกไม่สำเร็จ/.test(message)) return 'memory_write';
   if (/429/.test(message)) return 'model_rate_limit';
   if (/timed out|timeout/i.test(message)) return 'model_timeout';
   if (/401|403/.test(message)) return 'model_auth';
@@ -13,6 +14,7 @@ export function failureCategory(error: unknown): string {
 }
 
 export function lineFailureReply(error: unknown): string {
+  if (failureCategory(error) === 'memory_write') return 'ยังบันทึกข้อมูลเพิ่มไม่สำเร็จครับ ข้อมูลเดิมยังอยู่ กรุณาลองใหม่ และตรวจสิ่งที่บันทึกด้วย /memory';
   if (failureCategory(error) === 'model_rate_limit') {
     return 'ขณะนี้โมเดลสนทนาถูกจำกัดโควตาชั่วคราว กรุณารอสักครู่แล้วลองใหม่ ระหว่างนี้ยังถาม FAQ ได้ เช่น “สมัครสมาชิกอย่างไร” หรือดู https://cbtumu.net/faq/';
   }

@@ -28,6 +28,8 @@ Tests 27 รายการรวม LINE memory เดิมผ่าน Live c
 
 รุ่น `/help` restart บน DemoB1 โหมดตอบจริงแล้วโดยใช้ tunnel/webhook และ memory store เดิม ตรวจ public health200/unsigned401/signed-empty200 และ LINE Verify ผ่าน ไม่มีการส่ง push/broadcast เพื่อทดสอบ
 
+รุ่น semantic memory requests ขึ้น runtime และ restart บน DemoB1 แล้ว: รองรับคำขอจำหลายสำนวนพร้อม host validation/staged commit และทวนfactหลังsaveสำเร็จ อ้างเรื่องกำกวมถามก่อน ไม่อ้างsuccessเมื่อprovider/parse/storeล้มเหลว Build/tests49รายการและAPIจริง2สำนวนในstoreชั่วคราวผ่าน หลังrestart health/signatureและLINE Verifyผ่านบนURLเดิม คง.env/provider/credentials/ความจำเดิม รายละเอียด [MEMORY_REQUEST_GUIDE.md](./MEMORY_REQUEST_GUIDE.md) รอผู้ใช้ส่งคำขอจริงและ/memoryเพื่อยืนยันการรับในLINE ไม่มีpush/broadcastหรือใช้replytokenเก่า
+
 Build/tests22รายการผ่าน รวมLINEsignedmemorypersist/restart/compaction, OA/user/channelisolation, Terminalคนละโปรเซส/storeเปิดพร้อมLINEได้, reset/forgetcancel/expiry/physicaldelete/no-revival และretention Local HTTPhealth200/signature401/200/dedupeหนึ่งmockreplyผ่าน Serverrestartแล้วเปิดpersistentstoreจริงและpublichealth/signature/LINE Verifyผ่านactive=trueใช้URLเดิม ผู้ใช้บอกชื่อผ่านLINEสำเร็จ(ok490ms/replied) ตรวจmetadatarecordมีชื่อและrecent1คู่/0600แล้วrestartอีกครั้ง ผู้ใช้ส่ง/memoryผ่านLINEและยืนยันว่าชื่อในprofileกับrecent1คู่ยังอยู่หลังrestart จึงยืนยันpersistentreloadผ่านLINEจริงแล้ว
 
 คำสั่งเริ่มใช้ค่า.envตามปกติ; โปรเซสทดสอบreplyปัจจุบันใช้ `LINE_DRY_RUN=false npm run server` โดยไม่แก้credentials/.env ระหว่างงานนี้ ต้องเปิดserver/tunnelค้างไว้ การpersistไม่ได้ทำให้คิว/dedupeเป็นdurableและไม่ได้แก้providerquota

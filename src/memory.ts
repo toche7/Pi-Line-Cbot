@@ -18,7 +18,7 @@ export function safeText(text: string): string {
     .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, '[email removed]')
     .replace(/\b(?:\d[ -]?){10,16}\b/g, '[personal number removed]').slice(0, 2000);
 }
-function profileValue(value: string): string | undefined {
+export function profileValue(value: string): string | undefined {
   const clean = safeText(value).trim().split(/[,\n]|\s+(?:ช่วย|จำไว้|นะครับ|นะคะ)/)[0].trim().replace(/\s*(?:ครับ|ค่ะ|คะ)$/, '');
   return clean && clean.length <= 160 && !/\[|https?:|ignore|system|instruction|admin|สิทธิ์|คำสั่ง|เปลี่ยนตัวตน|อะไร|ใคร|ไหม|หรือ|[?]|\b(?:what|who)\b/i.test(clean) ? clean : undefined;
 }
