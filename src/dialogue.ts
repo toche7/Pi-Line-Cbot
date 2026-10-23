@@ -29,9 +29,9 @@ export async function runDialogue(session: AgentSession, prompt: string, timeout
           status: value => { if (!value.startsWith('[completed')) output.status(value); },
         });
       } catch (error) {
-        if (!(error instanceof DemoFailure) || !/output token budget|no answer text/.test(error.message)) throw error;
+        if (!(error instanceof DemoFailure) || !/output token budget|no answer text|JSON generation failed/.test(error.message)) throw error;
         if (attempt === 1) throw error;
-        output.status('[คำตอบถูกตัดหรือว่าง กำลังขอคำตอบสั้นใหม่หนึ่งครั้ง]');
+        output.status('[คำตอบถูกตัด ว่าง หรือจัดรูปแบบไม่ได้ กำลังขอคำตอบสั้นใหม่หนึ่งครั้ง]');
         continue;
       }
       try {

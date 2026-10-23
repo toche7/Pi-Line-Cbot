@@ -5,7 +5,7 @@ import { createDemo } from './agent.js';
 import { runDialogue } from './dialogue.js';
 
 test('dialogue repairs malformed or truncated output once, hides plans, and restores tools/hooks', async () => {
-  for (const failure of ['malformed', 'truncated'] as const) {
+  for (const failure of ['malformed', 'truncated', 'provider-json', 'provider-json-repeated'] as const) {
     const { session, modelRuntime } = await createDemo();
     await modelRuntime.setRuntimeApiKey('groq', 'offline-placeholder');
     let requests = 0;
@@ -15,22 +15,26 @@ test('dialogue repairs malformed or truncated output once, hides plans, and rest
     modelRuntime.streamSimple = (model) => {
       assert.deepEqual(session.getActiveToolNames(), []);
       requests++;
+      const rejectedJson = failure.startsWith('provider-json') && (requests === 1 || failure === 'provider-json-repeated');
       const message: AssistantMessage = {
         role: 'assistant', content: [{ type: 'text', text: requests === 1 ? '{broken' : '{"intent":"chat","reply":"กำลังคุยกับคุณครับ"}' }],
         provider: model.provider, model: model.id, api: model.api,
-        stopReason: requests === 1 && failure === 'truncated' ? 'length' : 'stop', timestamp: Date.now(),
+        stopReason: rejectedJson ? 'error' : requests === 1 && failure === 'truncated' ? 'length' : 'stop',
+        errorMessage: rejectedJson ? 'Failed to generate JSON. private-generation-fixture' : undefined, timestamp: Date.now(),
         usage: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, totalTokens: 0,
           cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 } },
       };
       const stream = createAssistantMessageEventStream();
-      stream.push({ type: 'done', reason: message.stopReason === 'length' ? 'length' : 'stop', message });
+      if (rejectedJson) stream.push({ type: 'error', reason: 'error', error: message });
+      else stream.push({ type: 'done', reason: message.stopReason === 'length' ? 'length' : 'stop', message });
       return stream;
     };
     try {
-      const reply = await runDialogue(session, 'ทำอะไรอยู่', 1000, {
+      const result = runDialogue(session, 'ทำอะไรอยู่', 1000, {
         text: () => { assert.fail('raw plan must not be exposed'); }, status: s => { status.push(s); },
       });
-      assert.equal(reply, 'กำลังคุยกับคุณครับ');
+      if (failure === 'provider-json-repeated') await assert.rejects(result, /^Error: Model JSON generation failed\.$/);
+      else assert.equal(await result, 'กำลังคุยกับคุณครับ');
       assert.equal(requests, 2);
       assert.ok(status.some(s => s.includes('หนึ่งครั้ง')));
       assert.deepEqual(session.getActiveToolNames(), tools);

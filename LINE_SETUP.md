@@ -4,7 +4,15 @@
 
 ## ผล readiness ล่าสุด
 
-### แก้ fallback จาก model rate limit (ผลล่าสุด)
+### แก้ provider JSON generation failure หลังเปลี่ยนคีย์
+
+ผู้ใช้เปลี่ยนคีย์บนเครื่องแล้วทดสอบหนึ่ง model turnสำเร็จ และรับreplyปกติในLINE404ms ต่อมามีภาพfallbackซ้ำ ตรวจlogพบcore_failure (จึงไม่สรุปว่าเป็น429) ทำซ้ำบทสนทนาในcoreชั่วคราวพบ provider error “Failed to generate JSON” โดยไม่เก็บหรือแสดงraw error/failed generation การย่อบริบทหลังFAQ6turnทดสอบแยกแล้วผ่าน จึงยังไม่มีหลักฐานว่าcompactionเป็นต้นเหตุ
+
+แก้describeFailureให้จำแนกJSON generation errorอย่างปลอดภัย และrunDialogueซ่อมได้หนึ่งครั้งภายในdeadlineเดิมเช่นเดียวกับคำตอบผิดรูปแบบ ไม่retry429/auth/network เพิ่ม model_format categoryและข้อความLINEเฉพาะกรณีซ่อมแล้วยังไม่ผ่าน TestsครอบคลุมproviderJSONล้มครั้งแรกแล้วสำเร็จ และล้มซ้ำต้องหยุดที่สองcalls ไม่เผยrawerror Build/tests20รายการผ่าน บทสนทนาผ่านcoreจริงหลังแก้8turnต่อเนื่องผ่าน
+
+Restart serverด้วยโหมดreplyเฉพาะallowlistเดิมและtunnelเดิม หลังแก้ผู้ใช้ส่ง “เหนื่อยอีกแล้ว” ในLINEและยืนยันได้รับคำตอบปกติ Logล่าสุดมีok496ms/repliedและok332ms/replied ไม่มีfallbackสองturnนั้น ไม่ได้ยืนยันว่าโมเดลจะไม่มีerrorทุกกรณี ไม่มีการเปลี่ยนcredentialsหรือTerminal memory
+
+### แก้ fallback จาก model rate limit (ประวัติก่อนเปลี่ยนคีย์)
 
 ผู้ใช้พบข้อความ “ขณะนี้ซีบอตยังตอบไม่ได้…” ทั้งที่ webhook/reply ทำงาน ตรวจ core เดียวกับ LINE ด้วย config เดิม (Groq qwen/qwen3.8-27b, timeout25s, identity allowlistเดิมแต่ sessionทดสอบชั่วคราว ไม่แตะ Terminal store) พบ model turn สำเร็จหนึ่งครั้ง แล้ว follow-up ได้ HTTP429; FAQ สำเร็จทันที ทดสอบซ้ำพบ429อีกครั้ง ไม่เปลี่ยนcredentialsหรือmodel และไม่retryreplytokenเดิม
 
