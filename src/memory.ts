@@ -113,6 +113,7 @@ export class MemoryStore {
       || !data.recent.every((t: any) => typeof t.user === 'string' && typeof t.assistant === 'string' && safeText(t.user) === t.user && safeText(t.assistant) === t.assistant)
       || !Array.isArray(data.longTerm) || data.longTerm.length > 8 || data.longTerm.some((s: unknown) => typeof s !== 'string' || profileValue(s) !== s)
       || !Number.isInteger(data.compactions) || data.compactions < 0 || (data.catalog !== undefined && (!validCatalogState(data.catalog) || safeText(data.catalog.query) !== data.catalog.query))
+      || (data.catalog?.advice && [data.catalog.advice.goal, data.catalog.advice.background, data.catalog.advice.time].some(s => s !== undefined && safeText(s) !== s))
       || !data.profile || Object.keys(data.profile).some(k => !['name', 'interests', 'goals'].includes(k))
       || Object.values(data.profile).some(v => typeof v !== 'string' || profileValue(v) !== v)) throw new DemoFailure('Memory file invalid; preserved for manual recovery.');
     chmodSync(path, 0o600);

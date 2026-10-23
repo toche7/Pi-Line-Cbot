@@ -4,6 +4,8 @@
 
 ## LINE persistent memory
 
+Catalog context มี advice goal/background/time/stage แบบoptionalและbounded200ตัวอักษรต่อคำตอบ เก็บเฉพาะสิ่งที่ผู้ใช้ตอบ ไม่เดาอาชีพ/คุณสมบัติ ใช้เฉพาะidentityเดิม ผ่านcompaction/restart `/reset` และ `/forget` ล้างadviceด้วย การคุยเล่นและการถามราคา/รายชื่อไม่ถูกเก็บเป็นคำตอบขั้นadviceโดยอัตโนมัติ
+
 Catalog context ปัจจุบันเก็บ full matched IDs / shown IDs / offset / page size / filter queryที่กรองแล้ว แยกจากหัวข้อ FAQ เพื่อไม่เสียบริบทเมื่อขอราคา/รายการต่อหรือคุยเล่น รองรับไม่เกิน20IDsและหน้าละ10รายการ สร้างเมื่อใช้catalogคงผ่านcompaction/restart และล้างด้วย/resetหรือ/forget ไม่เชื่อมข้ามผู้ใช้/OA/ช่องทาง รายละเอียด [LINE_HISTORY_REVIEW.md](./LINE_HISTORY_REVIEW.md)
 
 LINE server เปิด MemoryStore ใน `.line-memory/` ส่วน Terminal ใช้ `.customer-memory/` ทั้งสองถูกignoreในGit โฟลเดอร์และlockแยกกันจึงเปิดคนละโปรเซสพร้อมกันได้ LINE keyประกอบด้วยchannel=line + channelIDของOA/direct + LINE userIDที่ผ่านsignature/allowlist ไม่ดึงidentityจากเนื้อหาข้อความ ไม่แชร์ไฟล์หรือprofileกับTerminal แม้เป็นเจ้าของคนเดียวกัน

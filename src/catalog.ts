@@ -1,4 +1,5 @@
 import { courseCatalog, type Course } from './course-catalog.js';
+import { briefCard, briefSourceNote, courseBrief } from './course-briefs.js';
 
 export type CatalogSelection = {
   kind: 'found' | 'ambiguous' | 'not_found' | 'interest';
@@ -124,6 +125,9 @@ export function renderCatalog(selection: CatalogSelection, ids?: string[]) {
   if (selection.kind === 'not_found') return 'ยังไม่พบหลักสูตรที่ตรงในชุดข้อมูล CBTU ที่เก็บไว้ครับ ไม่ได้หมายความว่าไม่มีหลักสูตรนั้นจริง ลองระบุชื่อเต็มหรือหัวข้อเพิ่มเติม หรือตรวจ https://cbtumu.net/ และติดต่อผ่าน https://cbtumu.net/faq/';
   if (selection.kind === 'ambiguous') return `${selection.field === 'compare' ? 'กรุณาระบุสองหลักสูตรที่ต้องการเทียบครับ ตอนนี้ยังเลือกคู่ไม่ชัดเจน' : 'ชื่อ/หัวข้อนี้ตรงหลายรายการครับ ต้องการตัวไหน? ระบุชื่อเต็มหรือ “อันแรก/อันที่สอง/อันที่สาม”'}\n${selection.courses.map((c, i) => `${i + 1}. ${c.name}\n${c.canonical_url}\nเก็บ ${c.provenance.retrieved_at}${c.detail_access !== 'public' ? ' (หน้ารายละเอียดล็อก)' : ''}`).join('\n')}\nเป็นข้อมูลสำเนา ไม่ยืนยันราคา/รอบที่เปิดตอนนี้`;
   const selected = ids ? ids.map(id => selection.courses.find(c => c.id === id)!) : selection.courses;
+  if (selection.field === 'details' || selection.field === 'compare') {
+    return `${selection.field === 'compare' ? 'เทียบงานที่นำไปใช้และพื้นฐานที่ต้องเตรียม:\n\n' : ''}${selected.map(c => briefCard(c, selection.field === 'compare' ? 'compare' : 'details')).join('\n\n')}\n\n${briefSourceNote(selected)}\nถามต่อเรื่องหัวข้อเรียน ราคา หรือใบประกาศได้ครับ`;
+  }
   const cards = selected.map(c => [
     c.name,
     ...(selection.field === 'price' ? [price(c)] : selection.field === 'certificate' ? [
@@ -142,14 +146,17 @@ export function renderCatalog(selection: CatalogSelection, ids?: string[]) {
     ...(caveats(c) ? [`ข้อควรตรวจ: ${caveats(c)}`] : []),
     `แหล่ง: ${c.canonical_url}\nเก็บ: ${c.provenance.retrieved_at}`,
   ].join('\n'));
-  return `${selection.recommendation ? 'จากหัวข้อที่สนใจ ลองพิจารณารายการเหล่านี้ครับ (ยังไม่ยืนยันความเหมาะสมแทนคุณ):\n' : selection.field === 'compare' ? 'เปรียบเทียบเฉพาะข้อมูลที่มีใน snapshot:\n' : ''}${cards.join('\n\n')}\n\nข้อมูลสำเนา ไม่ใช่ราคา/การเปิดรับสมัครสด Add to Cart/Enroll Now ไม่ยืนยันว่ามีรอบใหม่ ตรวจหน้าหลักสูตรและเจ้าหน้าที่ผ่าน https://cbtumu.net/faq/ ก่อนตัดสินใจ`;
+  return `${cards.join('\n\n')}\n\n${briefSourceNote(selected, selection.field === 'price')}`;
 }
 
 // Only the ranked candidates enter the model request; facts are always rendered by the host.
 export function catalogContext(selection: CatalogSelection) {
-  return selection.courses.map(c => ({ id: c.id, name: c.name, description: c.description_th, topics: c.topics,
-    audience: c.audience_th, prerequisites: c.prerequisites_th, format: c.format_th, duration: c.duration_text,
-    price: c.price, flags: c.flags, missingFields: c.missing_fields, source: c.canonical_url, capturedAt: c.provenance.retrieved_at }));
+  return selection.courses.map(c => {
+    const b = courseBrief(c);
+    return { id: c.id, name: c.name, workExamples: b.workExamples, outcomes: b.outcomes,
+      prerequisites: b.prerequisites, format: b.format, duration: b.duration,
+      source: b.evidence.source, ...(selection.field === 'price' ? { price: c.price } : {}) };
+  });
 }
 export function renderCatalogPlan(plan: any, selection: CatalogSelection) {
   const ids = plan?.courseIds;

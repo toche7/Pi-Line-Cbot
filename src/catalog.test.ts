@@ -80,21 +80,23 @@ test('five acceptance cases use only selected catalog facts; memory and dialogue
   const client = core.client({ channel: 'terminal', scope: 'local', user: 'catalog-fixture' });
   const send = async (q: string) => { let text = ''; await client.send(q, { text: s => { text += s; }, status: () => {} }); return text; };
   try {
-    assert.match(await send('ยังไม่รู้จะเรียนอะไร'), /สนใจ.*ทักษะ/);
+    assert.match(await send('ยังไม่รู้จะเรียนอะไร'), /ช่วยงานอะไร/);
     assert.equal(requests.length, 0);
-    const recommendation = await send('สนใจ Excel ไปใช้วิเคราะห์ข้อมูล');
-    assert.match(recommendation, /Microsoft Excel/); assert.match(recommendation, /ลองพิจารณา/);
-    assert.deepEqual(requests.at(-1)!.candidates, ['cbtu-06']);
+    assert.match(await send('สนใจ Excel ไปใช้วิเคราะห์ข้อมูล'), /พื้นฐาน/);
+    assert.match(await send('เคยใช้ Excel แต่ไม่เขียนโปรแกรม'), /เวลาเรียน/);
+    const recommendation = await send('มีเวลาวันละ30นาที ชอบวิดีโอ');
+    assert.match(recommendation, /Microsoft Excel/); assert.match(recommendation, /ตัวเลือก/);
+    assert.equal(requests.length, 0, 'goal matching uses reviewed facts without model prose');
     const comparison = await send('เปรียบเทียบ Excel กับ Canva');
     assert.match(comparison, /Microsoft Excel/); assert.match(comparison, /สร้างสื่อสวยด้วย Canva/);
-    assert.match(comparison, /ไม่พบข้อมูลใน snapshot/); assert.doesNotMatch(comparison, /999999|เปิดรับสมัครทันที/);
+    assert.match(comparison, /เว็บยังไม่ระบุ/); assert.doesNotMatch(comparison, /999999|เปิดรับสมัครทันที/);
     assert.deepEqual(requests.at(-1)!.candidates, ['cbtu-06', 'cbtu-07']);
     const missing = await send('AI Agent for ALL ราคาเท่าไร');
     assert.match(missing, /ไม่พบราคา.*ไม่ถือว่าฟรี/); assert.match(missing, /https:\/\/cbtumu.net\/faq\//);
     const before = requests.length;
     assert.match(await send('มีคอร์ส Quantum Computing ไหม'), /ไม่พบ.*ในชุดข้อมูล.*ไม่ได้หมายความว่าไม่มี/);
     assert.equal(requests.length, before);
-    assert.match(await send('แนะนำคอร์ส Data เป็นทางเลือกให้หน่อย'), /ลองพิจารณา/);
+    assert.match(await send('แนะนำคอร์ส Data เป็นทางเลือกให้หน่อย'), /ช่วยงานอะไร/);
     assert.ok(requests.at(-1)!.candidates.length <= 3);
     assert.ok(!requests.at(-1)!.prompt.includes('Popular Course Bundle'));
     assert.match(await send('แล้วคุณล่ะ'), /อยู่คุย/);
@@ -112,7 +114,7 @@ test('host rejects IDs outside retrieval, retains cohort warnings and answers gr
   const reordered = renderCatalogPlan({ intent: 'catalog', courseIds: ['cbtu-07', 'cbtu-06'] }, selection);
   assert.equal(selectCatalog('อันแรก', catalogTopicForAnswer(reordered, selection))?.courses[0].id, 'cbtu-07');
   assert.match(renderCatalog(selectCatalog('Data Analytics ราคาเท่าไร')!), /วันเรียนเก่า|รุ่นจบแล้ว/);
-  assert.match(renderCatalog(selectCatalog('Mini AI Agent Engineering')!), /ต้องยืนยันเพิ่มเติม/);
+  assert.doesNotMatch(renderCatalog(selectCatalog('Mini AI Agent Engineering')!), /ข้อความสถานะบนหน้าเดิม|เก็บ:|ราคาแสดง/);
   assert.equal(catalogContext(selection).length, 2);
   const requests: { candidates: string[]; prompt: string }[] = [], logs: object[] = [];
   const core = new CustomerCore(modelFactory(requests, true), 1000, r => logs.push(r));
@@ -121,7 +123,7 @@ test('host rejects IDs outside retrieval, retains cohort warnings and answers gr
     const client = core.client({ channel: 'line', scope: 'test:direct', user: 'A' });
     for (const prompt of ['Excel รายละเอียด', 'Canva ราคาเท่าไร']) {
       text = ''; await client.send(prompt, { text: s => { text += s; }, status: () => {} });
-      assert.match(text, /1,000 THB/); assert.match(text, /ข้อมูลสำเนา/);
+      assert.match(text, prompt.includes('ราคา') ? /1,000 THB/ : /PivotTable/); assert.match(text, /ข้อมูลเว็บที่เก็บ/);
     }
     assert.equal(requests.length, 1, 'cooldown uses host facts without hammering provider');
     assert.match(JSON.stringify(logs), /catalog_model_fallback.*model_rate_limit/);

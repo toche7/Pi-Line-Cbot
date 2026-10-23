@@ -131,7 +131,11 @@ export class CustomerCore {
             // Persist rendered answers, never raw model JSON, reasoning, tool payloads or provider errors.
             current.memory.recent.push({ user: prompt.slice(0, 1000), assistant: safeText(renderedAnswer).slice(0, 1000), at: this.now() });
             current.memory.lastTopic = current.lastTopic;
-            current.memory.catalog = nextCatalog ? { ...nextCatalog, query: safeText(nextCatalog.query).slice(0, 200) } : undefined;
+            current.memory.catalog = nextCatalog ? { ...nextCatalog, query: safeText(nextCatalog.query).slice(0, 200),
+              ...(nextCatalog.advice ? { advice: { ...nextCatalog.advice,
+                goal: nextCatalog.advice.goal && safeText(nextCatalog.advice.goal).slice(0, 200),
+                background: nextCatalog.advice.background && safeText(nextCatalog.advice.background).slice(0, 200),
+                time: nextCatalog.advice.time && safeText(nextCatalog.advice.time).slice(0, 200) } } : {}) } : undefined;
             current.memory.updatedAt = this.now();
             if (Buffer.byteLength(JSON.stringify(current.memory)) > 60000) current.memory = compactMemory(current.memory, this.summarizer);
             this.store?.save(key, current.memory);

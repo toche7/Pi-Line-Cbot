@@ -4,6 +4,10 @@
 
 ## ผล readiness ล่าสุด
 
+### สาระวิชาและการแนะนำตามงาน
+
+ปรับ20รายการเป็นbriefsเน้นงาน/สิ่งที่ฝึก/พื้นฐาน/เวลา ไม่เทราคา/สถานะ/metadataทุกครั้ง เพิ่มadviceถามงาน→พื้นฐาน→เวลาแล้วคัดตัวเลือกที่ตรงพอ ไม่เติมวิชาอ้อมให้ครบ3 รายละเอียดเฉพาะส่วนตอบเมื่อถาม คงquery/paging/priceและLINEmemoryเดิม Advice slotsจำข้ามrestartแยกidentityและล้างreset/forget Tests35รายการ/HTTPmockผ่าน Restartserverแล้วpublichealth/signature/LINE Verifyผ่าน ใช้store/endpointเดิม ผู้ใช้ทดสอบเบื้องต้นในLINEแล้วตอบว่า “ได้อยู่” logหลายturnเป็นok/replied ยังไม่ถือว่ายืนยันครบทุกเส้นทางภาษาพูดหรือครบทุกadvice stageจริง รายละเอียด COURSE_ADVICE_GUIDE.md และข้อมูลสำหรับตรวจ COURSE_BRIEFS.md
+
 ### แก้จาก LINE history จริง
 
 ตรวจrecent/summaryเฉพาะผู้ทดสอบพบตอบไม่ตรงคำถามเรื่องราคาแต่ละตัว จำนวนทั้งหมด และคำขอรายการเพิ่ม จึงเพิ่ม query operations และ persistent catalog context ที่ไม่หายเมื่อคุยเล่น แสดงรายการครั้งละ1–10ได้ ไม่จำกัด3วิชา ข้อความภาษาพูดให้โมเดลคืนvalidatedoperationแล้วhostค้น/นับ/เรียงจากsnapshot Tests32รายการและsignedLINEreplayผ่าน Restartแล้ว publichealth/signature/LINE Verifyผ่านactive=trueใช้endpointเดิม ผู้ใช้ลอง “มีหลักสูตร AI อะไรบ้าง” → “ขอราคาแต่ละตัวด้วย” และยืนยันokแล้ว Logok26ms/replied และok11ms/replied ตรวจmetadataเฉพาะidentityเดิมยืนยันURLsหลักสูตรในคำตอบราคาเหมือนรายการก่อนหน้าทุกตัว มีmatched12/shown3 ไม่พิมพ์ชื่อส่วนตัวหรือIDs หลักฐานและข้อจำกัดcoverageอยู่ใน [LINE_HISTORY_REVIEW.md](./LINE_HISTORY_REVIEW.md)
