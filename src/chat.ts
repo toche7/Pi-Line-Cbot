@@ -4,6 +4,7 @@ import type { AgentSession } from '@earendil-works/pi-coding-agent';
 import { runConversation } from './conversation.js';
 import { DemoFailure } from './diagnostics.js';
 import type { ChatClient } from './core.js';
+import { commandHelp } from './command-help.js';
 
 export async function runChat(
   session: AgentSession | ChatClient, timeoutMs: number,
@@ -24,7 +25,7 @@ export async function runChat(
   };
   rl.on('SIGINT', interrupt);
   process.on('SIGINT', interrupt);
-  output.write('แชตพร้อมแล้ว จำข้าม restart | /memory ดูข้อมูล | /reset ล้างบทสนทนา/เรื่องค้าง แต่คงโปรไฟล์ | /forget ลืมทั้งหมด (ต้องยืนยัน) | /exit ออก\n');
+  output.write('แชตพร้อมแล้ว | /help ดูคำสั่ง | /exit ออก\n');
   if (terminal) rl.prompt();
   try {
     for await (const line of rl) {
@@ -52,8 +53,15 @@ export async function runChat(
         if (terminal) rl.prompt();
         continue;
       }
+      const cancelledForget = !!forgetToken;
       forgetToken = undefined;
       if ('cancelForget' in session) session.cancelForget?.();
+      if (prompt === '/help') {
+        if (cancelledForget) output.write('[ยกเลิกคำขอ /forget ที่รอยืนยันแล้ว ข้อมูลยังอยู่]\n');
+        output.write(commandHelp('terminal', 'send' in session ? session : undefined) + '\n');
+        if (terminal) rl.prompt();
+        continue;
+      }
       if (prompt === '/memory' && 'memory' in session && session.memory) {
         output.write(await session.memory() + '\n');
         if (terminal) rl.prompt();

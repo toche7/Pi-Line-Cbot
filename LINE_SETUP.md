@@ -24,6 +24,10 @@ Tests 27 รายการรวม LINE memory เดิมผ่าน Live c
 
 /memoryแสดงsnapshotแบบย่อเพื่อพอดีLINE /resetล้างrecent/summary/pending/lastTopicแต่คงprofile/long-term /forgetต้องchallenge60วินาทีที่ผูกuser/OA/adapterเดิม ข้อความหรือคำสั่งอื่นยกเลิกchallenge ไม่ให้โมเดลลบmemoryเอง ไม่เปิดกลุ่ม ไม่ส่งpush/broadcast ไม่มีrawerrors/tokens/IDsในlogs ประวัติRAMของLINEก่อนเปิดstoreไม่ได้ย้ายอัตโนมัติ
 
+`/help` เป็น host command ใน1:1allowlist ผ่าน signature/dedupe เดิม ตอบรายการ `/help`, `/memory`, `/reset`, `/forget`, `/confirm-forget`, `/cancel` พร้อมคำอธิบายไทย ไม่เรียกโมเดล/ใช้quota/เพิ่มrecentturn ไม่แสดงคำสั่งPiCLIหรือคำสั่งออกโปรแกรมของTerminal หากมีforgetchallengeค้างจะยกเลิกและแจ้งชัดว่าข้อมูลยังอยู่ ทดสอบ signed LINE mock กับ Terminal รวม regression42รายการผ่าน; การมองเห็นคำตอบ `/help` ในแอปจริงต้องรอผู้ใช้ส่งหลังrestart
+
+รุ่น `/help` restart บน DemoB1 โหมดตอบจริงแล้วโดยใช้ tunnel/webhook และ memory store เดิม ตรวจ public health200/unsigned401/signed-empty200 และ LINE Verify ผ่าน ไม่มีการส่ง push/broadcast เพื่อทดสอบ
+
 Build/tests22รายการผ่าน รวมLINEsignedmemorypersist/restart/compaction, OA/user/channelisolation, Terminalคนละโปรเซส/storeเปิดพร้อมLINEได้, reset/forgetcancel/expiry/physicaldelete/no-revival และretention Local HTTPhealth200/signature401/200/dedupeหนึ่งmockreplyผ่าน Serverrestartแล้วเปิดpersistentstoreจริงและpublichealth/signature/LINE Verifyผ่านactive=trueใช้URLเดิม ผู้ใช้บอกชื่อผ่านLINEสำเร็จ(ok490ms/replied) ตรวจmetadatarecordมีชื่อและrecent1คู่/0600แล้วrestartอีกครั้ง ผู้ใช้ส่ง/memoryผ่านLINEและยืนยันว่าชื่อในprofileกับrecent1คู่ยังอยู่หลังrestart จึงยืนยันpersistentreloadผ่านLINEจริงแล้ว
 
 คำสั่งเริ่มใช้ค่า.envตามปกติ; โปรเซสทดสอบreplyปัจจุบันใช้ `LINE_DRY_RUN=false npm run server` โดยไม่แก้credentials/.env ระหว่างงานนี้ ต้องเปิดserver/tunnelค้างไว้ การpersistไม่ได้ทำให้คิว/dedupeเป็นdurableและไม่ได้แก้providerquota

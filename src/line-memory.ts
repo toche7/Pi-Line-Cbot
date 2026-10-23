@@ -1,6 +1,7 @@
 import type { ChatClient, CustomerCore, Identity, Output } from './core.js';
 import { DemoFailure } from './diagnostics.js';
 import type { Memory } from './memory.js';
+import { commandHelp } from './command-help.js';
 
 type Entry = { client: ChatClient; touched: number; forgetToken?: string };
 const shorten = (text: string, limit: number) => text.length > limit ? text.slice(0, limit) + '… (ย่อ)' : text;
@@ -62,8 +63,13 @@ export class LineConversations {
       }
       return;
     }
+    const cancelledForget = !!entry.forgetToken;
     entry.forgetToken = undefined;
     client.cancelForget?.(); // Every other message cancels a pending challenge.
+    if (command === '/help') {
+      output.text((cancelledForget ? 'ยกเลิกคำขอ /forget ที่รอยืนยันแล้ว ข้อมูลยังอยู่\n\n' : '') + commandHelp('line', client));
+      return;
+    }
     if (command === '/cancel') { output.text('ยกเลิกการลืมทั้งหมด ข้อมูลยังอยู่'); return; }
     if (command === '/memory' && client.memory) { output.text(memoryView(await client.memory())); return; }
     if (command === '/reset' && client.reset) {
