@@ -21,7 +21,7 @@ export const orderTool = {
   },
 };
 
-export async function createDemo() {
+export async function createDemo(options: { sessionManager?: SessionManager } = {}) {
   const provider = process.env.PI_PROVIDER || 'groq';
   const modelId = process.env.PI_MODEL || 'qwen/qwen3.8-27b';
   const credentials = new InMemoryCredentialStore();
@@ -60,7 +60,7 @@ export async function createDemo() {
     thinkingLevel: 'off', resourceLoader,
     tools: ['lookup_demo_order', 'search_public_knowledge'], customTools: [orderTool, knowledgeTool],
     settingsManager: SettingsManager.inMemory({ compaction: { enabled: false }, retry: { enabled: false } }),
-    sessionManager: SessionManager.inMemory(),
+    sessionManager: options.sessionManager ?? SessionManager.inMemory(),
   });
   session.subscribe(event => { if (event.type === 'agent_start') { modelCalls = 0; toolCalls = 0; } });
   const beforeToolCall = session.agent.beforeToolCall;

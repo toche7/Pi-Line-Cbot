@@ -2,6 +2,16 @@
 
 วันที่: 23 ตุลาคม 2026
 
+## ล่าสุด: persistent memory milestone
+
+ตรวจ build/tests18รายการผ่าน; CLIจริง `npm run chat -- --user memory-check-1023` บอกชื่อมะลิ73ด้วยโมเดล (514ms) → /exit → เปิดโปรเซสใหม่ถามชื่อ ตอบชื่อถูก (370ms) ใช้ .env ปัจจุบันไม่อ่าน credentials เอง ต่ออีก24ข้อความ FAQ/greetingโดยไม่บังคับreset มี auto compaction แล้ว /reset → /memory ยืนยัน profile ยังอยู่แต่ recent/summary/pending ว่าง
+
+ทดสอบ /forget→/cancel ข้อมูลยังอยู่ แล้ว /forget→/confirm-forget ลบจริง; ปิดเปิดใหม่ /memory ว่าง ตรวจ hashed identity file ว่า absent=true ผู้ทดสอบถูกลบแล้ว ไม่มีการเปลี่ยนหรือลบ user เริ่มต้น ไม่มีการแตะ LINE
+
+ทดสอบ offline เพิ่ม: >32turn/compactionหลายครั้งพร้อมรักษาสาระ, next-day fake clock และ separate Node process reopen, user/channel isolation, resetคงlong-termแต่ไม่คืนpending, forget confirm/cancel/deletion/no revival, malformed summary/provider429ไม่ล้างfacts, sensitive fixtureไม่ถูกpersist, permission/lock/corrupt file/retention รายละเอียด [MEMORY_GUIDE.md](./MEMORY_GUIDE.md)
+
+ผลข้ามวันเป็น simulated clock ไม่ได้รอจริง24ชั่วโมง Compaction เป็น host extractive summary ผ่าน Pi compaction projection ไม่เรียก LLM summary เพิ่ม ข้อมูลมีเพดานตามคู่มือ จึงไม่รับรองจำทุกถ้อยคำตลอดไป ผล20turn capและresetล้างทุกอย่างในบันทึกเก่าด้านล่างเป็นพฤติกรรมเดิมที่ถูกแทนแล้ว
+
 ## อัปเดต: bug แชตหลาย turn และผลจริงที่ต้องแยก
 
 ผล 2-turn ด้านล่างเป็นผลทดสอบเดิม ไม่ได้ครอบคลุม small talk หรือรับรองแชตยาว ผู้ใช้พบปัญหาเพิ่ม จึงทดสอบ PTY หลายรอบต่อเนื่อง โดยมีทั้งรอบเกิน 10 turn และรอบที่ไปถึงขีดจำกัด 20 turn

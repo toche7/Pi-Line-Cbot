@@ -2,6 +2,8 @@ import { createDemo } from './agent.js';
 import { DemoFailure, requestTimeout } from './diagnostics.js';
 import { runChat } from './chat.js';
 import { CustomerCore } from './core.js';
+import { MemoryStore } from './memory.js';
+import { resolve } from 'node:path';
 
 async function main() {
   const timeoutMs = requestTimeout(process.env.PI_TIMEOUT_MS);
@@ -15,23 +17,26 @@ async function main() {
       console.log('Session initialized; no model request made.');
       return;
     }
-    let initialSessionAvailable = true;
-    const core = new CustomerCore(async () => {
-      if (initialSessionAvailable) { initialSessionAvailable = false; return session; }
-      return (await createDemo()).session;
-    }, timeoutMs);
-    const client = core.client({ channel: 'terminal', scope: 'local', user: 'tester' });
+    const store = new MemoryStore(resolve('.customer-memory'));
+    const core = new CustomerCore(async manager => (await createDemo({ sessionManager: manager })).session, timeoutMs, undefined, undefined, store);
     try {
+      const userIndex = process.argv.indexOf('--user');
+      const user = userIndex >= 0 ? process.argv[userIndex + 1] || '' : 'tester';
+      if (!/^[a-zA-Z0-9_-]{1,64}$/.test(user)) throw new DemoFailure('--user ต้องเป็นชื่อ local tester 1–64 ตัวอักษร a-z A-Z 0-9 _ -');
+      const client = core.client({ channel: 'terminal', scope: 'local', user });
       if (process.argv.includes('--chat')) {
         await runChat(client, timeoutMs);
         return;
       }
-      const prompt = process.argv.slice(2).join(' ') || 'สวัสดี';
+      const args = process.argv.slice(2);
+      const flagIndex = args.indexOf('--user');
+      if (flagIndex >= 0) args.splice(flagIndex, 2);
+      const prompt = args.join(' ') || 'สวัสดี';
       await client.send(prompt, {
         text: value => { process.stdout.write(value); },
         status: value => { process.stderr.write(`${value}\n`); },
       });
-    } finally { await core.dispose(); }
+    } finally { await core.dispose(); store.close(); }
   } finally { session.dispose(); }
 }
 

@@ -82,16 +82,14 @@ test('core isolates customers/channels, serializes turns, retains grounded turns
     assert.match(text, /ไม่พบออเดอร์/);
     await assert.rejects(a.send('x'.repeat(2001), output), /2000/);
     assert.doesNotMatch(JSON.stringify(logs), /private-A-73|replyToken|API_KEY/);
-    while (logs.filter((r: any) => r.channel === 'line').length < 21) {
-      try { await a.send('สวัสดี', output); } catch { break; }
-    }
-    await assert.rejects(a.send('สวัสดี', output), /20/);
+    for (let i = 0; i < 25; i++) await a.send('สวัสดี', output);
+    const beforeReset = sessions.length;
     await a.reset!();
     await a.send('สวัสดี', output);
-    assert.equal(sessions.length, 4, 'explicit reset recovers from turn cap');
+    assert.equal(sessions.length, beforeReset + 1, 'explicit reset creates fresh session');
     clock = 31 * 60_000;
     await a.send('สวัสดี', output);
-    assert.equal(sessions.length, 5, 'idle TTL creates fresh session');
+    assert.equal(sessions.length, beforeReset + 2, 'idle TTL creates fresh session');
   } finally { await core.dispose(); }
 });
 

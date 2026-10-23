@@ -15,18 +15,18 @@
 | สถานะ | งาน | หลักฐาน/ข้อจำกัด |
 |---|---|---|
 | DONE | M1: Git baseline | local main เริ่มจาก 31365a3; กัน .env/secrets/build/logs/customer runtime ออก; ไม่มี remote/push |
-| DONE | Pi SDK/Terminal | one-shot `npm start`, แชต `npm run chat`, check/build/tests; มี memory ในโปรเซสและ progress/error/timeout |
+| DONE | Pi SDK/Terminal | one-shot `npm start`, แชต `npm run chat`, check/build/tests; Terminal มี bounded persistent memory และ progress/error/timeout |
 | DONE | แยก channel/core | CustomerCore ไม่พิมพ์ stdout เอง รับ trusted identity + callbacks; Terminal/LINE ใช้ core เดียวกัน |
 | DONE | ข้อมูลสาธารณะ CBTU ชุดเริ่มต้น | FAQ/Home/About มี source/capturedAt; deterministic routing สำหรับ FAQ, unknown/conflict; ไม่เรียก Notion ไม่ crawler สด |
 | DONE | กติกาซีบอตและ tools | ชื่อไทย, read-only public knowledge tool และ mock order เดิม; ไม่มี shell/file tools |
 | DONE | Memory session isolation/queue | key แยก channel/OA/direct/user, FIFO รายลูกค้า; ทดสอบ A/B และ Terminal แยกกัน |
 | DONE | LINE adapter + mock tests | raw body HMAC, valid/invalid signature, immediate ACK, in-memory queue/dedupe, allowlist, mock reply; ไม่ส่ง LINE จริง |
 | DONE | Config/คู่มือ LINE | .env.example และ append keys ที่ขาดใน .env โดยไม่เขียนทับค่าเดิม; LINE_SETUP.md; local endpoint ยังต้องเติม config |
-| DONE | Limits เบื้องต้น | input 2000 chars, 20 คำตอบสำเร็จ/session, 100 sessions, idle TTL 30 นาที, output 800 tokens, model/tool calls สูงสุด 4/turn, session token threshold 100000; Terminal /reset เพื่อเริ่มใหม่; dry run default |
+| DONE | Limits เบื้องต้น | input 2000 chars, 100 active sessions, idle TTL 30 นาที, output 800 tokens, model/tool calls สูงสุด 4/turn; เปลี่ยนเพดาน 20 turn/100000 tokens เป็น bounded context+auto compaction; dry run ของ LINE ไม่เปลี่ยน |
 | PARTIAL | Logging/cost control | safe metadata และ token/call limits มีแล้ว; ยังไม่มี dashboard, monetary/daily budget หรือ billing reconciliation |
 | PARTIAL | การประเมินคุณภาพ | tests 10 รายการผ่าน รวมชุด FAQ 11 คำถาม แต่ยังไม่ใช่การประเมินทุกคำถาม/ทุกภาษา/ทุก prompt injection |
 | TODO | LINE end-to-end จริง | ผู้ใช้ต้องเติม test OA credentials/allowlist และมี HTTPS hosting; ยังไม่ deploy, ตั้ง tunnel หรือส่ง reply จริง |
-| TODO | Persistent sessions/retention | ปัจจุบัน memory only; ต้องกำหนด retention, access control และ deletion ก่อนเลือก store |
+| DONE สำหรับ Terminal | Persistent memory | local JSON store 0700/0600, idle retention 90 วัน, profile/recent/summary/long-term, reset คง profile และ forget มี confirmation; LINE server ยังไม่เปิด store และ production retention ยังต้องทบทวน |
 | TODO | Durable queue/dedupe | ปัจจุบัน restart อาจสูญงานที่ ACK หรือประมวลผล redelivery ใหม่; ยังไม่ production delivery guarantee |
 | TODO | Customer verification/ข้อมูลจริง | LINE identity ไม่เท่ากับสิทธิ์ข้อมูลผู้เรียน; ต้อง map/verify/check ownership ก่อนเพิ่ม real-data tools |
 | TODO | Handoff จริง | ยังไม่มี case store/destination/recipient/authorization; แนะนำช่องทางเท่านั้น |
@@ -57,7 +57,7 @@
 |---|---|---|
 | M1 | DONE — Git | baseline local, staged secret scan, clean working tree, ไม่มี remote/push |
 | M2 | DONE สำหรับ prototype — shared core/CBTU policy | ทั้งสอง adapter ใช้ core/policy/tools เดียวกัน, Terminal ยังรันได้, knowledge มาจาก public URL เท่านั้น |
-| M3 | PARTIAL — sessions/identity | ผ่าน isolation/FIFO/idle TTL; ส่วนถาวรต้องทดสอบ restart/expiry/delete หลังตกลง retention; real-data access ต้อง verify ownership |
+| M3 | DONE สำหรับ local Terminal; production ยัง PARTIAL | ทดสอบ persistence/restart/day/isolation/reset/forget ผ่าน; ใช้ Pi compaction entry กับ bounded store; LINE persistence ยังไม่เชื่อม และ real-data access ต้อง verify ownership |
 | M4 | PARTIAL — FAQ/contact | ชุดคำถามเริ่มต้นผ่าน found/unknown/conflict/source; เพิ่ม dataset ที่เจ้าของรับรองและชุดคำถามทดสอบจริง; handoff ลดขอบเขตเป็นชี้ช่องทางตามคำสั่งผู้ใช้ ไม่ถือว่าทำส่งต่อจริงเสร็จ |
 | M5 | PARTIAL — reliability/cost | timeout/cancellation/empty response/tool denial และ limits เริ่มต้นผ่าน; ยังต้อง fault/load tests, monetary budget และตรวจคุณภาพคำตอบกว้างขึ้น |
 | M6 | พร้อมตั้งค่า/ยังไม่ E2E — LINE | เมื่อมี test OA/HTTPS: Verify events=[] ได้ 200, invalid signature ได้ 401, allowlist ทำงาน, A/B ไม่รั่ว, redelivery ไม่ซ้ำในโปรเซสเดียว, reply จริงสำเร็จ โดยผู้ใช้เปิดส่งเอง |
@@ -70,7 +70,7 @@
 - Test LINE OA: channel ID/secret/access token, tester IDs และ HTTPS hosting เจ้าของระบบจะเติมเองบนเครื่อง
 - แหล่ง public knowledge เลือกแล้ว: FAQ/Home/About; ยังต้องให้เจ้าของข้อมูลทบทวนข้อขัดแย้ง อัปเดต snapshot และอนุมัติ coverage ที่ต้องตอบ
 - วิธี map/verify learner และ ownership ก่อนใช้ข้อมูลจริง ไม่มีการรวมตัวตนข้ามช่องทางอัตโนมัติ
-- Retention และ storage: ตอนนี้ทดลอง memory idle 30 นาที ไม่ได้อนุมัติ retention ถาวร
+- Retention และ storage: Terminal demo เก็บไฟล์แบบมีขอบเขตจน inactive เกิน 90 วัน (purge ตอนเปิด/load), Pi active idle 30 นาที; ทบทวน production retention และ LINE persistence ก่อนใช้งานจริง
 - Handoff destination/recipient และการอนุญาตส่งจริง ยังไม่กำหนด ไม่มีการส่งออก
 - งบรายวัน/ลูกค้า, คุณภาพและ SLA, persistent queue/dedupe และ monitoring ก่อน production
 - Remote Git ยังไม่กำหนด จึงไม่ตั้งหรือ push
@@ -88,6 +88,16 @@
 เปลี่ยนเป็น structured Pi dialogue layer สำหรับข้อความที่ไม่ใช่ FAQ ที่ทราบ โดย host render ตัวตน/ข้อมูลธุรกิจ/ลิงก์ ตรวจสถาบันและ domain ผิด จำหัวข้อ FAQ ล่าสุดใน session และเพิ่ม clarification intent ไม่ให้โมเดลเดาข้อเท็จจริงเอง ลด system context/ข้อความซ้ำ ปิด tool loop ระหว่าง dialogue เลือก intent เพิ่ม cooldown เมื่อ 429 และ /reset เพื่อออกจากเพดาน session คำขอที่ล้มเหลวไม่เพิ่มจำนวน turn
 
 Tests ล่าสุด 14 รายการผ่าน รวม malformed/truncated dialogue พร้อมซ่อมหนึ่งครั้งภายใน deadline เดิม, domain/institution guard, contextual topic, isolation/reset และ 429→FAQ ยังใช้ได้→กลับแชตหลัง cooldown ยังไม่ถือว่าพิสูจน์ correctness ทุกประโยคหรือแก้ข้อจำกัดโควตา Groq ได้ รายละเอียดผลจริงใน TERMINAL_TEST_RESULTS.md ไม่มีการเปลี่ยน credentials หรือเรียก LINE ในรอบนี้
+
+## Milestone memory — ตรวจรับแล้ว
+
+เอาการบังคับ reset ทุก20คำตอบออก เก็บ local canonical store ที่ไม่รวม raw Pi transcript/reasoning/errors และคืน context ด้วย Pi SessionManager+compaction entry ใช้ extractive summary ในเครื่องเพื่อลด quota ไม่ใช่ยกเพดานเป็นตัวเลขใหญ่
+
+เก็บ recent 12 คู่ (ย่อเหลือ6), summary/หัวข้อ/เรื่องค้างแบบ bounded, profile จากที่ผู้ใช้บอกชัด และ long-term ที่ขอจำโดยตรง `/reset` ล้าง session context/pending แต่คง profile/long-term; `/forget` ต้อง confirm และ cancel ได้ ลบไฟล์ identity จริงไม่กระทบคนอื่น
+
+Build/tests ล่าสุด18รายการผ่าน รวม >32turn, fake next day และ separate-process restart, identity/channel isolation, reset/no pending revival, forget/no file revival, failed/malformed summary และ429ไม่ล้าง facts, privacy fixtures/permissions/locking/retention ทดสอบ CLI live เพียงสอง model calls: บอกชื่อ514ms และ restartแล้วถามชื่อ370ms จากนั้น24ข้อความ FAQ/greeting พร้อม auto compaction, reset, forget cancel/confirm และ restartอ่าน memory ว่างผ่าน ไม่มีการเปลี่ยน LINE/config/credentials
+
+ข้อจำกัดและ retention implementation: [MEMORY_GUIDE.md](./MEMORY_GUIDE.md) Summary คัดข้อความแบบมีขอบเขตสูญรายละเอียดได้ ไม่ใช่ semantic task manager, filtering เป็น heuristic, disk ไม่เข้ารหัส และ CLI --user ไม่ใช่ customer authentication
 
 ## ผลทดสอบ Terminal ก่อน LINE เพิ่มเติม
 

@@ -14,6 +14,7 @@ export async function runChat(
   const rl = createInterface({ input, output, terminal, prompt: 'คุณ > ' });
   let interrupted = false;
   let busy = false;
+  let forgetToken: string | undefined;
   const interrupt = () => {
     if (interrupted) return;
     interrupted = true;
@@ -23,17 +24,45 @@ export async function runChat(
   };
   rl.on('SIGINT', interrupt);
   process.on('SIGINT', interrupt);
-  output.write('แชตพร้อมแล้ว | /reset เริ่มใหม่และล้างประวัติ | /exit หรือ /quit ออก | Ctrl-C ยกเลิกและออก | Ctrl-D/EOF จบ\n');
+  output.write('แชตพร้อมแล้ว จำข้าม restart | /memory ดูข้อมูล | /reset ล้างบทสนทนา/เรื่องค้าง แต่คงโปรไฟล์ | /forget ลืมทั้งหมด (ต้องยืนยัน) | /exit ออก\n');
   if (terminal) rl.prompt();
   try {
     for await (const line of rl) {
       if (interrupted) break;
       const prompt = line.trim();
       if (prompt === '/exit' || prompt === '/quit') break;
+      if (prompt === '/forget' && 'requestForget' in session && session.requestForget) {
+        forgetToken = await session.requestForget();
+        output.write('[จะลบข้อความ สรุป เรื่องค้าง และโปรไฟล์ของคุณทั้งหมดจาก memory บนเครื่อง พิมพ์ /confirm-forget ภายใน 60 วินาทีเพื่อยืนยัน หรือ /cancel เพื่อยกเลิก]\n');
+        if (terminal) rl.prompt();
+        continue;
+      }
+      if (prompt === '/confirm-forget' || prompt === '/cancel') {
+        try {
+          if (prompt === '/confirm-forget') {
+            if (!forgetToken || !('forget' in session) || !session.forget) throw new DemoFailure('ต้องใช้ /forget และอ่านคำอธิบายก่อนยืนยัน');
+            await session.forget(forgetToken);
+            output.write('[ลืมทั้งหมดแล้ว ลบ persistent memory ของคุณแล้ว คนอื่นไม่ถูกเปลี่ยน]\n');
+          } else {
+            if ('cancelForget' in session) session.cancelForget?.();
+            output.write('[ยกเลิกการลืมทั้งหมด ข้อมูลยังอยู่]\n');
+          }
+        } catch (error) { status.write(`${error instanceof DemoFailure ? error.message : 'ไม่สามารถลบ memory ได้ ข้อมูลอาจยังอยู่'}\n`); }
+        forgetToken = undefined;
+        if (terminal) rl.prompt();
+        continue;
+      }
+      forgetToken = undefined;
+      if ('cancelForget' in session) session.cancelForget?.();
+      if (prompt === '/memory' && 'memory' in session && session.memory) {
+        output.write(await session.memory() + '\n');
+        if (terminal) rl.prompt();
+        continue;
+      }
       if (prompt === '/reset') {
         if ('reset' in session && session.reset) {
           await session.reset();
-          output.write('[เริ่มแชตใหม่แล้ว ประวัติเดิมถูกล้าง]\n');
+          output.write('[เริ่มบทสนทนาใหม่ ล้างข้อความ/สรุป/เรื่องค้างแล้ว คงโปรไฟล์และข้อมูลที่ขอจำระยะยาวไว้]\n');
         } else output.write('[โหมดนี้ไม่มี /reset กรุณาเปิดโปรแกรมใหม่]\n');
         if (terminal) rl.prompt();
         continue;
@@ -60,6 +89,6 @@ export async function runChat(
     process.removeListener('SIGINT', interrupt);
     rl.removeListener('SIGINT', interrupt);
     rl.close();
-    output.write('\nจบแชตแล้ว (ประวัติในหน่วยความจำสิ้นสุดพร้อมโปรเซส)\n');
+    output.write('\nจบแชตแล้ว (memory ที่บันทึกไว้ยังอยู่สำหรับครั้งถัดไป)\n');
   }
 }
