@@ -6,6 +6,7 @@
 - [ผลทดสอบ Terminal จริง รวมความจำผ่านโมเดล](./TERMINAL_TEST_RESULTS.md)
 - [คู่มือ memory / reset / ลืมทั้งหมด](./MEMORY_GUIDE.md)
 - [คู่มือตั้งค่า LINE ภาษาไทย](./LINE_SETUP.md)
+- [ค้นหลักสูตรจาก snapshot / retrieval](./COURSE_CATALOG_GUIDE.md)
 - [ตัวอย่าง config ไม่มี secrets](./.env.example)
 
 ## เริ่ม Terminal
@@ -54,16 +55,21 @@ npm run server
 
 LINE persistent memory เปิดแล้ว: `.line-memory/` แยกจากTerminal, key=line/OA/direct/user, retention90วันและcompactionค่าเดียวกัน ใช้ `/memory`, `/reset`, `/forget`→`/confirm-forget` หรือ `/cancel` ในแชต1:1 จากallowlist รายละเอียด [MEMORY_GUIDE.md](./MEMORY_GUIDE.md) ประวัติRAMก่อนเปิดstoreไม่ได้ย้ายอัตโนมัติ
 
+## ค้นหลักสูตร
+
+เชื่อม public snapshot 19 หลักสูตร + 1 bundle แล้ว ค้นชื่อ/alias/หัวข้อไทยอังกฤษและ rank candidates ไม่เกิน 3 รายการให้โมเดลเลือก IDs โค้ดแสดง facts/citations จาก snapshot เท่านั้น ชื่อกำกวมถามเพิ่ม ราคา null ไม่ถือว่าฟรี ไม่พบหลักสูตรไม่อ้างว่าไม่มีจริง ลอง “ยังไม่รู้จะเรียนอะไร”, “เปรียบเทียบ Excel กับ Canva”, “AI Agent for ALL ราคาเท่าไร”, “มีคอร์ส Quantum Computing ไหม” ข้อมูลไม่ใช่ราคา/รอบเปิดรับสด รายละเอียด [COURSE_CATALOG_GUIDE.md](./COURSE_CATALOG_GUIDE.md)
+
 ## โครงสร้างและผลตรวจ
 
 - `src/core.ts`: แยก session/channel/customer, คิวรายลูกค้า, idle TTL, auto compaction และ memory controls
 - `src/memory.ts`: local bounded persistence, profile/long-term preference extraction, summary, Pi context restoration และ confirmed deletion
+- `src/catalog.ts`, `src/course-catalog.ts`: public course snapshot, lexical ranking/aliases, bounded model candidates และ host-rendered facts
 - `src/agent.ts`: สร้าง Pi session, provider config, tool allowlist ไม่มี shell/file tools; Qwen ใช้ system role แทน developer role
 - `src/knowledge.ts`: แหล่งความรู้สาธารณะ กติกา conflict/unknown, read-only knowledge tool และ persona ซีบอต
 - `src/chat.ts`, `src/main.ts`: Terminal adapters; `src/conversation.ts`: model streaming/progress/timeout/call limits
 - `src/line.ts`, `src/line-memory.ts`, `src/server.ts`: raw-body signature verification, async queue, dedupe, allowlist, bounded reply client และ safe operational logs
 
-Build และ tests ล่าสุด 22 รายการผ่าน รวม persistence/restart, >20 turn/compaction, reset/forget confirm/cancel/physical deletion, isolation, safe memory และ failed summary/429 recovery เพิ่มจาก tests dialogue/FAQ/LINE จำลองเดิม หาก dialogue ผิดรูปแบบ/ถูกตัด/ว่าง จะขอซ่อมได้หนึ่งครั้งภายใน deadline เดิม Tests ไม่เรียก LINE จริง
+Build และ tests ล่าสุด 27 รายการผ่าน รวม catalog acceptance/grounding/aliases/follow-up, persistence/restart, >20 turn/compaction, reset/forget confirm/cancel/physical deletion, isolation, safe memory และ failed summary/429 recovery หาก dialogue ผิดรูปแบบ/ถูกตัด/ว่าง จะขอซ่อมได้หนึ่งครั้งภายใน deadline เดิม Tests ไม่เรียก LINE จริง
 
 ทดสอบ `npm run chat` ผ่าน PTY จริงหลายรอบและหลาย turn แบบผสมแล้ว พบและแก้ routing ที่วน FAQ fallback และการแต่งตัวตน/เว็บ ไม่พบ process crash ในรอบที่ reproduce แต่พบ provider 429 จริงด้วย จึงแยกผล functional กับข้อจำกัด provider ไว้ใน TERMINAL_TEST_RESULTS.md การทดสอบ 2 turn เดิมไม่เพียงพอยืนยัน small talk หรือความเสถียรแชตยาว LINE OA/HTTPS ตรวจ Verify และ signature จริงผ่านแล้ว และ LINE reply API ยอมรับ reply จริง 7 ครั้งแล้ว (ยังไม่ได้ตรวจหน้าจอผู้รับ)
 

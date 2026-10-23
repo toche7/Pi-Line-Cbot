@@ -4,6 +4,12 @@
 
 ## ผล readiness ล่าสุด
 
+### Course catalog retrieval
+
+เชื่อม public metadata 19 หลักสูตร + 1 bundle แล้ว ใช้ runtime projection แยก ไม่แก้ research หรือ memory ค้นชื่อ/alias/หัวข้อและ rank ไม่เกิน 3 candidates ส่งให้โมเดลเลือก IDs แล้ว host แสดง facts/URL/เวลาเก็บ ไม่ส่ง catalog ทั้งหมดทุก turn ชื่อกำกวมถามเพิ่ม null ไม่ถือว่าฟรี ไม่อ้างราคา/เปิดรับสมัครสดหรือรุ่นใหม่จากวันเก่า/ปุ่ม Add to Cart รองรับ follow-up และ comparison สองหลักสูตร
+
+Tests 27 รายการรวม LINE memory เดิมผ่าน Live core/model หนึ่งคำถาม Excel/Canva ผ่านไม่มี fallback หลัง restart ผู้ใช้ยืนยันรับคำตอบเปรียบเทียบพร้อมลิงก์ใน LINE แล้ว log ok552ms/replied Public signature/LINE Verify ผ่าน active=true ใช้ webhook เดิม ไม่ส่ง push หรือ reply token เก่า ดูวิธีค้น ข้อจำกัดและ refresh ใน [COURSE_CATALOG_GUIDE.md](./COURSE_CATALOG_GUIDE.md)
+
 ### LINE persistent memory (สถานะปัจจุบัน)
 
 ได้รับอนุญาตให้ใช้ค่าmemoryเดียวกับTerminalแล้ว LINEserverเปิดstoreที่ `.line-memory/` แยกdirectory/lockจาก `.customer-memory/` และkeyแยกchannel+OA/direct+user ไม่เชื่อมประวัติข้ามช่องทาง ใช้profile/explicitlong-term/recent/summary/lastTopic และcompaction/retention90วัน/limitsเดิม คำสั่ง `/memory`, `/reset`, `/forget`, `/confirm-forget`, `/cancel` ใช้ใน1:1allowlistเท่านั้น ดูรายละเอียดและข้อจำกัดใน MEMORY_GUIDE.md

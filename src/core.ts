@@ -5,6 +5,7 @@ import { publicAnswer, isTopicFollowup, renderKnowledge, topicForAnswer } from '
 import { runDialogue } from './dialogue.js';
 import { DemoFailure, rateLimitWaitMs, failureCategory } from './diagnostics.js';
 import { type Memory, type MemoryStore, type Summarizer, emptyMemory, memoryManager, learnProfile, safeText, compactMemory } from './memory.js';
+import { selectCatalog, renderCatalog, catalogTopicForAnswer } from './catalog.js';
 
 export type Output = { text: (value: string) => void; status: (value: string) => void };
 export type Identity = { channel: 'terminal' | 'line'; scope: string; user: string };
@@ -78,39 +79,44 @@ export class CustomerCore {
               output.status('[ย่อบริบทเก่าอัตโนมัติ คงโปรไฟล์ สาระ และเรื่องค้างไว้]');
             }
             const orderId = prompt.match(/\bDEMO-[0-9]+\b/i)?.[0].toUpperCase();
+            const catalog = orderId ? undefined : selectCatalog(prompt, current.lastTopic, current.memory.profile.interests);
             let answer: string | undefined;
             let renderedAnswer = '';
             if (orderId) {
               const result = await orderTool.execute('core-mock', { orderId });
               answer = `${result.details.found ? `ออเดอร์จำลอง ${orderId}: shipped / DEMO-TRACK-001` : 'ไม่พบออเดอร์จำลองนี้'}\nเป็นข้อมูลสมมติ ไม่ใช่ข้อมูลผู้เรียน CBTU`;
-            } else answer = publicAnswer(prompt);
-            if (answer === undefined && current.lastTopic && isTopicFollowup(prompt)) answer = renderKnowledge(current.lastTopic);
+            } else answer = catalog ? (catalog.kind === 'found' ? undefined : renderCatalog(catalog)) : publicAnswer(prompt);
+            if (!catalog && answer === undefined && current.lastTopic && !current.lastTopic.startsWith('catalog:') && isTopicFollowup(prompt)) answer = renderKnowledge(current.lastTopic);
             if (answer !== undefined) {
               // Store host-grounded turns through Pi's supported history API for later conversational context.
               await session.sendCustomMessage({ customType: 'grounded-turn', content: `ข้อความผู้ใช้: ${prompt}\nคำตอบที่ระบบตรวจจากแหล่งสาธารณะ: ${answer}`, display: false });
               output.status(orderId ? '[ข้อมูลสมมติสำหรับทดสอบ]' : '[ตอบจากข้อมูลสาธารณะที่กำหนด]');
               output.text(answer + '\n');
               renderedAnswer = answer;
-              current.lastTopic = topicForAnswer(answer);
+              current.lastTopic = catalog?.topic ?? topicForAnswer(answer);
             } else {
-              if (this.now() < this.modelCooldownUntil) {
+              if (!catalog && this.now() < this.modelCooldownUntil) {
                 throw new DemoFailure(`โมเดลถูกจำกัดการใช้งาน (429) รออีก ${Math.ceil((this.modelCooldownUntil - this.now()) / 1000)} วินาทีแล้วลองใหม่ ระหว่างนี้ FAQ ยังใช้ได้`);
               }
               let reply: string;
               try {
-                reply = await runDialogue(session, prompt, this.timeoutMs, output);
+                reply = catalog && this.now() < this.modelCooldownUntil ? renderCatalog(catalog)
+                  : await runDialogue(session, prompt, this.timeoutMs, output, catalog);
               } catch (error) {
                 if (error instanceof DemoFailure && /429/.test(error.message)) {
                   const last = [...session.messages].reverse().find(m => m.role === 'assistant');
                   const wait = rateLimitWaitMs(last?.errorMessage || '');
                   this.modelCooldownUntil = this.now() + wait;
-                  throw new DemoFailure(`โมเดลถูกจำกัดการใช้งาน (429) รอประมาณ ${Math.ceil(wait / 1000)} วินาทีแล้วลองใหม่ ระหว่างนี้ FAQ ยังใช้ได้`);
+                  if (!catalog) throw new DemoFailure(`โมเดลถูกจำกัดการใช้งาน (429) รอประมาณ ${Math.ceil(wait / 1000)} วินาทีแล้วลองใหม่ ระหว่างนี้ FAQ ยังใช้ได้`);
                 }
-                throw error;
+                if (!catalog) throw error;
+                // Ranked, host-rendered facts remain useful when model ordering fails.
+                this.log({ requestId, channel: identity.channel, outcome: 'catalog_model_fallback', category: failureCategory(error) });
+                reply = renderCatalog(catalog);
               }
               output.text(reply + '\n');
               renderedAnswer = reply;
-              current.lastTopic = topicForAnswer(reply);
+              current.lastTopic = catalog ? catalogTopicForAnswer(reply, catalog) : topicForAnswer(reply);
             }
             // Persist rendered answers, never raw model JSON, reasoning, tool payloads or provider errors.
             current.memory.recent.push({ user: prompt.slice(0, 1000), assistant: safeText(renderedAnswer).slice(0, 1000), at: this.now() });
