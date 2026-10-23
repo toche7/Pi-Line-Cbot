@@ -3,6 +3,7 @@
 ใช้ Pi SDK core เดียวสำหรับ Terminal และ LINE adapter ชื่ออังกฤษยังไม่ยืนยัน ใช้เฉพาะข้อมูลเว็บไซต์ CBTU สาธารณะ ไม่มี Notion ภายใน ไม่มีข้อมูลผู้เรียนจริง และยังไม่ deploy หรือส่ง LINE จริง
 
 - [แผนและสถานะงาน](./CUSTOMER_AGENT_PLAN.md)
+- [ผลทดสอบ Terminal จริง รวมความจำผ่านโมเดล](./TERMINAL_TEST_RESULTS.md)
 - [คู่มือตั้งค่า LINE ภาษาไทย](./LINE_SETUP.md)
 - [ตัวอย่าง config ไม่มี secrets](./.env.example)
 
@@ -54,7 +55,7 @@ npm run server
 
 Build และ tests ล่าสุด 10 รายการผ่าน รวม Pi tool allowlist/denial, conversation memory, session isolation, FIFO, FAQ grounding/unknown/conflict, idle expiry/limits, Ctrl-C, signature invalid/valid, raw-body integrity, webhook duplicate, dry run และ mocked reply API tests ไม่เรียก LINE จริง
 
-ก่อนปรับเป็น CBTU เคยทดสอบ live Groq Qwen สำเร็จทั้ง one-shot, หลาย turn และ mock tool calling รอบ CBTU ยืนยันผ่าน offline tests และ Terminal FAQ โดยไม่เรียกโมเดลเพิ่ม ยังไม่ได้ทดสอบ LINE OA/HTTPS จริง
+รุ่น CBTU ทดสอบ `npm run chat` ผ่าน PTY จริงแล้ว: FAQ 5 หมวดผ่าน, ความจำ 2 turn ผ่านโมเดลจริงด้วย .env ปัจจุบันผ่าน (476/441 ms), /exit จบโปรเซสด้วย code 0 ดูรายละเอียดใน TERMINAL_TEST_RESULTS.md ก่อนปรับเป็น CBTU เคยทดสอบ live mock tool calling แล้วด้วย ยังไม่ได้ทดสอบ LINE OA/HTTPS จริง
 
 สำหรับบริการจริงยังต้องเพิ่ม durable queue/dedupe, persistent store ตาม retention ที่ตกลง, customer verification ก่อนข้อมูลจริง, การประเมินคำตอบกว้างขึ้น และ cost monitoring แบบเงิน อ่านข้อจำกัดในคู่มือก่อนเปิดให้กลุ่มทดสอบ ไม่มีการส่งต่อเจ้าหน้าที่หรือ action เปลี่ยนข้อมูลในรุ่นนี้
 
