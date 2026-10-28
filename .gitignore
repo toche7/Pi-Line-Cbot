@@ -31,3 +31,8 @@ runtime/
 *.sqlite*
 *.db
 coverage/
+
+.line-monitor/
+__pycache__/
+*.pyc
+admin-tabs-preview.png

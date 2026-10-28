@@ -1,0 +1,27 @@
+[
+  {
+    "id": "cbtu-07",
+    "direct_names": [
+      "คุณอภิญญา ชูชาติ"
+    ],
+    "direct_url": "https://cbtumu.net/coursenew/creativemediadesignwithcanva/",
+    "bundle_names": [
+      "นางสาว อภิญญา ชูชาติ"
+    ],
+    "relationship": "unresolved; no alias/person merge",
+    "bundle_evidence": [
+      {
+        "name": "นางสาว อภิญญา ชูชาติ",
+        "source_url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+        "source_type": "explicit_bundle_teacher",
+        "excerpt": "สร้างสื่อสวยด้วย Canva | ผู้สอน นางสาว อภิญญา ชูชาติ",
+        "provenance": {
+          "requested_url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+          "resolved_url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+          "retrieved_at": "2026-10-23T15:25:27.685206+00:00",
+          "html_sha256": "2546fecb124257b9a1f89c1654d24871c8be5f8fdf0b97a759ce1033899166f7"
+        }
+      }
+    ]
+  }
+]

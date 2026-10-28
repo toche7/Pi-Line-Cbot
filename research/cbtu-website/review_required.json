@@ -1,0 +1,213 @@
+{
+  "status": "owner_review_only_do_not_ingest_as_customer_facts",
+  "issues": [
+    {
+      "id": "payment-account-conflict",
+      "severity": "block_payment_guidance",
+      "observations": [
+        {
+          "url": "https://cbtumu.net/faq/",
+          "section": "วิธีชำระเงินออนไลน์",
+          "bank": "ธนาคารไทยพาณิชย์",
+          "account_name": "เงินรายได้คณะวิศวกรรมศาสตร์ มหาวิทยาลัยมหิดล",
+          "account_number_as_published": "333-279192-7"
+        },
+        {
+          "url": "https://cbtumu.net/payment/",
+          "section": "ขั้นตอนการชำระค่าลงทะเบียน",
+          "bank": "ธนาคารไทยพาณิชย์",
+          "account_name": "มหาวิทยาลัยมหิดล",
+          "account_number_as_published": "016-210322-3"
+        }
+      ],
+      "resolution": "เจ้าของต้องตรวจว่าบัญชีใดใช้กับรายการใด; ห้ามเลือกบัญชีจากการเดาหรือใช้ทั้งคู่เป็นคำแนะนำ"
+    },
+    {
+      "id": "access-time-conflict",
+      "sources": [
+        "https://cbtumu.net/faq/",
+        "https://cbtumu.net/payment/"
+      ],
+      "observations": [
+        "FAQ ขั้นตอนสมัคร: เริ่มเรียนทันทีหลังชำระ",
+        "FAQ คำถามถัดมาและ Payment: ตรวจ 1–2 วัน"
+      ],
+      "resolution": "ไม่รับรองเวลาที่เข้าเรียนได้ ให้เจ้าหน้าที่ยืนยัน"
+    },
+    {
+      "id": "contact-email-conflict",
+      "sources": [
+        "https://cbtumu.net/faq/",
+        "https://cbtumu.net/contactus/"
+      ],
+      "observations": [
+        "เนื้อหา Contact และ FAQ ใบเสนอราคา: cbtu.mu@gmail.com",
+        "Footer: cbtumu.net@gmail.com"
+      ],
+      "resolution": "ให้เจ้าของกำหนดอีเมลหลักก่อน ingest"
+    },
+    {
+      "id": "past-dates-with-cart",
+      "course_ids": [
+        "cbtu-10",
+        "cbtu-15",
+        "cbtu-16"
+      ],
+      "resolution": "คงปุ่มและวันเรียนเป็น observations แยกกัน; ไม่สรุปว่าเปิดอบรมสดรอบใหม่"
+    },
+    {
+      "id": "certificate-scope",
+      "sources": [
+        "https://cbtumu.net/",
+        "https://cbtumu.net/faq/",
+        "https://cbtumu.net/about-cbtu/"
+      ],
+      "resolution": "Home อ้างใบประกาศทุกหลักสูตร แต่ FAQ มีเงื่อนไขผ่านเกณฑ์; ห้ามเหมารวม TPQI หรือคะแนนผ่านของรายวิชา"
+    },
+    {
+      "id": "protected-detail",
+      "course_ids": [
+        "cbtu-18"
+      ],
+      "resolution": "ไม่กรอกรหัสหรือ bypass; รอเจ้าของให้ข้อมูลที่เผยแพร่สาธารณะ"
+    },
+    {
+      "id": "author-versus-teacher",
+      "course_ids": [
+        "cbtu-03"
+      ],
+      "observations": [
+        "listing By taweesak samanchuen",
+        "About Course ผู้สอน: ดำรงพล ชนะวรรณ และ อภิญญา ชูชาติ"
+      ],
+      "resolution": "เก็บชื่อผู้สอนจากคำอธิบาย ไม่แทนที่ด้วยผู้โพสต์"
+    },
+    {
+      "id": "n8n-requirement-label",
+      "course_ids": [
+        "cbtu-09"
+      ],
+      "resolution": "Requirements ใช้คำ NSN ในบางบรรทัด ขณะที่ About ใช้ n8n; ไม่แก้แหล่งอ้างอิงเอง"
+    },
+    {
+      "id": "pagination-and-cache",
+      "resolution": "HTML GET ของ ?current_page คืนซ้ำและ web index ต่างจาก live; Home UI click จากหน้าแรกให้ครบ 4 หน้า ส่วน Courses UI หน้า 2/3 กลับตัวชี้หน้า 1"
+    }
+  ],
+  "linked_program_hub_observations": [
+    {
+      "related_catalog_id": "cbtu-04",
+      "record_type": "supplemental_cohort_not_merged",
+      "cohort": "Mini AI Agent รุ่น 2",
+      "url": "https://miniaiagentweb-production.up.railway.app/apply",
+      "observations": {
+        "mode": "waitlist",
+        "headline_price": "ประกาศเร็ว ๆ นี้",
+        "cohort_price_text": "24000",
+        "headline_seats": "ยังไม่ประกาศจำนวนรับ",
+        "cohort_seats_text": "30",
+        "headline_open_date": "ยังไม่ประกาศวันเปิดรับสมัคร",
+        "cohort_deadline": "1 เมษายน 2570",
+        "cohort_start": "1 สิงหาคม 2570",
+        "outcome_text": "test"
+      },
+      "flags": [
+        "unannounced_vs_numeric_price_seats_dates",
+        "placeholder_test_text",
+        "start_date_is_Sunday_but_weekly_schedule_says_Saturday"
+      ],
+      "customer_use": "ต้องตรวจยืนยันก่อนตอบวัน ราคา และที่นั่ง; การลงชื่อรอไม่ใช่ยืนยันรับสมัคร",
+      "provenance": {
+        "requested_url": "https://miniaiagentweb-production.up.railway.app/apply",
+        "resolved_url": "https://miniaiagentweb-production.up.railway.app/apply",
+        "retrieved_at": "2026-10-23T12:38:41.968922+00:00",
+        "html_sha256": "cb05427da5e1a09ffa0e821f5a029bf6f95bab6642fc470641b87a137828b63a"
+      }
+    },
+    {
+      "related_catalog_id": "cbtu-05",
+      "record_type": "supplemental_cohort_not_merged",
+      "cohort": "Mini Data Science รุ่น 11",
+      "url": "https://minidswebsite-production.up.railway.app/apply",
+      "observations": {
+        "mode": "open",
+        "price_text": "29,500 บาท",
+        "promotion_text": "Early Bird ลด 10% ตามช่วงที่ประกาศ",
+        "seats_text": "30 คน",
+        "deadline_a": "15 ธันวาคม 2569 หรือเมื่อเต็ม",
+        "deadline_b": "15 สิงหาคม (ไม่ระบุปีในข้อความนี้)",
+        "start_text": "1 กันยายน 2569",
+        "schedule": "วันเสาร์ 6 ชั่วโมง; 17 สัปดาห์ / 5 เดือน"
+      },
+      "flags": [
+        "conflicting_deadlines",
+        "start_date_is_Tuesday_but_schedule_says_Saturday",
+        "separate_cohort_from_completed_catalog_cohort10",
+        "homepage_and_apply_status_may_differ"
+      ],
+      "customer_use": "ไม่เปลี่ยนราคา/รุ่น 10 ใน catalog ให้เป็นรุ่น 11; ข้อมูลนี้ยังต้องให้เจ้าของยืนยัน",
+      "provenance": {
+        "requested_url": "https://minidswebsite-production.up.railway.app/apply",
+        "resolved_url": "https://minidswebsite-production.up.railway.app/apply",
+        "retrieved_at": "2026-10-23T12:38:42.247087+00:00",
+        "html_sha256": "125abac3d920f6870ed915bdf9a22e495af03a14af2983dc0db36886db396ce3"
+      }
+    }
+  ],
+  "source_provenance": [
+    {
+      "requested_url": "https://cbtumu.net/faq/",
+      "resolved_url": "https://cbtumu.net/faq/",
+      "retrieved_at": "2026-10-23T12:38:39.899195+00:00",
+      "html_sha256": "25cc5b7f1a33e053adb69a721b248cffc0505e7b5decd44e848753f77c298914"
+    },
+    {
+      "requested_url": "https://cbtumu.net/payment/",
+      "resolved_url": "https://cbtumu.net/payment/",
+      "retrieved_at": "2026-10-23T12:38:40.172064+00:00",
+      "html_sha256": "5de3ddbcec97209653ed93b6837244fa7c777e757616e2cacf9932f0377f4cdb"
+    },
+    {
+      "requested_url": "https://cbtumu.net/about-cbtu/",
+      "resolved_url": "https://cbtumu.net/about-cbtu/",
+      "retrieved_at": "2026-10-23T12:38:40.456081+00:00",
+      "html_sha256": "1e6075109185e18ea9404ec6ab61a37b6f7e4e76d60009467f3550a9ea4954c2"
+    },
+    {
+      "requested_url": "https://cbtumu.net/contactus/",
+      "resolved_url": "https://cbtumu.net/contactus/",
+      "retrieved_at": "2026-10-23T12:38:40.690000+00:00",
+      "html_sha256": "f7b88adaf21480e823b2f60ece363cab594227ad185ab5861a9710cecda3db04"
+    },
+    {
+      "requested_url": "https://cbtumu.net/mini-data-science-10-completion/",
+      "resolved_url": "https://cbtumu.net/mini-data-science-10-completion/",
+      "retrieved_at": "2026-10-23T12:38:40.967208+00:00",
+      "html_sha256": "27c99a359c13742351e3723770f473edb71cc59853a87b9923bc4ef55702bef9"
+    },
+    {
+      "requested_url": "https://cbtumu.net/hermes-agent-training-cbtu-mu/",
+      "resolved_url": "https://cbtumu.net/hermes-agent-training-cbtu-mu/",
+      "retrieved_at": "2026-10-23T12:38:41.696999+00:00",
+      "html_sha256": "2c97cf7c54ae1d3f67365e58e1bc544c211be4b391ddebc26206638c300885e6"
+    },
+    {
+      "requested_url": "https://miniaiagentweb-production.up.railway.app/apply",
+      "resolved_url": "https://miniaiagentweb-production.up.railway.app/apply",
+      "retrieved_at": "2026-10-23T12:38:41.968922+00:00",
+      "html_sha256": "cb05427da5e1a09ffa0e821f5a029bf6f95bab6642fc470641b87a137828b63a"
+    },
+    {
+      "requested_url": "https://minidswebsite-production.up.railway.app/apply",
+      "resolved_url": "https://minidswebsite-production.up.railway.app/apply",
+      "retrieved_at": "2026-10-23T12:38:42.247087+00:00",
+      "html_sha256": "125abac3d920f6870ed915bdf9a22e495af03a14af2983dc0db36886db396ce3"
+    }
+  ],
+  "other_linked_site_note": {
+    "url": "https://www.minidatasci.com/",
+    "observed_via": "web open 2026-10-23",
+    "summary_th": "เว็บเก่าระบุ 28,000 บาท 4 เดือน/17 สัปดาห์ คุณสมบัติปริญญาตรีหรือเทียบเท่าและประสบการณ์ 1 ปี; ยังยืนยันไม่ได้ว่าเงื่อนไขใช้กับรุ่น 10/11 ใด",
+    "not_merged_into_cohort_requirements": true
+  }
+}

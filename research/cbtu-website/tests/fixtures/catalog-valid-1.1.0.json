@@ -1,0 +1,177 @@
+{
+  "schema_version": "1.1.0",
+  "collection_date": "2026-10-23",
+  "timezone": "Asia/Bangkok",
+  "status": "research_for_owner_review_not_runtime_ingestion",
+  "scope": "19 courses + 1 bundle observed in public Home pagination; not every item in payment selector or site archive",
+  "null_means": "not found or unavailable; never assume false/free/unlimited",
+  "availability_rule": "Observed page text only; dates, prices and capacity must be confirmed before advising a purchase.",
+  "courses": [
+    {
+      "id": "cbtu-01",
+      "record_type": "course",
+      "name": "Data Analysis with AI",
+      "canonical_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+      "detail_access": "public",
+      "description_th": "ใช้ AI ช่วยเตรียมและวิเคราะห์ข้อมูล สร้างโมเดล และจัดการฐานข้อมูล",
+      "topics": [
+        "Data quality",
+        "EDA",
+        "Machine Learning",
+        "Python/Pandas",
+        "SQL",
+        "ER diagram",
+        "Dashboard"
+      ],
+      "learning_outcomes_th": [
+        "ใช้ AI ช่วยเตรียมและวิเคราะห์ข้อมูล สร้างโมเดล และจัดการฐานข้อมูล"
+      ],
+      "audience_th": "ผู้ต้องการพัฒนาทักษะ Data Analyst และ Data Engineer",
+      "prerequisites_th": null,
+      "format_th": "Online workshop ผ่าน Zoom",
+      "duration_text": "4 สัปดาห์ / 4 วัน / 12 ชั่วโมง",
+      "session_dates_text": "13 กันยายน–4 ตุลาคม 2569 วันอาทิตย์ 13:00–16:00",
+      "instructors_text": "ผศ. ดร.ทวีศักดิ์ สมานชื่น น.ท. ดร.บัญชา ช่วยสี ดร. ผกามาศ ไพโรจน์",
+      "price": {
+        "displayed_amount": 2000.0,
+        "currency": "THB",
+        "reference_amount": null,
+        "label": null,
+        "is_current_offer_verified": false
+      },
+      "enrollment": {
+        "observed_text": "Enrollment is now closed",
+        "is_live_availability_verified": false,
+        "catalog_observed_text": null
+      },
+      "certificate": {
+        "observed_text": "Certificate of completion",
+        "course_specific_pass_criteria": null,
+        "general_faq_rule": "เรียนจบและผ่านการประเมินตามเกณฑ์; ไม่พบเกณฑ์คะแนนของรายวิชา",
+        "faq_url": "https://cbtumu.net/faq/"
+      },
+      "application_links": [
+        {
+          "url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+          "type": "course_detail_entry",
+          "transaction_not_tested": true
+        }
+      ],
+      "additional_public_links": [],
+      "flags": [
+        "dated_sessions_are_before_collection_date",
+        "curated_summary_and_schedule_need_review_after_refresh"
+      ],
+      "provenance": {
+        "requested_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+        "resolved_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+        "retrieved_at": "2026-10-23T15:25:25.957639+00:00",
+        "html_sha256": "cbaa4e65d7350cb487568aaec41d18713f2575b086601683b3ebfb6cba1f3088"
+      },
+      "field_sources": {
+        "name": "h1 + canonical link",
+        "description_th,topics,learning_outcomes_th": "About Course; What Will You Learn (paraphrased) | reviewed snapshot retrieved_at=2026-10-23T12:35:55.441979+00:00",
+        "audience_th,prerequisites_th": "About Course / Audience / Requirements; null if not found | reviewed snapshot retrieved_at=2026-10-23T12:35:55.441979+00:00",
+        "format_th,duration_text,session_dates_text": "About Course / Material Includes / sidebar Duration | reviewed snapshot retrieved_at=2026-10-23T12:35:55.441979+00:00",
+        "instructors_text": "Legacy raw field retained; use instructors + instructor_evidence for verified teachers.",
+        "price,enrollment": "sidebar .tutor-card-body",
+        "certificate": "sidebar .tutor-card-footer; About Bundle; general FAQ only | reviewed snapshot retrieved_at=2026-10-23T12:35:55.441979+00:00"
+      },
+      "evidence": {
+        "pricing_and_status_excerpt": "฿2,000.00 Enrollment is now closed",
+        "duration_and_certificate_excerpt": "Intermediate [aggregate omitted] October 15, 2026 Last Updated Certificate of completion",
+        "named_teachers_excerpt": "ผู้สอน ผศ. ดร.ทวีศักดิ์ สมานชื่น; น.ท. ดร.บัญชา ช่วยสี; ดร. ผกามาศ ไพโรจน์"
+      },
+      "missing_fields": [
+        "certificate.course_specific_pass_criteria",
+        "prerequisites_th"
+      ],
+      "source_refs": [
+        {
+          "url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+          "role": "public_detail"
+        },
+        {
+          "url": "https://cbtumu.net/",
+          "role": "catalog_UI_pagination_observed_2026-10-23"
+        },
+        {
+          "url": "https://cbtumu.net/faq/",
+          "role": "general_certificate_rule_not_course_specific"
+        }
+      ],
+      "catalog_author_text": null,
+      "included_course_ids": [],
+      "instructor_evidence": [
+        {
+          "name": "ผศ. ดร.ทวีศักดิ์ สมานชื่น",
+          "source_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+          "source_type": "course_detail",
+          "excerpt": "ผู้สอน ผศ. ดร.ทวีศักดิ์ สมานชื่น",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+            "resolved_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+            "retrieved_at": "2026-10-23T15:25:25.957639+00:00",
+            "html_sha256": "cbaa4e65d7350cb487568aaec41d18713f2575b086601683b3ebfb6cba1f3088"
+          }
+        },
+        {
+          "name": "น.ท. ดร.บัญชา ช่วยสี",
+          "source_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+          "source_type": "course_detail",
+          "excerpt": "ผู้สอน น.ท. ดร.บัญชา ช่วยสี",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+            "resolved_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+            "retrieved_at": "2026-10-23T15:25:25.957639+00:00",
+            "html_sha256": "cbaa4e65d7350cb487568aaec41d18713f2575b086601683b3ebfb6cba1f3088"
+          }
+        },
+        {
+          "name": "ดร. ผกามาศ ไพโรจน์",
+          "source_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+          "source_type": "course_detail",
+          "excerpt": "ผู้สอน ดร. ผกามาศ ไพโรจน์",
+          "provenance": {
+            "requested_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+            "resolved_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+            "retrieved_at": "2026-10-23T15:25:25.957639+00:00",
+            "html_sha256": "cbaa4e65d7350cb487568aaec41d18713f2575b086601683b3ebfb6cba1f3088"
+          }
+        }
+      ],
+      "instructors": [
+        {
+          "name": "ผศ. ดร.ทวีศักดิ์ สมานชื่น",
+          "source_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+          "source_type": "course_detail"
+        },
+        {
+          "name": "น.ท. ดร.บัญชา ช่วยสี",
+          "source_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+          "source_type": "course_detail"
+        },
+        {
+          "name": "ดร. ผกามาศ ไพโรจน์",
+          "source_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+          "source_type": "course_detail"
+        }
+      ],
+      "dates": {
+        "raw": "13 กันยายน–4 ตุลาคม 2569 วันอาทิตย์ 13:00–16:00",
+        "parsed": null
+      }
+    }
+  ],
+  "collection": {
+    "built_at": "2026-10-23T15:25:50.428932+00:00",
+    "mode": "reviewed_snapshot_migration",
+    "expected_ids": [
+      "cbtu-01"
+    ],
+    "fetch_errors": [],
+    "coverage": "complete",
+    "summary_policy": "Existing authored summaries/raw schedules retained from reviewed snapshot. Fresh teacher/price/status metadata only. Re-review authored text before runtime ingestion.",
+    "listing_coverage_ref": "catalog_observations.json (historical UI enumeration; refresh is not fresh discovery)"
+  }
+}

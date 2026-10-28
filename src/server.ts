@@ -1,4 +1,6 @@
 import { createServer } from 'node:http';
+import { adminHandler } from './admin.js';
+import { ConversationMonitor } from './monitor.js';
 import { CustomerCore } from './core.js';
 import { LineAdapter, lineReply, webhookHandler } from './line.js';
 import { requestTimeout } from './diagnostics.js';
@@ -21,9 +23,16 @@ function start() {
   const log = (record: object) => console.log(JSON.stringify(record));
   const timeout = Math.min(requestTimeout(process.env.PI_TIMEOUT_MS), 25000);
   const store = new MemoryStore(resolve('.line-memory'));
-  const requests = new CourseRequests(new CourseRequestStore(resolve('runtime/course-requests')));
+  const requestStore = new CourseRequestStore(resolve('runtime/course-requests'));
+  const requests = new CourseRequests(requestStore);
   const core = new CustomerCore(undefined, timeout, log, undefined, store, undefined, requests);
-  const adapter = new LineAdapter({ secret, account: process.env.LINE_CHANNEL_ID || 'test-oa', allowedUsers, dryRun, core, reply: lineReply(token), log });
+  const monitor = new ConversationMonitor(resolve('.line-monitor'));
+  const monitorPort = Number(process.env.MONITOR_PORT || '3001');
+  if (!Number.isInteger(monitorPort) || monitorPort < 1 || monitorPort > 65535 || monitorPort === port) throw new Error('Invalid monitor port');
+  const monitorServer = createServer(adminHandler(monitor, requestStore));
+  monitorServer.requestTimeout = 10000;
+  monitorServer.headersTimeout = 10000;
+  const adapter = new LineAdapter({ secret, account: process.env.LINE_CHANNEL_ID || 'test-oa', allowedUsers, dryRun, core, observe: event => monitor.record(event), reply: lineReply(token), log });
   const server = createServer(webhookHandler(adapter));
   server.requestTimeout = 10000;
   server.headersTimeout = 10000;
@@ -33,12 +42,16 @@ function start() {
     console.log(`LINE dry run: ${dryRun}; allowlist configured: ${allowedUsers.size > 0}; no public deployment configured`);
     console.log('LINE persistent memory enabled; separate directory/lock from Terminal; retention 90 days');
   });
+  monitorServer.on('error', () => { console.error('Monitor server unavailable'); void stop(); process.exitCode = 1; });
+  monitorServer.listen(monitorPort, '127.0.0.1', () => console.log(`ติดตามบทสนทนา: http://127.0.0.1:${monitorPort}`));
   let closing = false;
   const stop = async () => {
     if (closing) return;
     closing = true;
     adapter.close();
     server.close();
+    monitorServer.close();
+    monitorServer.closeAllConnections();
     try { await adapter.drain(); await core.dispose(); }
     finally { store.close(); server.closeAllConnections(); }
   };

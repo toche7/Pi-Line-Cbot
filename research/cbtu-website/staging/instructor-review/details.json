@@ -1,0 +1,1613 @@
+{
+  "collected_at": "2026-10-23T15:25:27.687920+00:00",
+  "records": [
+    {
+      "provenance": {
+        "requested_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+        "resolved_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+        "retrieved_at": "2026-10-23T15:25:25.957639+00:00",
+        "html_sha256": "cbaa4e65d7350cb487568aaec41d18713f2575b086601683b3ebfb6cba1f3088"
+      },
+      "canonical_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+      "name": "Data Analysis with AI",
+      "about_present": true,
+      "marketing_events": [
+        {
+          "tag": "h2",
+          "text": "About Course",
+          "lines": [
+            "About Course"
+          ]
+        },
+        {
+          "tag": "h3",
+          "text": "Data Analysis with AI",
+          "lines": [
+            "Data Analysis with AI"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "หลักสูตรสำหรับผู้ที่ต้องการยกระดับทักษะด้านข้อมูลด้วย AI ครบตั้งแต่การวิเคราะห์และสร้างโมเดล Machine Learning ไปจนถึงการใช้ Python, SQL และการออกแบบฐานข้อมูล พร้อมนำไปใช้ได้จริง",
+          "lines": [
+            "หลักสูตรสำหรับผู้ที่ต้องการยกระดับทักษะด้านข้อมูลด้วย AI ครบตั้งแต่การวิเคราะห์และสร้างโมเดล Machine Learning ไปจนถึงการใช้ Python, SQL และการออกแบบฐานข้อมูล พร้อมนำไปใช้ได้จริง"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "ผู้สอน",
+          "lines": [
+            "ผู้สอน"
+          ]
+        },
+        {
+          "tag": "p",
+          "text": "ผศ. ดร.ทวีศักดิ์ สมานชื่น",
+          "lines": [
+            "ผศ. ดร.ทวีศักดิ์ สมานชื่น"
+          ]
+        },
+        {
+          "tag": "p",
+          "text": "น.ท. ดร.บัญชา ช่วยสี",
+          "lines": [
+            "น.ท. ดร.บัญชา ช่วยสี"
+          ]
+        },
+        {
+          "tag": "p",
+          "text": "ดร. ผกามาศ ไพโรจน์",
+          "lines": [
+            "ดร. ผกามาศ ไพโรจน์"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "สิ่งที่คุณจะได้เรียนรู้จากคอร์สนี้",
+          "lines": [
+            "สิ่งที่คุณจะได้เรียนรู้จากคอร์สนี้"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "หลังจากเรียนจบคอร์สนี้ ผู้เรียนจะสามารถ…",
+          "lines": [
+            "หลังจากเรียนจบคอร์สนี้ ผู้เรียนจะสามารถ…"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "รูปแบบและวันที่จัดอบรม",
+          "lines": [
+            "รูปแบบและวันที่จัดอบรม"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "หัวข้อการอบรม",
+          "lines": [
+            "หัวข้อการอบรม"
+          ]
+        }
+      ],
+      "blocks": [
+        {
+          "class": "tutor-card-body",
+          "text": "฿2,000.00 Enrollment is now closed"
+        },
+        {
+          "class": "tutor-card-footer ",
+          "text": "Intermediate 70 Total Enrolled October 15, 2026 Last Updated Certificate of completion"
+        }
+      ],
+      "public_links": [],
+      "status": "ok",
+      "error": null,
+      "requested_url": "https://cbtumu.net/coursenew/dataanalysiswithai/"
+    },
+    {
+      "provenance": {
+        "requested_url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-research/",
+        "resolved_url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-research/",
+        "retrieved_at": "2026-10-23T15:25:25.932309+00:00",
+        "html_sha256": "ab4f85dac59d8f96eb917393511e33a997903c82f40cc1ed6ece470dfcc677d2"
+      },
+      "canonical_url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-research/",
+      "name": "CBTU AI Day : AI for Research",
+      "about_present": true,
+      "marketing_events": [
+        {
+          "tag": "h2",
+          "text": "About Course",
+          "lines": [
+            "About Course"
+          ]
+        },
+        {
+          "tag": "h2",
+          "text": "AI เพื่องานวิจัย (AI for Research)",
+          "lines": [
+            "AI เพื่องานวิจัย (AI for Research)"
+          ]
+        },
+        {
+          "tag": "h3",
+          "text": "หลักสูตรระยะสั้นสำหรับผู้ที่ต้องการประยุกต์ใช้ AI ในการทำงานวิจัย",
+          "lines": [
+            "หลักสูตรระยะสั้นสำหรับผู้ที่ต้องการประยุกต์ใช้ AI ในการทำงานวิจัย"
+          ]
+        },
+        {
+          "tag": "h3",
+          "text": "ผู้สอน",
+          "lines": [
+            "ผู้สอน"
+          ]
+        },
+        {
+          "tag": "p",
+          "text": "ผศ. ดร.ทวีศักดิ์ สมานชื่น",
+          "lines": [
+            "ผศ. ดร.ทวีศักดิ์ สมานชื่น"
+          ]
+        },
+        {
+          "tag": "h3",
+          "text": "สิ่งที่คุณจะได้เรียนรู้จากคอร์สนี้",
+          "lines": [
+            "สิ่งที่คุณจะได้เรียนรู้จากคอร์สนี้"
+          ]
+        },
+        {
+          "tag": "h3",
+          "text": "หลังจากเรียนจบคอร์สนี้ ผู้เรียนจะสามารถ…",
+          "lines": [
+            "หลังจากเรียนจบคอร์สนี้ ผู้เรียนจะสามารถ…"
+          ]
+        },
+        {
+          "tag": "h3",
+          "text": "หัวข้อการอบรม",
+          "lines": [
+            "หัวข้อการอบรม"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "Module 1 : Research with Prism AI",
+          "lines": [
+            "Module 1 : Research with Prism AI"
+          ]
+        }
+      ],
+      "blocks": [
+        {
+          "class": "tutor-card-body",
+          "text": "Free Enroll Now Free access this course"
+        },
+        {
+          "class": "tutor-card-footer ",
+          "text": "Intermediate 486 Total Enrolled 1 hour 30 minutes Duration October 6, 2026 Last Updated"
+        }
+      ],
+      "public_links": [],
+      "status": "ok",
+      "error": null,
+      "requested_url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-research/"
+    },
+    {
+      "provenance": {
+        "requested_url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-work/",
+        "resolved_url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-work/",
+        "retrieved_at": "2026-10-23T15:25:25.945722+00:00",
+        "html_sha256": "241b3fb5e050fbea3f0772398e9ff369c38148d2859b03eaf06eb49d31bfc895"
+      },
+      "canonical_url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-work/",
+      "name": "CBTU AI Day : AI for Work",
+      "about_present": true,
+      "marketing_events": [
+        {
+          "tag": "h2",
+          "text": "About Course",
+          "lines": [
+            "About Course"
+          ]
+        },
+        {
+          "tag": "h2",
+          "text": "AI เพื่อการทำงาน (AI for Work)",
+          "lines": [
+            "AI เพื่อการทำงาน (AI for Work)"
+          ]
+        },
+        {
+          "tag": "h3",
+          "text": "หลักสูตรระยะสั้นสำหรับผู้ที่ต้องการนำ AI มาเพิ่มประสิทธิภาพการทำงาน",
+          "lines": [
+            "หลักสูตรระยะสั้นสำหรับผู้ที่ต้องการนำ AI มาเพิ่มประสิทธิภาพการทำงาน"
+          ]
+        },
+        {
+          "tag": "h3",
+          "text": "ผู้สอน",
+          "lines": [
+            "ผู้สอน"
+          ]
+        },
+        {
+          "tag": "p",
+          "text": "คุณดำรงพล ชนะวรรณ",
+          "lines": [
+            "คุณดำรงพล ชนะวรรณ"
+          ]
+        },
+        {
+          "tag": "p",
+          "text": "คุณอภิญญา ชูชาติ",
+          "lines": [
+            "คุณอภิญญา ชูชาติ"
+          ]
+        },
+        {
+          "tag": "h3",
+          "text": "สิ่งที่คุณจะได้เรียนรู้จากคอร์สนี้",
+          "lines": [
+            "สิ่งที่คุณจะได้เรียนรู้จากคอร์สนี้"
+          ]
+        },
+        {
+          "tag": "h3",
+          "text": "หลังจากเรียนจบคอร์สนี้ ผู้เรียนจะสามารถ…",
+          "lines": [
+            "หลังจากเรียนจบคอร์สนี้ ผู้เรียนจะสามารถ…"
+          ]
+        },
+        {
+          "tag": "h3",
+          "text": "หัวข้อการอบรม",
+          "lines": [
+            "หัวข้อการอบรม"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "Module 1 : Claude for Productivity",
+          "lines": [
+            "Module 1 : Claude for Productivity"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "Module 2 : Canva with AI",
+          "lines": [
+            "Module 2 : Canva with AI"
+          ]
+        }
+      ],
+      "blocks": [
+        {
+          "class": "tutor-card-body",
+          "text": "Free Enroll Now Free access this course"
+        },
+        {
+          "class": "tutor-card-footer ",
+          "text": "Intermediate 586 Total Enrolled 2 hours Duration October 6, 2026 Last Updated Certificate of completion"
+        }
+      ],
+      "public_links": [],
+      "status": "ok",
+      "error": null,
+      "requested_url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-work/"
+    },
+    {
+      "provenance": {
+        "requested_url": "https://cbtumu.net/coursenew/miniaiagentengineer/",
+        "resolved_url": "https://cbtumu.net/coursenew/miniaiagentengineer/",
+        "retrieved_at": "2026-10-23T15:25:26.211029+00:00",
+        "html_sha256": "2733d3932fd1ad7229bcd51f3a1a500fafe64906d2c311559e0f6c6cb8bd2550"
+      },
+      "canonical_url": "https://cbtumu.net/coursenew/miniaiagentengineer/",
+      "name": "Mini AI Agent Engineering",
+      "about_present": true,
+      "marketing_events": [
+        {
+          "tag": "h2",
+          "text": "About Course",
+          "lines": [
+            "About Course"
+          ]
+        },
+        {
+          "tag": "h3",
+          "text": "Mini AI Agent Engineering",
+          "lines": [
+            "Mini AI Agent Engineering"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "หลักสูตรระยะสั้นสำหรับผู้ที่อยากต่อยอดจากการใช้ AI แบบถามตอบ ไปสู่การออกแบบ workflow, automation และ agent prototype ที่นำไปใช้กับงานจริงได้",
+          "lines": [
+            "หลักสูตรระยะสั้นสำหรับผู้ที่อยากต่อยอดจากการใช้ AI แบบถามตอบ ไปสู่การออกแบบ workflow, automation และ agent prototype ที่นำไปใช้กับงานจริงได้"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "ผู้สอน",
+          "lines": [
+            "ผู้สอน"
+          ]
+        },
+        {
+          "tag": "p",
+          "text": "ผศ. ดร.ทวีศักดิ์ สมานชื่น",
+          "lines": [
+            "ผศ. ดร.ทวีศักดิ์ สมานชื่น"
+          ]
+        },
+        {
+          "tag": "p",
+          "text": "น.ท. ดร.บัญชา ช่วยสี",
+          "lines": [
+            "น.ท. ดร.บัญชา ช่วยสี"
+          ]
+        },
+        {
+          "tag": "p",
+          "text": "ภก. ดร.สามารถ จำรัส",
+          "lines": [
+            "ภก. ดร.สามารถ จำรัส"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "สิ่งที่คุณจะได้เรียนรู้จากคอร์สนี้",
+          "lines": [
+            "สิ่งที่คุณจะได้เรียนรู้จากคอร์สนี้"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "หลังจากเรียนจบคอร์สนี้ ผู้เรียนจะสามารถ…",
+          "lines": [
+            "หลังจากเรียนจบคอร์สนี้ ผู้เรียนจะสามารถ…"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "รูปแบบและวันที่จัดอบรม",
+          "lines": [
+            "รูปแบบและวันที่จัดอบรม"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "หัวข้อการอบรม",
+          "lines": [
+            "หัวข้อการอบรม"
+          ]
+        }
+      ],
+      "blocks": [
+        {
+          "class": "tutor-card-body",
+          "text": "฿24,000.00 Enrollment is now closed"
+        },
+        {
+          "class": "tutor-card-footer ",
+          "text": "Intermediate 30 Total Enrolled October 6, 2026 Last Updated Certificate of completion"
+        }
+      ],
+      "public_links": [
+        "https://miniaiagentweb-production.up.railway.app/"
+      ],
+      "status": "ok",
+      "error": null,
+      "requested_url": "https://cbtumu.net/coursenew/miniaiagentengineer/"
+    },
+    {
+      "provenance": {
+        "requested_url": "https://cbtumu.net/coursenew/minidatascience10/",
+        "resolved_url": "https://cbtumu.net/coursenew/minidatascience10/",
+        "retrieved_at": "2026-10-23T15:25:26.233131+00:00",
+        "html_sha256": "44bbf453d27077d2ccee646c4f8745e46a9c411513d486597cee1b6562185efb"
+      },
+      "canonical_url": "https://cbtumu.net/coursenew/minidatascience10/",
+      "name": "Mini Data Science รุ่นที่ 10",
+      "about_present": true,
+      "marketing_events": [
+        {
+          "tag": "h2",
+          "text": "About Course",
+          "lines": [
+            "About Course"
+          ]
+        },
+        {
+          "tag": "h3",
+          "text": "Mini-Data Science",
+          "lines": [
+            "Mini-Data Science"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "หลักสูตรระยะสั้นสำหรับผู้ที่ต้องการเป็นผู้นำทางด้านเทคโนโลยี",
+          "lines": [
+            "หลักสูตรระยะสั้นสำหรับผู้ที่ต้องการเป็นผู้นำทางด้านเทคโนโลยี"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "ผู้สอน",
+          "lines": [
+            "ผู้สอน"
+          ]
+        },
+        {
+          "tag": "p",
+          "text": "ผศ. ดร.ทวีศักดิ์ สมานชื่น",
+          "lines": [
+            "ผศ. ดร.ทวีศักดิ์ สมานชื่น"
+          ]
+        },
+        {
+          "tag": "p",
+          "text": "ผศ. ดร.วรัญญู วงษ์เสรี",
+          "lines": [
+            "ผศ. ดร.วรัญญู วงษ์เสรี"
+          ]
+        },
+        {
+          "tag": "p",
+          "text": "ดร.ธนสาร หงส์ไพศาลวิวัฒน์",
+          "lines": [
+            "ดร.ธนสาร หงส์ไพศาลวิวัฒน์"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "สิ่งที่คุณจะได้เรียนรู้จากคอร์สนี้",
+          "lines": [
+            "สิ่งที่คุณจะได้เรียนรู้จากคอร์สนี้"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "หลังจากเรียนจบคอร์สนี้ ผู้เรียนจะสามารถ…",
+          "lines": [
+            "หลังจากเรียนจบคอร์สนี้ ผู้เรียนจะสามารถ…"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "รูปแบบและวันที่จัดอบรม",
+          "lines": [
+            "รูปแบบและวันที่จัดอบรม"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "หัวข้อการอบรม",
+          "lines": [
+            "หัวข้อการอบรม"
+          ]
+        }
+      ],
+      "blocks": [
+        {
+          "class": "tutor-card-body",
+          "text": "฿28,000.00 Enrollment is now closed"
+        },
+        {
+          "class": "tutor-card-footer ",
+          "text": "Intermediate 15 Total Enrolled October 6, 2026 Last Updated Certificate of completion"
+        }
+      ],
+      "public_links": [
+        "https://cbtumu.net/profile/ajwaranyu/?view=instructor",
+        "https://cbtumu.net/profile/mirf-mvgmail-com/?view=instructor",
+        "https://drive.google.com/file/d/1xW4QIE8PNASoQ_fkm3zrZG1_HU7Q6ic3/view?usp=sharing",
+        "https://www.minidatasci.com/"
+      ],
+      "status": "ok",
+      "error": null,
+      "requested_url": "https://cbtumu.net/coursenew/minidatascience10/"
+    },
+    {
+      "provenance": {
+        "requested_url": "https://cbtumu.net/coursenew/analyticsmicrosoftexcel/",
+        "resolved_url": "https://cbtumu.net/coursenew/analyticsmicrosoftexcel/",
+        "retrieved_at": "2026-10-23T15:25:26.224097+00:00",
+        "html_sha256": "d60f03a429178f9dd379a0af8e84471a796b2a1e7471363a5a1d4c808abd618e"
+      },
+      "canonical_url": "https://cbtumu.net/coursenew/analyticsmicrosoftexcel/",
+      "name": "การวิเคราะห์ข้อมูลด้วย Microsoft Excel",
+      "about_present": true,
+      "marketing_events": [
+        {
+          "tag": "h2",
+          "text": "About Course",
+          "lines": [
+            "About Course"
+          ]
+        },
+        {
+          "tag": "h3",
+          "text": "Basic Microsoft Excel (2026)",
+          "lines": [
+            "Basic Microsoft Excel (2026)"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "สิ่งที่คุณจะได้เรียนรู้จากคอร์สนี้",
+          "lines": [
+            "สิ่งที่คุณจะได้เรียนรู้จากคอร์สนี้"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "หลังจากเรียนจบคอร์สนี้ ผู้เรียนจะ…",
+          "lines": [
+            "หลังจากเรียนจบคอร์สนี้ ผู้เรียนจะ…"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "รูปแบบและวันที่จัดอบรม",
+          "lines": [
+            "รูปแบบและวันที่จัดอบรม"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "หัวข้อการอบรม",
+          "lines": [
+            "หัวข้อการอบรม"
+          ]
+        }
+      ],
+      "blocks": [
+        {
+          "class": "tutor-card-body",
+          "text": "฿1,000.00 Add to Cart"
+        },
+        {
+          "class": "tutor-card-footer ",
+          "text": "Intermediate 72 Total Enrolled October 6, 2026 Last Updated Certificate of completion"
+        }
+      ],
+      "public_links": [],
+      "status": "ok",
+      "error": null,
+      "requested_url": "https://cbtumu.net/coursenew/analyticsmicrosoftexcel/"
+    },
+    {
+      "provenance": {
+        "requested_url": "https://cbtumu.net/coursenew/creativemediadesignwithcanva/",
+        "resolved_url": "https://cbtumu.net/coursenew/creativemediadesignwithcanva/",
+        "retrieved_at": "2026-10-23T15:25:26.525984+00:00",
+        "html_sha256": "f9ca6e0d60d75ffd3d620aa39da95349f751a33e770de7fed5ede23c62ecd473"
+      },
+      "canonical_url": "https://cbtumu.net/coursenew/creativemediadesignwithcanva/",
+      "name": "สร้างสื่อสวยด้วย Canva",
+      "about_present": true,
+      "marketing_events": [
+        {
+          "tag": "h2",
+          "text": "About Course",
+          "lines": [
+            "About Course"
+          ]
+        },
+        {
+          "tag": "h3",
+          "text": "สร้างสื่อสวยด้วย Canva",
+          "lines": [
+            "สร้างสื่อสวยด้วย Canva"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "เปลี่ยนไอเดียให้กลายเป็นผลงานกราฟิกและสื่อดิจิทัลระดับมืออาชีพ ด้วยเครื่องมือที่ใช้งานง่ายและทรงพลังอย่าง Canva",
+          "lines": [
+            "เปลี่ยนไอเดียให้กลายเป็นผลงานกราฟิกและสื่อดิจิทัลระดับมืออาชีพ ด้วยเครื่องมือที่ใช้งานง่ายและทรงพลังอย่าง Canva"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "ผู้สอน",
+          "lines": [
+            "ผู้สอน"
+          ]
+        },
+        {
+          "tag": "p",
+          "text": "คุณอภิญญา ชูชาติ",
+          "lines": [
+            "คุณอภิญญา ชูชาติ"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "สิ่งที่คุณจะได้เรียนรู้จากคอร์สนี้",
+          "lines": [
+            "สิ่งที่คุณจะได้เรียนรู้จากคอร์สนี้"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "หลังจากเรียนจบคอร์สนี้ ผู้เรียนจะ…",
+          "lines": [
+            "หลังจากเรียนจบคอร์สนี้ ผู้เรียนจะ…"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "รูปแบบการจัดอบรม",
+          "lines": [
+            "รูปแบบการจัดอบรม"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "หัวข้อการอบรม",
+          "lines": [
+            "หัวข้อการอบรม"
+          ]
+        }
+      ],
+      "blocks": [
+        {
+          "class": "tutor-card-body",
+          "text": "฿1,000.00 Add to Cart"
+        },
+        {
+          "class": "tutor-card-footer ",
+          "text": "Beginner 115 Total Enrolled October 6, 2026 Last Updated Certificate of completion"
+        }
+      ],
+      "public_links": [],
+      "status": "ok",
+      "error": null,
+      "requested_url": "https://cbtumu.net/coursenew/creativemediadesignwithcanva/"
+    },
+    {
+      "provenance": {
+        "requested_url": "https://cbtumu.net/coursenew/generativeaiinhealthproductmarketing/",
+        "resolved_url": "https://cbtumu.net/coursenew/generativeaiinhealthproductmarketing/",
+        "retrieved_at": "2026-10-23T15:25:26.540796+00:00",
+        "html_sha256": "1d043759c8fb7090ad557a925b2c9575b959a897674a96e5301894ea75f58ed1"
+      },
+      "canonical_url": "https://cbtumu.net/coursenew/generativeaiinhealthproductmarketing/",
+      "name": "Generative AI in Health Product Marketing",
+      "about_present": true,
+      "marketing_events": [
+        {
+          "tag": "h2",
+          "text": "About Course",
+          "lines": [
+            "About Course"
+          ]
+        },
+        {
+          "tag": "h3",
+          "text": "Generative AI in Health Product Marketing",
+          "lines": [
+            "Generative AI in Health Product Marketing"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "สร้างคอนเทนต์ที่แม่นยำและโดนใจด้วย Generative AI",
+          "lines": [
+            "สร้างคอนเทนต์ที่แม่นยำและโดนใจด้วย Generative AI"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "ผู้สอน",
+          "lines": [
+            "ผู้สอน"
+          ]
+        },
+        {
+          "tag": "p",
+          "text": "ภก.ดร.สามารถ จำรัส",
+          "lines": [
+            "ภก.ดร.สามารถ จำรัส"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "สิ่งที่คุณจะได้เรียนรู้จากคอร์สนี้",
+          "lines": [
+            "สิ่งที่คุณจะได้เรียนรู้จากคอร์สนี้"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "หลังจากเรียนจบคอร์สนี้ ผู้เรียนจะสามารถ…",
+          "lines": [
+            "หลังจากเรียนจบคอร์สนี้ ผู้เรียนจะสามารถ…"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "รูปแบบและวันที่จัดอบรม",
+          "lines": [
+            "รูปแบบและวันที่จัดอบรม"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "หัวข้อการอบรม",
+          "lines": [
+            "หัวข้อการอบรม"
+          ]
+        }
+      ],
+      "blocks": [
+        {
+          "class": "tutor-card-body",
+          "text": "฿1,000.00 Add to Cart"
+        },
+        {
+          "class": "tutor-card-footer ",
+          "text": "Intermediate 39 Total Enrolled 5 hours Duration October 6, 2026 Last Updated Certificate of completion"
+        }
+      ],
+      "public_links": [
+        "https://cbtumu.net/profile/ajsamart/?view=instructor"
+      ],
+      "status": "ok",
+      "error": null,
+      "requested_url": "https://cbtumu.net/coursenew/generativeaiinhealthproductmarketing/"
+    },
+    {
+      "provenance": {
+        "requested_url": "https://cbtumu.net/coursenew/aiagentwithn8n/",
+        "resolved_url": "https://cbtumu.net/coursenew/aiagentwithn8n/",
+        "retrieved_at": "2026-10-23T15:25:26.512103+00:00",
+        "html_sha256": "963e79a0d2de2514ad63d5fdd782c7b522e7def056a3c0ceaf144936f659d188"
+      },
+      "canonical_url": "https://cbtumu.net/coursenew/aiagentwithn8n/",
+      "name": "AI Agent with n8n",
+      "about_present": true,
+      "marketing_events": [
+        {
+          "tag": "h2",
+          "text": "About Course",
+          "lines": [
+            "About Course"
+          ]
+        },
+        {
+          "tag": "h2",
+          "text": "หลักสูตร AI Agent with n8n",
+          "lines": [
+            "หลักสูตร AI Agent with n8n"
+          ]
+        },
+        {
+          "tag": "h3",
+          "text": "ผู้สอน",
+          "lines": [
+            "ผู้สอน"
+          ]
+        },
+        {
+          "tag": "p",
+          "text": "ผศ.ดร. ทวีศักดิ์ สมานชื่น คณะวิศวกรรมศาสตร์ มหาวิทยาลัยมหิดล",
+          "lines": [
+            "ผศ.ดร. ทวีศักดิ์ สมานชื่น",
+            "คณะวิศวกรรมศาสตร์ มหาวิทยาลัยมหิดล"
+          ]
+        },
+        {
+          "tag": "h3",
+          "text": "สิ่งที่คุณจะได้เรียนรู้จากคอร์สนี้",
+          "lines": [
+            "สิ่งที่คุณจะได้เรียนรู้จากคอร์สนี้"
+          ]
+        },
+        {
+          "tag": "h3",
+          "text": "พื้นฐานที่จำเป็นและสิ่งที่ต้องเตรียม",
+          "lines": [
+            "พื้นฐานที่จำเป็นและสิ่งที่ต้องเตรียม"
+          ]
+        },
+        {
+          "tag": "h3",
+          "text": "รูปแบบการเรียนรู้ – เน้นปฏิบัติจริง (Hands-on Workshop)",
+          "lines": [
+            "รูปแบบการเรียนรู้ – เน้นปฏิบัติจริง (Hands-on Workshop)"
+          ]
+        },
+        {
+          "tag": "h3",
+          "text": "รูปแบบการอบรม",
+          "lines": [
+            "รูปแบบการอบรม"
+          ]
+        }
+      ],
+      "blocks": [
+        {
+          "class": "tutor-card-body",
+          "text": "฿1,000.00 Add to Cart"
+        },
+        {
+          "class": "tutor-card-footer ",
+          "text": "Beginner 280 Total Enrolled October 6, 2026 Last Updated Certificate of completion"
+        }
+      ],
+      "public_links": [],
+      "status": "ok",
+      "error": null,
+      "requested_url": "https://cbtumu.net/coursenew/aiagentwithn8n/"
+    },
+    {
+      "provenance": {
+        "requested_url": "https://cbtumu.net/coursenew/n8n-workshop/",
+        "resolved_url": "https://cbtumu.net/coursenew/n8n-workshop/",
+        "retrieved_at": "2026-10-23T15:25:26.813938+00:00",
+        "html_sha256": "5394df0a1912a6deb4943d5db1a91efd3cbcdfa813e126d89c479af169f236fd"
+      },
+      "canonical_url": "https://cbtumu.net/coursenew/n8n-workshop/",
+      "name": "AI Agent Workshop with n8n",
+      "about_present": true,
+      "marketing_events": [
+        {
+          "tag": "h2",
+          "text": "About Course",
+          "lines": [
+            "About Course"
+          ]
+        },
+        {
+          "tag": "h2",
+          "text": "หลักสูตร AI Agent Workshop with n8n",
+          "lines": [
+            "หลักสูตร AI Agent Workshop with n8n"
+          ]
+        }
+      ],
+      "blocks": [
+        {
+          "class": "tutor-card-body",
+          "text": "฿3,000.00 Add to Cart"
+        },
+        {
+          "class": "tutor-card-footer ",
+          "text": "Intermediate 116 Total Enrolled October 6, 2026 Last Updated Certificate of completion"
+        }
+      ],
+      "public_links": [],
+      "status": "ok",
+      "error": null,
+      "requested_url": "https://cbtumu.net/coursenew/n8n-workshop/"
+    },
+    {
+      "provenance": {
+        "requested_url": "https://cbtumu.net/coursenew/basicpromptengineering2026/",
+        "resolved_url": "https://cbtumu.net/coursenew/basicpromptengineering2026/",
+        "retrieved_at": "2026-10-23T15:25:26.825337+00:00",
+        "html_sha256": "fe562a203017185d7094619697824a8f5992f9378c0a2a3d7c1cb07fe3b15f4a"
+      },
+      "canonical_url": "https://cbtumu.net/coursenew/basicpromptengineering2026/",
+      "name": "Basic Prompt Engineering (2026)",
+      "about_present": true,
+      "marketing_events": [
+        {
+          "tag": "h2",
+          "text": "About Course",
+          "lines": [
+            "About Course"
+          ]
+        },
+        {
+          "tag": "h3",
+          "text": "Basic Prompt Engineering",
+          "lines": [
+            "Basic Prompt Engineering"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "ปูพื้นฐานการใช้งาน AI อย่างถูกวิธี เพื่อประสิทธิภาพสูงสุดในการทำงาน",
+          "lines": [
+            "ปูพื้นฐานการใช้งาน AI อย่างถูกวิธี เพื่อประสิทธิภาพสูงสุดในการทำงาน"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "ผู้สอน",
+          "lines": [
+            "ผู้สอน"
+          ]
+        },
+        {
+          "tag": "p",
+          "text": "ผศ.ดร. ทวีศักดิ์ สมานชื่น",
+          "lines": [
+            "ผศ.ดร. ทวีศักดิ์ สมานชื่น"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "สิ่งที่คุณจะได้เรียนรู้จากคอร์สนี้",
+          "lines": [
+            "สิ่งที่คุณจะได้เรียนรู้จากคอร์สนี้"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "หลังจากเรียนจบคอร์สนี้ ผู้เรียนจะสามารถ…",
+          "lines": [
+            "หลังจากเรียนจบคอร์สนี้ ผู้เรียนจะสามารถ…"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "รูปแบบและวันที่จัดอบรม",
+          "lines": [
+            "รูปแบบและวันที่จัดอบรม"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "หัวข้อการอบรม",
+          "lines": [
+            "หัวข้อการอบรม"
+          ]
+        }
+      ],
+      "blocks": [
+        {
+          "class": "tutor-card-body",
+          "text": "฿1,000.00 Add to Cart"
+        },
+        {
+          "class": "tutor-card-footer ",
+          "text": "Beginner 481 Total Enrolled 2 hours Duration October 6, 2026 Last Updated Certificate of completion"
+        }
+      ],
+      "public_links": [],
+      "status": "ok",
+      "error": null,
+      "requested_url": "https://cbtumu.net/coursenew/basicpromptengineering2026/"
+    },
+    {
+      "provenance": {
+        "requested_url": "https://cbtumu.net/coursenew/aiagentforall/",
+        "resolved_url": "https://cbtumu.net/coursenew/aiagentforall/",
+        "retrieved_at": "2026-10-23T15:25:26.803454+00:00",
+        "html_sha256": "91c1721063a6ab13c2d9f8a27d242375b5fb4bf027e4722a2274ac965727eee4"
+      },
+      "canonical_url": "https://cbtumu.net/coursenew/aiagentforall/",
+      "name": "AI Agent for ALL",
+      "about_present": true,
+      "marketing_events": [
+        {
+          "tag": "h2",
+          "text": "About Course",
+          "lines": [
+            "About Course"
+          ]
+        },
+        {
+          "tag": "h3",
+          "text": "AI Agent for ALL",
+          "lines": [
+            "AI Agent for ALL"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "AI ไม่ใช่เรื่องไกลตัวอีกต่อไป มาเริ่มต้นสร้าง AI Agent ของคุณไปพร้อมกัน",
+          "lines": [
+            "AI ไม่ใช่เรื่องไกลตัวอีกต่อไป มาเริ่มต้นสร้าง AI Agent ของคุณไปพร้อมกัน"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "ผู้สอน",
+          "lines": [
+            "ผู้สอน"
+          ]
+        },
+        {
+          "tag": "p",
+          "text": "ผศ.ดร. ทวีศักดิ์ สมานชื่น",
+          "lines": [
+            "ผศ.ดร. ทวีศักดิ์ สมานชื่น"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "สิ่งที่คุณจะได้เรียนรู้จากคอร์สนี้",
+          "lines": [
+            "สิ่งที่คุณจะได้เรียนรู้จากคอร์สนี้"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "หลังจากเรียนจบคอร์สนี้ ผู้เรียนจะ…",
+          "lines": [
+            "หลังจากเรียนจบคอร์สนี้ ผู้เรียนจะ…"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "รูปแบบและวันที่จัดอบรม",
+          "lines": [
+            "รูปแบบและวันที่จัดอบรม"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "หัวข้อการอบรม",
+          "lines": [
+            "หัวข้อการอบรม"
+          ]
+        }
+      ],
+      "blocks": [
+        {
+          "class": "tutor-card-body",
+          "text": "This course is full right now. We limit the number of students to create an optimized and productive group dynamic."
+        },
+        {
+          "class": "tutor-card-footer ",
+          "text": "Beginner 5000 Total Enrolled 2 hours 30 minutes Duration October 6, 2026 Last Updated Certificate of completion"
+        }
+      ],
+      "public_links": [],
+      "status": "ok",
+      "error": null,
+      "requested_url": "https://cbtumu.net/coursenew/aiagentforall/"
+    },
+    {
+      "provenance": {
+        "requested_url": "https://cbtumu.net/coursenew/ai-agents-in-action/",
+        "resolved_url": "https://cbtumu.net/coursenew/ai-agents-in-action/",
+        "retrieved_at": "2026-10-23T15:25:27.120909+00:00",
+        "html_sha256": "0f20494fffeb230f1bcbf0ae0a4052ab065e8041c252bf5c3f8f969f8ed743a0"
+      },
+      "canonical_url": "https://cbtumu.net/coursenew/ai-agents-in-action/",
+      "name": "AI Agents in Action",
+      "about_present": true,
+      "marketing_events": [
+        {
+          "tag": "h2",
+          "text": "About Course",
+          "lines": [
+            "About Course"
+          ]
+        },
+        {
+          "tag": "h3",
+          "text": "AI Agents in Action – “ให้ AI ทำงานแทน”",
+          "lines": [
+            "AI Agents in Action – “ให้ AI ทำงานแทน”"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "ผู้สอน",
+          "lines": [
+            "ผู้สอน"
+          ]
+        },
+        {
+          "tag": "p",
+          "text": "ผศ.ดร. ทวีศักดิ์ สมานชื่น",
+          "lines": [
+            "ผศ.ดร. ทวีศักดิ์ สมานชื่น"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "สิ่งที่คุณจะได้เรียนรู้จากคอร์สนี้",
+          "lines": [
+            "สิ่งที่คุณจะได้เรียนรู้จากคอร์สนี้"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "หลังจากเรียนจบคอร์สนี้ ผู้เรียนจะสามารถ…",
+          "lines": [
+            "หลังจากเรียนจบคอร์สนี้ ผู้เรียนจะสามารถ…"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "รูปแบบและวันที่จัดอบรม",
+          "lines": [
+            "รูปแบบและวันที่จัดอบรม"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "หัวข้อการอบรม",
+          "lines": [
+            "หัวข้อการอบรม"
+          ]
+        }
+      ],
+      "blocks": [
+        {
+          "class": "tutor-card-body",
+          "text": "This course is full right now. We limit the number of students to create an optimized and productive group dynamic."
+        },
+        {
+          "class": "tutor-card-footer ",
+          "text": "Intermediate 5004 Total Enrolled October 6, 2026 Last Updated Certificate of completion"
+        }
+      ],
+      "public_links": [],
+      "status": "ok",
+      "error": null,
+      "requested_url": "https://cbtumu.net/coursenew/ai-agents-in-action/"
+    },
+    {
+      "provenance": {
+        "requested_url": "https://cbtumu.net/coursenew/ai-for-all/",
+        "resolved_url": "https://cbtumu.net/coursenew/ai-for-all/",
+        "retrieved_at": "2026-10-23T15:25:27.114619+00:00",
+        "html_sha256": "04284d5f799b5a94fa6cf7b8d4219485f30701f5f430432c64a5d8c47d327c76"
+      },
+      "canonical_url": "https://cbtumu.net/coursenew/ai-for-all/",
+      "name": "AI for All",
+      "about_present": true,
+      "marketing_events": [
+        {
+          "tag": "h2",
+          "text": "About Course",
+          "lines": [
+            "About Course"
+          ]
+        }
+      ],
+      "blocks": [
+        {
+          "class": "tutor-card-body",
+          "text": "This course is full right now. We limit the number of students to create an optimized and productive group dynamic."
+        },
+        {
+          "class": "tutor-card-footer ",
+          "text": "Intermediate 5000 Total Enrolled 2 hours Duration October 6, 2026 Last Updated Certificate of completion"
+        }
+      ],
+      "public_links": [],
+      "status": "ok",
+      "error": null,
+      "requested_url": "https://cbtumu.net/coursenew/ai-for-all/"
+    },
+    {
+      "provenance": {
+        "requested_url": "https://cbtumu.net/coursenew/dataanalytic/",
+        "resolved_url": "https://cbtumu.net/coursenew/dataanalytic/",
+        "retrieved_at": "2026-10-23T15:25:27.093913+00:00",
+        "html_sha256": "77e5b474690b47a1778d8ecec88c40055d656820a49d72a06b1f3e019c608da1"
+      },
+      "canonical_url": "https://cbtumu.net/coursenew/dataanalytic/",
+      "name": "Data Analytics",
+      "about_present": true,
+      "marketing_events": [
+        {
+          "tag": "h2",
+          "text": "About Course",
+          "lines": [
+            "About Course"
+          ]
+        },
+        {
+          "tag": "h2",
+          "text": "Data Analytics",
+          "lines": [
+            "Data Analytics"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "ผู้สอน",
+          "lines": [
+            "ผู้สอน"
+          ]
+        },
+        {
+          "tag": "li",
+          "text": "ผศ. ดร.ทวีศักดิ์ สมานชื่น",
+          "lines": [
+            "ผศ. ดร.ทวีศักดิ์ สมานชื่น"
+          ]
+        },
+        {
+          "tag": "li",
+          "text": "น.ท. ดร.บัญชา ช่วยสี",
+          "lines": [
+            "น.ท. ดร.บัญชา ช่วยสี"
+          ]
+        },
+        {
+          "tag": "li",
+          "text": "ผศ. ดร.วรัญญู วงษ์เสรี",
+          "lines": [
+            "ผศ. ดร.วรัญญู วงษ์เสรี"
+          ]
+        },
+        {
+          "tag": "li",
+          "text": "อ.อดิศร นิลวิสุทธิ์",
+          "lines": [
+            "อ.อดิศร นิลวิสุทธิ์"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "สิ่งที่คุณจะได้เรียนรู้จากคอร์สนี้",
+          "lines": [
+            "สิ่งที่คุณจะได้เรียนรู้จากคอร์สนี้"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "หลังจากเรียนจบคอร์สนี้ ผู้เรียนจะสามารถ…",
+          "lines": [
+            "หลังจากเรียนจบคอร์สนี้ ผู้เรียนจะสามารถ…"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "รูปแบบและวันที่จัดอบรม",
+          "lines": [
+            "รูปแบบและวันที่จัดอบรม"
+          ]
+        }
+      ],
+      "blocks": [
+        {
+          "class": "tutor-card-body",
+          "text": "฿3,150.00 ฿4,500.00 Add to Cart"
+        },
+        {
+          "class": "tutor-card-footer ",
+          "text": "Intermediate 50 Total Enrolled October 6, 2026 Last Updated Certificate of completion"
+        }
+      ],
+      "public_links": [],
+      "status": "ok",
+      "error": null,
+      "requested_url": "https://cbtumu.net/coursenew/dataanalytic/"
+    },
+    {
+      "provenance": {
+        "requested_url": "https://cbtumu.net/coursenew/datascienceessentials/",
+        "resolved_url": "https://cbtumu.net/coursenew/datascienceessentials/",
+        "retrieved_at": "2026-10-23T15:25:27.378204+00:00",
+        "html_sha256": "cfd2d02bb0cca01a93a130683e8d7fc400c0deeefb418650bc67bd8999ee396d"
+      },
+      "canonical_url": "https://cbtumu.net/coursenew/datascienceessentials/",
+      "name": "Data Science Essentials",
+      "about_present": true,
+      "marketing_events": [
+        {
+          "tag": "h2",
+          "text": "About Course",
+          "lines": [
+            "About Course"
+          ]
+        },
+        {
+          "tag": "h3",
+          "text": "Data Science Essentials",
+          "lines": [
+            "Data Science Essentials"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "ยกระดับการทำงานด้วยข้อมูล ตั้งแต่ “เตรียมข้อมูล–สร้างโมเดล–สื่อสารผลลัพธ์” ครบจบในหลักสูตรเดียว",
+          "lines": [
+            "ยกระดับการทำงานด้วยข้อมูล ตั้งแต่ “เตรียมข้อมูล–สร้างโมเดล–สื่อสารผลลัพธ์” ครบจบในหลักสูตรเดียว"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "ผู้สอน",
+          "lines": [
+            "ผู้สอน"
+          ]
+        },
+        {
+          "tag": "p",
+          "text": "ผศ. ดร.ทวีศักดิ์ สมานชื่น",
+          "lines": [
+            "ผศ. ดร.ทวีศักดิ์ สมานชื่น"
+          ]
+        },
+        {
+          "tag": "p",
+          "text": "ผศ. ดร.โษฑศ์รัตต ธรรมบุษดี",
+          "lines": [
+            "ผศ. ดร.โษฑศ์รัตต ธรรมบุษดี"
+          ]
+        },
+        {
+          "tag": "p",
+          "text": "ผศ. ดร.วรัญญู วงษ์เสรี",
+          "lines": [
+            "ผศ. ดร.วรัญญู วงษ์เสรี"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "สิ่งที่คุณจะได้เรียนรู้จากคอร์สนี้",
+          "lines": [
+            "สิ่งที่คุณจะได้เรียนรู้จากคอร์สนี้"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "หลังจากเรียนจบคอร์สนี้ ผู้เรียนจะสามารถ…",
+          "lines": [
+            "หลังจากเรียนจบคอร์สนี้ ผู้เรียนจะสามารถ…"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "หลังจากเรียนจบคอร์สนี้ ผู้เรียนจะสามารถ…",
+          "lines": [
+            "หลังจากเรียนจบคอร์สนี้ ผู้เรียนจะสามารถ…"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "หัวข้อการอบรม",
+          "lines": [
+            "หัวข้อการอบรม"
+          ]
+        }
+      ],
+      "blocks": [
+        {
+          "class": "tutor-card-body",
+          "text": "฿6,300.00 ฿9,000.00 Add to Cart"
+        },
+        {
+          "class": "tutor-card-footer ",
+          "text": "Intermediate 42 Total Enrolled October 6, 2026 Last Updated Certificate of completion"
+        }
+      ],
+      "public_links": [
+        "https://cbtumu.net/profile/ajwaranyu/?view=instructor",
+        "https://cbtumu.net/profile/mirf-mvgmail-com/?view=instructor"
+      ],
+      "status": "ok",
+      "error": null,
+      "requested_url": "https://cbtumu.net/coursenew/datascienceessentials/"
+    },
+    {
+      "provenance": {
+        "requested_url": "https://cbtumu.net/coursenew/data-analyst-level-4-รุ่นที่-4/",
+        "resolved_url": "https://cbtumu.net/coursenew/data-analyst-level-4-%E0%B8%A3%E0%B8%B8%E0%B9%88%E0%B8%99%E0%B8%97%E0%B8%B5%E0%B9%88-4/",
+        "retrieved_at": "2026-10-23T15:25:27.398304+00:00",
+        "html_sha256": "71752831b9f9367a11c37f53091d4d5f8c38bf5d285d379eb17230867cc0bb3f"
+      },
+      "canonical_url": "https://cbtumu.net/coursenew/data-analyst-level-4-รุ่นที่-4/",
+      "name": "Data Analyst Level 4 รุ่นที่ 4",
+      "about_present": true,
+      "marketing_events": [
+        {
+          "tag": "h2",
+          "text": "About Course",
+          "lines": [
+            "About Course"
+          ]
+        },
+        {
+          "tag": "h2",
+          "text": "หลักสูตร Data Analyst Level 4",
+          "lines": [
+            "หลักสูตร Data Analyst Level 4"
+          ]
+        }
+      ],
+      "blocks": [
+        {
+          "class": "tutor-card-body",
+          "text": "฿3,000.00 Enrollment is now closed"
+        },
+        {
+          "class": "tutor-card-footer ",
+          "text": "Intermediate 36 Total Enrolled October 6, 2026 Last Updated Certificate of completion"
+        }
+      ],
+      "public_links": [],
+      "status": "ok",
+      "error": null,
+      "requested_url": "https://cbtumu.net/coursenew/data-analyst-level-4-รุ่นที่-4/"
+    },
+    {
+      "provenance": {
+        "requested_url": "https://cbtumu.net/coursenew/exambasicpromptengineeringupdate/",
+        "resolved_url": "https://cbtumu.net/coursenew/exambasicpromptengineeringupdate/",
+        "retrieved_at": "2026-10-23T15:25:27.646822+00:00",
+        "html_sha256": "578be27c87da53b50f44d65b69572220c545d0a50d5b91c24562480c87040930"
+      },
+      "canonical_url": "https://cbtumu.net/coursenew/exambasicpromptengineeringupdate/",
+      "name": "Protected: Basic Prompt Engineering (Update)",
+      "about_present": false,
+      "marketing_events": [],
+      "blocks": [],
+      "public_links": [],
+      "status": "ok",
+      "error": null,
+      "requested_url": "https://cbtumu.net/coursenew/exambasicpromptengineeringupdate/"
+    },
+    {
+      "provenance": {
+        "requested_url": "https://cbtumu.net/coursenew/basic-prompt-engineering/",
+        "resolved_url": "https://cbtumu.net/coursenew/basic-prompt-engineering/",
+        "retrieved_at": "2026-10-23T15:25:27.677376+00:00",
+        "html_sha256": "3df0091ad37bd0e8c2687abcbcb28a5f79bc1f62d7e0dd3a1f9394ec281b929c"
+      },
+      "canonical_url": "https://cbtumu.net/coursenew/basic-prompt-engineering/",
+      "name": "Basic Prompt Engineering",
+      "about_present": true,
+      "marketing_events": [
+        {
+          "tag": "h2",
+          "text": "About Course",
+          "lines": [
+            "About Course"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "โดย CBTU",
+          "lines": [
+            "โดย CBTU"
+          ]
+        }
+      ],
+      "blocks": [
+        {
+          "class": "tutor-card-body",
+          "text": "Enrollment is now closed"
+        },
+        {
+          "class": "tutor-card-footer ",
+          "text": "Intermediate 12449 Total Enrolled 2 hours Duration June 16, 2026 Last Updated Certificate of completion"
+        }
+      ],
+      "public_links": [],
+      "status": "ok",
+      "error": null,
+      "requested_url": "https://cbtumu.net/coursenew/basic-prompt-engineering/"
+    },
+    {
+      "provenance": {
+        "requested_url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+        "resolved_url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+        "retrieved_at": "2026-10-23T15:25:27.685206+00:00",
+        "html_sha256": "2546fecb124257b9a1f89c1654d24871c8be5f8fdf0b97a759ce1033899166f7"
+      },
+      "canonical_url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+      "name": "Popular Course Bundle",
+      "about_present": true,
+      "marketing_events": [
+        {
+          "tag": "h2",
+          "text": "About Bundle",
+          "lines": [
+            "About Bundle"
+          ]
+        },
+        {
+          "tag": "h3",
+          "text": "สร้างสื่อสวยด้วย Canva",
+          "lines": [
+            "สร้างสื่อสวยด้วย Canva"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "เนื้อหาการสอน",
+          "lines": [
+            "เนื้อหาการสอน"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "อาจารย์ผู้สอน นางสาว อภิญญา ชูชาติ",
+          "lines": [
+            "อาจารย์ผู้สอน นางสาว อภิญญา ชูชาติ"
+          ]
+        },
+        {
+          "tag": "h3",
+          "text": "การวิเคราะห์ข้อมูลด้วย Microsoft Excel",
+          "lines": [
+            "การวิเคราะห์ข้อมูลด้วย Microsoft Excel"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "เนื้อหาการสอน",
+          "lines": [
+            "เนื้อหาการสอน"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "อาจารย์ผู้สอน นางสาว กานต์นภัส ช้ำเกตุ",
+          "lines": [
+            "อาจารย์ผู้สอน นางสาว กานต์นภัส ช้ำเกตุ"
+          ]
+        },
+        {
+          "tag": "h3",
+          "text": "AI Agent with n8n",
+          "lines": [
+            "AI Agent with n8n"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "เนื้อหาการสอน",
+          "lines": [
+            "เนื้อหาการสอน"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "อาจารย์ผู้สอน ผศ.ดร. ทวีศักดิ์ สมานชื่น",
+          "lines": [
+            "อาจารย์ผู้สอน ผศ.ดร. ทวีศักดิ์ สมานชื่น"
+          ]
+        },
+        {
+          "tag": "h3",
+          "text": "Basic Prompt Engineering (2026)",
+          "lines": [
+            "Basic Prompt Engineering (2026)"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "เนื้อหาการสอน",
+          "lines": [
+            "เนื้อหาการสอน"
+          ]
+        },
+        {
+          "tag": "h4",
+          "text": "อาจารย์ผู้สอน ผศ.ดร. ทวีศักดิ์ สมานชื่น",
+          "lines": [
+            "อาจารย์ผู้สอน ผศ.ดร. ทวีศักดิ์ สมานชื่น"
+          ]
+        }
+      ],
+      "blocks": [
+        {
+          "class": "tutor-card-body",
+          "text": "฿1,500.00 ฿4,000.00 62.5% off Add to Cart"
+        },
+        {
+          "class": "tutor-card-footer ",
+          "text": "4 Total Courses 0 Total Enrolled 02:00:00 Duration 90 Lesson Content 0 Downloadable Resources 10 Quiz Papers"
+        }
+      ],
+      "public_links": [],
+      "status": "ok",
+      "error": null,
+      "requested_url": "https://cbtumu.net/course-bundle/mostcoursebundle/"
+    }
+  ],
+  "collector_schema_version": "1.0.0"
+}

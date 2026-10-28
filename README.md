@@ -93,3 +93,7 @@ Git local baseline เริ่มจาก `31365a3`; .env/secrets/runtime data
 
 
 ผลแก้ LINE fallback ล่าสุด: ทำซ้ำพบ Groq HTTP429 ขณะที่ FAQ ยังตอบได้ จึงแยกข้อความแจ้งโควตา/timeoutและlog `model_rate_limit`, `replied_fallback` ออกจากคำตอบปกติ ไม่แสดงraw error ผู้ใช้ยืนยันรับFAQหลังrestartแล้ว Build/tests20รายการและHTTP/public/LINE Verifyผ่าน โควตาโมเดลยังเป็นข้อจำกัดของprovider รายละเอียดและโหมดรันปัจจุบันใน LINE_SETUP.md
+
+## ติดตามบทสนทนา
+
+หลังเริ่ม server รุ่นใหม่ เปิด http://127.0.0.1:3001 เพื่อดูผู้ติดต่อและข้อความรับ–ตอบบนเครื่องนี้ ดูข้อจำกัด การเก็บข้อมูล และแนวทาง push message ที่ [MONITOR_GUIDE.md](./MONITOR_GUIDE.md)

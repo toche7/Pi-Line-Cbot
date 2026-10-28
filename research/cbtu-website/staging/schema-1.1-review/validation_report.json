@@ -1,0 +1,143 @@
+{
+  "schema_version": "1.1.0",
+  "validated_at": "2026-10-23T15:29:48.064018+00:00",
+  "valid": true,
+  "errors": [],
+  "warnings": [
+    {
+      "code": "review_flags",
+      "path": "/courses/0",
+      "message": "dated_sessions_are_before_collection_date, curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/1",
+      "message": "curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/2",
+      "message": "catalog_By_author_differs_from_named_teachers, curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/3",
+      "message": "linked_program_hub_has_unverified_cohort2_waitlist_conflicts, curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/4",
+      "message": "completed_cohort_news, newer_program_hub_is_separate_cohort11_not_this_cohort, linked_schedule_not_read, curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/5",
+      "message": "curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/6",
+      "message": "alternate_teacher_name_forms_in_bundle_require_review, curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/7",
+      "message": "curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/8",
+      "message": "Requirements_widget_uses_NSN_while_course_describes_n8n, curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "instructor_unknown",
+      "path": "/courses/9",
+      "message": "No explicit named-teacher evidence; catalog By is not promoted"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/9",
+      "message": "dated_sessions_are_before_collection_date, past_session_dates_but_add_to_cart_displayed, explicit_teacher_not_found_catalog_author_not_promoted, legacy_instructors_text_contains_catalog_author_unverified_as_teacher, curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/10",
+      "message": "curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/11",
+      "message": "curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/12",
+      "message": "curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "instructor_unknown",
+      "path": "/courses/13",
+      "message": "No explicit named-teacher evidence; catalog By is not promoted"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/13",
+      "message": "explicit_teacher_not_found_catalog_author_not_promoted, legacy_instructors_text_contains_catalog_author_unverified_as_teacher, curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/14",
+      "message": "dated_sessions_are_before_collection_date, past_session_dates_but_add_to_cart_displayed, curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/15",
+      "message": "dated_sessions_are_before_collection_date, past_session_dates_but_add_to_cart_displayed, curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "instructor_unknown",
+      "path": "/courses/16",
+      "message": "No explicit named-teacher evidence; catalog By is not promoted"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/16",
+      "message": "dated_sessions_are_before_collection_date, explicit_teacher_not_found_catalog_author_not_promoted, legacy_instructors_text_contains_catalog_author_unverified_as_teacher, curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "instructor_unknown",
+      "path": "/courses/17",
+      "message": "No explicit named-teacher evidence; catalog By is not promoted"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/17",
+      "message": "password_protected_detail_not_accessed, explicit_teacher_not_found_catalog_author_not_promoted, curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "instructor_unknown",
+      "path": "/courses/18",
+      "message": "No explicit named-teacher evidence; catalog By is not promoted"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/18",
+      "message": "explicit_teacher_not_found_catalog_author_not_promoted, legacy_instructors_text_contains_catalog_author_unverified_as_teacher, curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "review_flags",
+      "path": "/courses/19",
+      "message": "bundle_duration_requires_verification, curated_summary_and_schedule_need_review_after_refresh"
+    },
+    {
+      "code": "curated_summaries",
+      "path": "/collection",
+      "message": "Authored summaries/manifest are curated; this is not a general autonomous crawler"
+    }
+  ],
+  "changes": {
+    "added": [],
+    "removed": [],
+    "price_changes": []
+  }
+}

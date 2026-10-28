@@ -1,0 +1,215 @@
+{
+  "schema_version": "1.0",
+  "status": "research_for_owner_review",
+  "faq": [
+    {
+      "id": "faq-enroll",
+      "question_th": "สมัครเรียนอย่างไร",
+      "answer_th": "เลือกหลักสูตรจาก Home แล้วใช้ Enroll/ลงทะเบียน; หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนหน้าเว็บ",
+      "source_url": "https://cbtumu.net/faq/",
+      "source_section": "วิธีสมัครเรียนคอร์สออนไลน์",
+      "provenance": {
+        "requested_url": "https://cbtumu.net/faq/",
+        "resolved_url": "https://cbtumu.net/faq/",
+        "retrieved_at": "2026-10-23T12:38:39.899195+00:00",
+        "html_sha256": "25cc5b7f1a33e053adb69a721b248cffc0505e7b5decd44e848753f77c298914"
+      },
+      "requires_owner_review": false
+    },
+    {
+      "id": "faq-access",
+      "question_th": "ชำระแล้วเข้าเรียนเมื่อไร",
+      "answer_th": "หน้า FAQ มีทั้งข้อความเข้าเรียนทันทีและรอตรวจ 1–2 วัน จึงต้องให้เจ้าหน้าที่ยืนยันสิทธิ์เข้าเรียน",
+      "source_url": "https://cbtumu.net/faq/",
+      "source_section": "วิธีสมัครเรียนคอร์สออนไลน์",
+      "provenance": {
+        "requested_url": "https://cbtumu.net/faq/",
+        "resolved_url": "https://cbtumu.net/faq/",
+        "retrieved_at": "2026-10-23T12:38:39.899195+00:00",
+        "html_sha256": "25cc5b7f1a33e053adb69a721b248cffc0505e7b5decd44e848753f77c298914"
+      },
+      "requires_owner_review": true
+    },
+    {
+      "id": "faq-coupon",
+      "question_th": "ใช้คูปองได้ทุกคอร์สหรือไม่",
+      "answer_th": "ใช้ได้เฉพาะคอร์สที่ร่วมรายการ; ตรวจราคาที่ระบบแสดงหลังกรอกรหัสในขั้นตอนชำระเงิน",
+      "source_url": "https://cbtumu.net/faq/",
+      "source_section": "วิธีการใช้งานคูปอง",
+      "provenance": {
+        "requested_url": "https://cbtumu.net/faq/",
+        "resolved_url": "https://cbtumu.net/faq/",
+        "retrieved_at": "2026-10-23T12:38:39.899195+00:00",
+        "html_sha256": "25cc5b7f1a33e053adb69a721b248cffc0505e7b5decd44e848753f77c298914"
+      },
+      "requires_owner_review": false
+    },
+    {
+      "id": "faq-receipt",
+      "question_th": "ขอเอกสารรับเงินอย่างไร",
+      "answer_th": "FAQ ระบุให้กรอกรายละเอียดใน Payment เพื่อให้เจ้าหน้าที่ตรวจและออกเอกสาร",
+      "source_url": "https://cbtumu.net/faq/",
+      "source_section": "วิธีชำระเงินออนไลน์",
+      "provenance": {
+        "requested_url": "https://cbtumu.net/faq/",
+        "resolved_url": "https://cbtumu.net/faq/",
+        "retrieved_at": "2026-10-23T12:38:39.899195+00:00",
+        "html_sha256": "25cc5b7f1a33e053adb69a721b248cffc0505e7b5decd44e848753f77c298914"
+      },
+      "requires_owner_review": true
+    },
+    {
+      "id": "faq-receipt-time",
+      "question_th": "ใบเสร็จใช้เวลานานเท่าไร",
+      "answer_th": "FAQ ระบุกระบวนการผ่านคณะประมาณ 1–2 สัปดาห์ แล้วจัดส่งภายใน 3–5 วันทำการ; เป็นเวลาที่หน้าเว็บระบุ",
+      "source_url": "https://cbtumu.net/faq/",
+      "source_section": "วิธีชำระเงินออนไลน์",
+      "provenance": {
+        "requested_url": "https://cbtumu.net/faq/",
+        "resolved_url": "https://cbtumu.net/faq/",
+        "retrieved_at": "2026-10-23T12:38:39.899195+00:00",
+        "html_sha256": "25cc5b7f1a33e053adb69a721b248cffc0505e7b5decd44e848753f77c298914"
+      },
+      "requires_owner_review": false
+    },
+    {
+      "id": "faq-enter",
+      "question_th": "เข้าเรียนจากเมนูใด",
+      "answer_th": "เข้าสู่ระบบด้วยบัญชีที่ลงทะเบียน ไป Dashboard > Enrolled Courses เลือกวิชา แล้ว Start Learning",
+      "source_url": "https://cbtumu.net/faq/",
+      "source_section": "วิธีเรียนคอร์สออนไลน์",
+      "provenance": {
+        "requested_url": "https://cbtumu.net/faq/",
+        "resolved_url": "https://cbtumu.net/faq/",
+        "retrieved_at": "2026-10-23T12:38:39.899195+00:00",
+        "html_sha256": "25cc5b7f1a33e053adb69a721b248cffc0505e7b5decd44e848753f77c298914"
+      },
+      "requires_owner_review": false
+    },
+    {
+      "id": "faq-duration",
+      "question_th": "เรียนได้ตลอดชีพทุกคอร์สหรือไม่",
+      "answer_th": "FAQ บอกว่าส่วนมากไม่จำกัดอายุ แต่บางคอร์สจำกัด ต้องตรวจเงื่อนไขของรายวิชา",
+      "source_url": "https://cbtumu.net/faq/",
+      "source_section": "คอร์สออนไลน์มีอายุการใช้งานหรือไม่",
+      "provenance": {
+        "requested_url": "https://cbtumu.net/faq/",
+        "resolved_url": "https://cbtumu.net/faq/",
+        "retrieved_at": "2026-10-23T12:38:39.899195+00:00",
+        "html_sha256": "25cc5b7f1a33e053adb69a721b248cffc0505e7b5decd44e848753f77c298914"
+      },
+      "requires_owner_review": false
+    },
+    {
+      "id": "faq-cert",
+      "question_th": "ดาวน์โหลดใบประกาศได้เมื่อไร",
+      "answer_th": "หลังเรียนจบและผ่านการประเมินตามเกณฑ์ ไป Dashboard > Enrolled Courses > Completed Courses",
+      "source_url": "https://cbtumu.net/faq/",
+      "source_section": "Certificate",
+      "provenance": {
+        "requested_url": "https://cbtumu.net/faq/",
+        "resolved_url": "https://cbtumu.net/faq/",
+        "retrieved_at": "2026-10-23T12:38:39.899195+00:00",
+        "html_sha256": "25cc5b7f1a33e053adb69a721b248cffc0505e7b5decd44e848753f77c298914"
+      },
+      "requires_owner_review": false
+    },
+    {
+      "id": "faq-cert-name",
+      "question_th": "เปลี่ยนชื่อในใบประกาศอย่างไร",
+      "answer_th": "แก้ First Name/Last Name ที่ Settings > Profile บันทึก Update Profile และเลือก Display name publicly as ตามขั้นตอน FAQ",
+      "source_url": "https://cbtumu.net/faq/",
+      "source_section": "Certificate",
+      "provenance": {
+        "requested_url": "https://cbtumu.net/faq/",
+        "resolved_url": "https://cbtumu.net/faq/",
+        "retrieved_at": "2026-10-23T12:38:39.899195+00:00",
+        "html_sha256": "25cc5b7f1a33e053adb69a721b248cffc0505e7b5decd44e848753f77c298914"
+      },
+      "requires_owner_review": false
+    },
+    {
+      "id": "faq-history",
+      "question_th": "ดูสถานะคำสั่งซื้อที่ไหน",
+      "answer_th": "Dashboard > Order History > Invoice ตามหน้า FAQ",
+      "source_url": "https://cbtumu.net/faq/",
+      "source_section": "รายละเอียดหลังชำระเงิน",
+      "provenance": {
+        "requested_url": "https://cbtumu.net/faq/",
+        "resolved_url": "https://cbtumu.net/faq/",
+        "retrieved_at": "2026-10-23T12:38:39.899195+00:00",
+        "html_sha256": "25cc5b7f1a33e053adb69a721b248cffc0505e7b5decd44e848753f77c298914"
+      },
+      "requires_owner_review": false
+    }
+  ],
+  "contact": {
+    "phones": [
+      "099 629 8236",
+      "086 945 3895"
+    ],
+    "body_email": "cbtu.mu@gmail.com",
+    "footer_email": "cbtumu.net@gmail.com",
+    "email_requires_owner_confirmation": true,
+    "address_th": "กลุ่มสาขาวิชาเทคโนโลยีการจัดการระบบสารสนเทศ คณะวิศวกรรมศาสตร์ มหาวิทยาลัยมหิดล 999 ถนนพุทธมณฑลสาย 4 ตำบลศาลายา อำเภอพุทธมณฑล จังหวัดนครปฐม 73170",
+    "provenance": {
+      "requested_url": "https://cbtumu.net/contactus/",
+      "resolved_url": "https://cbtumu.net/contactus/",
+      "retrieved_at": "2026-10-23T12:38:40.690000+00:00",
+      "html_sha256": "f7b88adaf21480e823b2f60ece363cab594227ad185ab5861a9710cecda3db04"
+    }
+  },
+  "about": {
+    "summary_th": "CBTU เป็นโครงการฝึกอบรมภายใต้คณะวิศวกรรมศาสตร์ มหาวิทยาลัยมหิดล มี Onsite, Online Live, On-demand และ In-house; หน้า About ระบุทะเบียนหน่วยฝึก TP-0021-A และ 6 หลักสูตรที่รับรอง",
+    "tpqi_courses_named_on_about": [
+      "Mini-Data Science",
+      "Data Science Essentials",
+      "Data Analyst and Data Engineer Intermediate Level",
+      "Data Analyst – Upper Intermediate Level",
+      "Data Engineer – Upper Intermediate Level",
+      "Project Management"
+    ],
+    "rule": "รายการใน About ไม่ได้ยืนยันว่าเปิดรับปัจจุบัน และไม่หมายความว่าทุกคอร์สได้คุณวุฒิ TPQI อัตโนมัติ",
+    "provenance": {
+      "requested_url": "https://cbtumu.net/about-cbtu/",
+      "resolved_url": "https://cbtumu.net/about-cbtu/",
+      "retrieved_at": "2026-10-23T12:38:40.456081+00:00",
+      "html_sha256": "1e6075109185e18ea9404ec6ab61a37b6f7e4e76d60009467f3550a9ea4954c2"
+    }
+  },
+  "payment": {
+    "url": "https://cbtumu.net/payment/",
+    "owner_review_required": true,
+    "customer_answer_rule": "ไม่ให้เลขบัญชีหรือรับรองการโอนเงินจากชุดข้อมูลนี้; ให้เจ้าหน้าที่ยืนยันเพราะแหล่งทางการขัดกัน",
+    "provenance": {
+      "requested_url": "https://cbtumu.net/payment/",
+      "resolved_url": "https://cbtumu.net/payment/",
+      "retrieved_at": "2026-10-23T12:38:40.172064+00:00",
+      "html_sha256": "5de3ddbcec97209653ed93b6837244fa7c777e757616e2cacf9932f0377f4cdb"
+    }
+  },
+  "excluded_news": [
+    {
+      "title": "Mini Data Science รุ่นที่ 10 เสร็จสิ้นการอบรม",
+      "type": "completion_news_not_open_catalog_offer",
+      "summary_th": "ข่าวยืนยันการอบรมรุ่น 10 เสร็จสิ้น รวม 17 วัน 102 ชั่วโมง ที่ KX",
+      "provenance": {
+        "requested_url": "https://cbtumu.net/mini-data-science-10-completion/",
+        "resolved_url": "https://cbtumu.net/mini-data-science-10-completion/",
+        "retrieved_at": "2026-10-23T12:38:40.967208+00:00",
+        "html_sha256": "27c99a359c13742351e3723770f473edb71cc59853a87b9923bc4ef55702bef9"
+      }
+    },
+    {
+      "title": "ปั้น AI ผู้ช่วยส่วนตัว 24 ชั่วโมง ฉบับมือใหม่ ด้วย HERMES AGENT",
+      "type": "completed_training_news_not_open_catalog_offer",
+      "summary_th": "ข่าวรายงานการอบรมเสร็จสิ้นที่คณะวิศวกรรมศาสตร์ มหิดล อาคาร 1 ห้อง R301; ไม่มีหลักฐานจาก catalog ว่ารับสมัครรอบใหม่",
+      "provenance": {
+        "requested_url": "https://cbtumu.net/hermes-agent-training-cbtu-mu/",
+        "resolved_url": "https://cbtumu.net/hermes-agent-training-cbtu-mu/",
+        "retrieved_at": "2026-10-23T12:38:41.696999+00:00",
+        "html_sha256": "2c97cf7c54ae1d3f67365e58e1bc544c211be4b391ddebc26206638c300885e6"
+      }
+    }
+  ]
+}

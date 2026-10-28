@@ -15,10 +15,10 @@ export function requestsAdminHandler(store: CourseRequestStore) {
       return;
     }
     if (req.url !== '/') { res.writeHead(404, headers).end(); return; }
-    res.writeHead(200, { ...headers, 'Content-Type': 'text/html; charset=utf-8' }).end(page);
+    res.writeHead(200, { ...headers, 'Content-Type': 'text/html; charset=utf-8' }).end(requestsPage);
   };
 }
-const page = `<!doctype html><html lang="th"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ซีบอต · คำขอกลาง</title>
+export const requestsPage = `<!doctype html><html lang="th"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ซีบอต · คำขอกลาง</title>
 <style>*{box-sizing:border-box}body{margin:0;background:#f3f6fa;color:#172b42;font:16px system-ui}header{padding:28px max(5%,20px);background:#142e47;color:white}h1{margin:0 0 8px;font-size:28px}header p{color:#c4d5e4}main{max-width:1000px;padding:24px;margin:auto}#count{font-size:24px;font-weight:700}input{width:100%;padding:14px;border:1px solid #ccd6df;border-radius:10px;margin:16px 0}article{background:white;border-radius:14px;margin:16px 0;padding:24px;overflow-wrap:anywhere}h2{font-size:20px;margin:0 0 12px}.tag{display:inline-block;border-radius:20px;background:#e6f4f1;padding:6px 12px;color:#116c5e}p{line-height:1.6}.note{white-space:pre-wrap;background:#f3f6fa;padding:14px;border-radius:8px}small{display:block;color:#586d82;line-height:1.7}.status{margin-top:12px;color:#586d82}a{color:#146f8e}</style>
 <header><h1>ซีบอต · คำขอกลาง</h1><p>คำขอจองและเรื่องที่ผู้ใช้ยืนยันแล้ว · รอทีมงานดำเนินการ</p></header>
 <main><div id="count">กำลังโหลด</div><p>ยังไม่ส่งอีเมลหรือ LINE และยังไม่ใช่การยืนยันที่นั่งหรือรอบเรียน</p><input id="search" aria-label="ค้นหาคำขอ" placeholder="ค้นหาเลขอ้างอิง หลักสูตร หรือเรื่องที่ฝาก"><div id="rows"></div><div id="status" class="status" role="status"></div><p>เก็บคำขอไม่เกิน90วัน · หน้านี้ใช้ดูรายการในเครื่องนี้ · ช่องทางส่งต่อจะกำหนดภายหลัง</p></main>

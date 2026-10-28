@@ -2,6 +2,7 @@ import { createHmac, timingSafeEqual, randomUUID } from 'node:crypto';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { CustomerCore } from './core.js';
 import { failureCategory, lineFailureReply } from './diagnostics.js';
+import type { MonitorEvent } from './monitor.js';
 import { LineConversations } from './line-memory.js';
 
 export function validSignature(raw: Buffer, signature: string | undefined, secret: string): boolean {
@@ -28,6 +29,7 @@ type LineOptions = {
   reply: (token: string, text: string) => Promise<void>;
   core: Pick<CustomerCore, 'client'>;
   log?: (record: object) => void;
+  observe?: (event: MonitorEvent) => void;
 };
 
 export class LineAdapter {
@@ -60,11 +62,17 @@ export class LineAdapter {
       if (this.seen.has(event.webhookEventId)) continue;
       this.seen.set(event.webhookEventId, Date.now() + 24 * 60 * 60_000);
       const receivedAt = Date.now();
+      const observe = (direction: 'in' | 'out', text: string, status: string) => {
+        try { this.options.observe?.({ id: event.webhookEventId, userId: event.source.userId,
+          account: this.options.account, direction, text, status, at: new Date().toISOString() }); }
+        catch { /* Monitoring must not interrupt replies. */ }
+      };
+      observe('in', event.message.text, 'received');
       const task = this.tail.then(async () => {
         if (this.closed) return;
         const requestId = randomUUID();
         const record = (outcome: string, category?: string) => this.options.log?.({ requestId, channel: 'line', outcome, ...(category ? { category } : {}) });
-        if (Date.now() - receivedAt > 20000) { record('queue_expired'); return; }
+        if (Date.now() - receivedAt > 20000) { record('queue_expired'); observe('out', '', 'queue_expired'); return; }
         let text = '';
         let fallback = false;
         try {
@@ -77,10 +85,10 @@ export class LineAdapter {
         }
         if (!text.trim()) text = 'ยังไม่พบคำตอบที่ยืนยันได้ กรุณาดู https://cbtumu.net/faq/';
         if (this.closed) return;
-        if (Date.now() - receivedAt > 50000) { record('reply_expired'); return; }
-        if (this.options.dryRun) { record('dry_run_no_send'); return; }
-        try { await this.options.reply(event.replyToken, text); record(fallback ? 'replied_fallback' : 'replied'); }
-        catch { record('reply_failed_no_retry'); }
+        if (Date.now() - receivedAt > 50000) { record('reply_expired'); observe('out', text, 'reply_expired'); return; }
+        if (this.options.dryRun) { record('dry_run_no_send'); observe('out', text, 'dry_run_no_send'); return; }
+        try { await this.options.reply(event.replyToken, text); record(fallback ? 'replied_fallback' : 'replied'); observe('out', text, fallback ? 'replied_fallback' : 'replied'); }
+        catch { record('reply_failed_no_retry'); observe('out', text, 'reply_failed_no_retry'); }
       });
       this.tail = task.catch(() => {});
       this.tasks.add(task);

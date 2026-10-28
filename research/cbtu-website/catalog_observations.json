@@ -1,0 +1,415 @@
+{
+  "browser_home_pages": [
+    {
+      "url": "https://cbtumu.net/",
+      "observed_on": "2026-10-23",
+      "method": "IAB UI click from freshly loaded Home; native AJAX pagination",
+      "course_ids": [
+        "cbtu-20",
+        "cbtu-01",
+        "cbtu-02",
+        "cbtu-03",
+        "cbtu-04",
+        "cbtu-05"
+      ]
+    },
+    {
+      "url": "https://cbtumu.net/?current_page=2",
+      "observed_on": "2026-10-23",
+      "method": "IAB UI click from freshly loaded Home; native AJAX pagination",
+      "course_ids": [
+        "cbtu-06",
+        "cbtu-07",
+        "cbtu-08",
+        "cbtu-09",
+        "cbtu-10",
+        "cbtu-11"
+      ]
+    },
+    {
+      "url": "https://cbtumu.net/?current_page=3",
+      "observed_on": "2026-10-23",
+      "method": "IAB UI click from freshly loaded Home; native AJAX pagination",
+      "course_ids": [
+        "cbtu-12",
+        "cbtu-13",
+        "cbtu-14",
+        "cbtu-15",
+        "cbtu-16",
+        "cbtu-17"
+      ]
+    },
+    {
+      "url": "https://cbtumu.net/?current_page=4",
+      "observed_on": "2026-10-23",
+      "method": "IAB UI click from freshly loaded Home; native AJAX pagination",
+      "course_ids": [
+        "cbtu-18",
+        "cbtu-19"
+      ]
+    }
+  ],
+  "direct_http_observations": [
+    {
+      "provenance": {
+        "requested_url": "https://cbtumu.net/",
+        "resolved_url": "https://cbtumu.net/",
+        "retrieved_at": "2026-10-23T12:33:34.853983+00:00",
+        "html_sha256": "2e8389e1a87b106ff0a78d5cb79240cd42c9e925e86a178156a5545eb0c01ede"
+      },
+      "courses": [
+        {
+          "name": "Popular Course Bundle",
+          "url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+          "listing_text": "SAVE 62.5% 4 - course bundle Popular Course Bundle 0 By akkaraponchaikot In AI , Design ฿1,500.00 ฿4,000.00 Add to Cart"
+        },
+        {
+          "name": "Data Analysis with AI",
+          "url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+          "listing_text": "4.20 (20) Data Analysis with AI 70 By taweesak samanchuen In AI , Data Science ฿2,000.00 Enrollment is now closed"
+        },
+        {
+          "name": "CBTU AI Day : AI for Research",
+          "url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-research/",
+          "listing_text": "4.77 (86) CBTU AI Day : AI for Research 486 1h30m By taweesak samanchuen In AI Enroll Course"
+        },
+        {
+          "name": "CBTU AI Day : AI for Work",
+          "url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-work/",
+          "listing_text": "4.62 (131) CBTU AI Day : AI for Work 585 2h By taweesak samanchuen In AI , Design Enroll Course"
+        },
+        {
+          "name": "Mini AI Agent Engineering",
+          "url": "https://cbtumu.net/coursenew/miniaiagentengineer/",
+          "listing_text": "Mini AI Agent Engineering 30 By taweesak samanchuen In AI ฿24,000.00 Enrollment is now closed"
+        },
+        {
+          "name": "Mini Data Science รุ่นที่ 10",
+          "url": "https://cbtumu.net/coursenew/minidatascience10/",
+          "listing_text": "Mini Data Science รุ่นที่ 10 15 By taweesak samanchuen In Data Science ฿28,000.00 Enrollment is now closed"
+        }
+      ],
+      "pagination": [
+        "Page 1 of 4"
+      ]
+    },
+    {
+      "provenance": {
+        "requested_url": "https://cbtumu.net/?current_page=2",
+        "resolved_url": "https://cbtumu.net/?current_page=2",
+        "retrieved_at": "2026-10-23T12:33:35.566217+00:00",
+        "html_sha256": "d15a0f7b81129943f48e7a6a4d5fb4642920ce51562a782bf71199e339a8fc73"
+      },
+      "courses": [
+        {
+          "name": "Popular Course Bundle",
+          "url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+          "listing_text": "SAVE 62.5% 4 - course bundle Popular Course Bundle 0 By akkaraponchaikot In AI , Design ฿1,500.00 ฿4,000.00 Add to Cart"
+        },
+        {
+          "name": "Data Analysis with AI",
+          "url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+          "listing_text": "4.20 (20) Data Analysis with AI 70 By taweesak samanchuen In AI , Data Science ฿2,000.00 Enrollment is now closed"
+        },
+        {
+          "name": "CBTU AI Day : AI for Research",
+          "url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-research/",
+          "listing_text": "4.77 (86) CBTU AI Day : AI for Research 486 1h30m By taweesak samanchuen In AI Enroll Course"
+        },
+        {
+          "name": "CBTU AI Day : AI for Work",
+          "url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-work/",
+          "listing_text": "4.61 (128) CBTU AI Day : AI for Work 579 2h By taweesak samanchuen In AI , Design Enroll Course"
+        },
+        {
+          "name": "Mini AI Agent Engineering",
+          "url": "https://cbtumu.net/coursenew/miniaiagentengineer/",
+          "listing_text": "Mini AI Agent Engineering 30 By taweesak samanchuen In AI ฿24,000.00 Enrollment is now closed"
+        },
+        {
+          "name": "Mini Data Science รุ่นที่ 10",
+          "url": "https://cbtumu.net/coursenew/minidatascience10/",
+          "listing_text": "Mini Data Science รุ่นที่ 10 15 By taweesak samanchuen In Data Science ฿28,000.00 Enrollment is now closed"
+        }
+      ],
+      "pagination": [
+        "Page 1 of 4"
+      ]
+    },
+    {
+      "provenance": {
+        "requested_url": "https://cbtumu.net/?current_page=3",
+        "resolved_url": "https://cbtumu.net/?current_page=3",
+        "retrieved_at": "2026-10-23T12:33:36.156153+00:00",
+        "html_sha256": "bf982773ca32fe2056fbee9597fa7d58bcf12275b7dae4cfeb9ae1d22845b94a"
+      },
+      "courses": [
+        {
+          "name": "Popular Course Bundle",
+          "url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+          "listing_text": "SAVE 62.5% 4 - course bundle Popular Course Bundle 0 By akkaraponchaikot In AI , Design ฿1,500.00 ฿4,000.00 Add to Cart"
+        },
+        {
+          "name": "Data Analysis with AI",
+          "url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+          "listing_text": "4.20 (20) Data Analysis with AI 70 By taweesak samanchuen In AI , Data Science ฿2,000.00 Enrollment is now closed"
+        },
+        {
+          "name": "CBTU AI Day : AI for Research",
+          "url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-research/",
+          "listing_text": "4.77 (86) CBTU AI Day : AI for Research 486 1h30m By taweesak samanchuen In AI Enroll Course"
+        },
+        {
+          "name": "CBTU AI Day : AI for Work",
+          "url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-work/",
+          "listing_text": "4.62 (131) CBTU AI Day : AI for Work 584 2h By taweesak samanchuen In AI , Design Enroll Course"
+        },
+        {
+          "name": "Mini AI Agent Engineering",
+          "url": "https://cbtumu.net/coursenew/miniaiagentengineer/",
+          "listing_text": "Mini AI Agent Engineering 30 By taweesak samanchuen In AI ฿24,000.00 Enrollment is now closed"
+        },
+        {
+          "name": "Mini Data Science รุ่นที่ 10",
+          "url": "https://cbtumu.net/coursenew/minidatascience10/",
+          "listing_text": "Mini Data Science รุ่นที่ 10 15 By taweesak samanchuen In Data Science ฿28,000.00 Enrollment is now closed"
+        }
+      ],
+      "pagination": [
+        "Page 1 of 4"
+      ]
+    },
+    {
+      "provenance": {
+        "requested_url": "https://cbtumu.net/?current_page=4",
+        "resolved_url": "https://cbtumu.net/?current_page=4",
+        "retrieved_at": "2026-10-23T12:33:36.732330+00:00",
+        "html_sha256": "d5168a0a46b7a5e993b03a13c4b8d4fa9dcf6f5ac40805ab3b60a02f604c10d0"
+      },
+      "courses": [
+        {
+          "name": "Popular Course Bundle",
+          "url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+          "listing_text": "SAVE 62.5% 4 - course bundle Popular Course Bundle 0 By akkaraponchaikot In AI , Design ฿1,500.00 ฿4,000.00 Add to Cart"
+        },
+        {
+          "name": "Data Analysis with AI",
+          "url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+          "listing_text": "4.20 (20) Data Analysis with AI 70 By taweesak samanchuen In AI , Data Science ฿2,000.00 Enrollment is now closed"
+        },
+        {
+          "name": "CBTU AI Day : AI for Research",
+          "url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-research/",
+          "listing_text": "4.77 (86) CBTU AI Day : AI for Research 486 1h30m By taweesak samanchuen In AI Enroll Course"
+        },
+        {
+          "name": "CBTU AI Day : AI for Work",
+          "url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-work/",
+          "listing_text": "4.62 (131) CBTU AI Day : AI for Work 585 2h By taweesak samanchuen In AI , Design Enroll Course"
+        },
+        {
+          "name": "Mini AI Agent Engineering",
+          "url": "https://cbtumu.net/coursenew/miniaiagentengineer/",
+          "listing_text": "Mini AI Agent Engineering 30 By taweesak samanchuen In AI ฿24,000.00 Enrollment is now closed"
+        },
+        {
+          "name": "Mini Data Science รุ่นที่ 10",
+          "url": "https://cbtumu.net/coursenew/minidatascience10/",
+          "listing_text": "Mini Data Science รุ่นที่ 10 15 By taweesak samanchuen In Data Science ฿28,000.00 Enrollment is now closed"
+        }
+      ],
+      "pagination": [
+        "Page 1 of 4"
+      ]
+    },
+    {
+      "provenance": {
+        "requested_url": "https://cbtumu.net/coursescurrent/",
+        "resolved_url": "https://cbtumu.net/coursescurrent/",
+        "retrieved_at": "2026-10-23T12:33:37.325320+00:00",
+        "html_sha256": "4fe412fdccccc56a2f665bb80a92e4b966cd0ae825eaca5d44329a04b9e82eb5"
+      },
+      "courses": [
+        {
+          "name": "Popular Course Bundle",
+          "url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+          "listing_text": "SAVE 62.5% 4 - course bundle Popular Course Bundle 0 By akkaraponchaikot In AI , Design ฿1,500.00 ฿4,000.00 Add to Cart"
+        },
+        {
+          "name": "Data Analysis with AI",
+          "url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+          "listing_text": "4.20 (20) Data Analysis with AI 70 By taweesak samanchuen In AI , Data Science ฿2,000.00 Enrollment is now closed"
+        },
+        {
+          "name": "CBTU AI Day : AI for Research",
+          "url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-research/",
+          "listing_text": "4.77 (86) CBTU AI Day : AI for Research 486 1h30m By taweesak samanchuen In AI Enroll Course"
+        },
+        {
+          "name": "CBTU AI Day : AI for Work",
+          "url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-work/",
+          "listing_text": "4.61 (128) CBTU AI Day : AI for Work 579 2h By taweesak samanchuen In AI , Design Enroll Course"
+        },
+        {
+          "name": "Mini AI Agent Engineering",
+          "url": "https://cbtumu.net/coursenew/miniaiagentengineer/",
+          "listing_text": "Mini AI Agent Engineering 30 By taweesak samanchuen In AI ฿24,000.00 Enrollment is now closed"
+        },
+        {
+          "name": "Mini Data Science รุ่นที่ 10",
+          "url": "https://cbtumu.net/coursenew/minidatascience10/",
+          "listing_text": "Mini Data Science รุ่นที่ 10 15 By taweesak samanchuen In Data Science ฿28,000.00 Enrollment is now closed"
+        },
+        {
+          "name": "การวิเคราะห์ข้อมูลด้วย Microsoft Excel",
+          "url": "https://cbtumu.net/coursenew/analyticsmicrosoftexcel/",
+          "listing_text": "4.83 (6) การวิเคราะห์ข้อมูลด้วย Microsoft Excel 72 By กานต์นภัส ช้ำเกตุ ฿1,000.00 Add to Cart"
+        },
+        {
+          "name": "สร้างสื่อสวยด้วย Canva",
+          "url": "https://cbtumu.net/coursenew/creativemediadesignwithcanva/",
+          "listing_text": "4.57 (7) สร้างสื่อสวยด้วย Canva 115 By Apinya Chuchat In Design ฿1,000.00 Add to Cart"
+        },
+        {
+          "name": "Generative AI in Health Product Marketing",
+          "url": "https://cbtumu.net/coursenew/generativeaiinhealthproductmarketing/",
+          "listing_text": "4.92 (13) Generative AI in Health Product Marketing 39 5h By Samart Jamrat In AI ฿1,000.00 Add to Cart"
+        }
+      ],
+      "pagination": [
+        "Page 1 of 3"
+      ]
+    },
+    {
+      "provenance": {
+        "requested_url": "https://cbtumu.net/coursescurrent/?current_page=2",
+        "resolved_url": "https://cbtumu.net/coursescurrent/?current_page=2",
+        "retrieved_at": "2026-10-23T12:33:38.510181+00:00",
+        "html_sha256": "82ba9ab3312ada9c5763452df9ab8ad9b2bdfb087fdd05f88001dfa6c6dd9040"
+      },
+      "courses": [
+        {
+          "name": "Popular Course Bundle",
+          "url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+          "listing_text": "SAVE 62.5% 4 - course bundle Popular Course Bundle 0 By akkaraponchaikot In AI , Design ฿1,500.00 ฿4,000.00 Add to Cart"
+        },
+        {
+          "name": "Data Analysis with AI",
+          "url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+          "listing_text": "4.20 (20) Data Analysis with AI 70 By taweesak samanchuen In AI , Data Science ฿2,000.00 Enrollment is now closed"
+        },
+        {
+          "name": "CBTU AI Day : AI for Research",
+          "url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-research/",
+          "listing_text": "4.77 (86) CBTU AI Day : AI for Research 486 1h30m By taweesak samanchuen In AI Enroll Course"
+        },
+        {
+          "name": "CBTU AI Day : AI for Work",
+          "url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-work/",
+          "listing_text": "4.62 (133) CBTU AI Day : AI for Work 586 2h By taweesak samanchuen In AI , Design Enroll Course"
+        },
+        {
+          "name": "Mini AI Agent Engineering",
+          "url": "https://cbtumu.net/coursenew/miniaiagentengineer/",
+          "listing_text": "Mini AI Agent Engineering 30 By taweesak samanchuen In AI ฿24,000.00 Enrollment is now closed"
+        },
+        {
+          "name": "Mini Data Science รุ่นที่ 10",
+          "url": "https://cbtumu.net/coursenew/minidatascience10/",
+          "listing_text": "Mini Data Science รุ่นที่ 10 15 By taweesak samanchuen In Data Science ฿28,000.00 Enrollment is now closed"
+        },
+        {
+          "name": "การวิเคราะห์ข้อมูลด้วย Microsoft Excel",
+          "url": "https://cbtumu.net/coursenew/analyticsmicrosoftexcel/",
+          "listing_text": "4.83 (6) การวิเคราะห์ข้อมูลด้วย Microsoft Excel 72 By กานต์นภัส ช้ำเกตุ ฿1,000.00 Add to Cart"
+        },
+        {
+          "name": "สร้างสื่อสวยด้วย Canva",
+          "url": "https://cbtumu.net/coursenew/creativemediadesignwithcanva/",
+          "listing_text": "4.57 (7) สร้างสื่อสวยด้วย Canva 115 By Apinya Chuchat In Design ฿1,000.00 Add to Cart"
+        },
+        {
+          "name": "Generative AI in Health Product Marketing",
+          "url": "https://cbtumu.net/coursenew/generativeaiinhealthproductmarketing/",
+          "listing_text": "4.92 (13) Generative AI in Health Product Marketing 39 5h By Samart Jamrat In AI ฿1,000.00 Add to Cart"
+        }
+      ],
+      "pagination": [
+        "Page 1 of 3"
+      ]
+    },
+    {
+      "provenance": {
+        "requested_url": "https://cbtumu.net/coursescurrent/?current_page=3",
+        "resolved_url": "https://cbtumu.net/coursescurrent/?current_page=3",
+        "retrieved_at": "2026-10-23T12:33:39.494263+00:00",
+        "html_sha256": "bb51b7c989052eb2f4af4a7671b72b7a50fa9ac0e5033a425b0884dff0a58ba5"
+      },
+      "courses": [
+        {
+          "name": "Popular Course Bundle",
+          "url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+          "listing_text": "SAVE 62.5% 4 - course bundle Popular Course Bundle 0 By akkaraponchaikot In AI , Design ฿1,500.00 ฿4,000.00 Add to Cart"
+        },
+        {
+          "name": "Data Analysis with AI",
+          "url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+          "listing_text": "4.20 (20) Data Analysis with AI 70 By taweesak samanchuen In AI , Data Science ฿2,000.00 Enrollment is now closed"
+        },
+        {
+          "name": "CBTU AI Day : AI for Research",
+          "url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-research/",
+          "listing_text": "4.77 (86) CBTU AI Day : AI for Research 486 1h30m By taweesak samanchuen In AI Enroll Course"
+        },
+        {
+          "name": "CBTU AI Day : AI for Work",
+          "url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-work/",
+          "listing_text": "4.62 (133) CBTU AI Day : AI for Work 586 2h By taweesak samanchuen In AI , Design Enroll Course"
+        },
+        {
+          "name": "Mini AI Agent Engineering",
+          "url": "https://cbtumu.net/coursenew/miniaiagentengineer/",
+          "listing_text": "Mini AI Agent Engineering 30 By taweesak samanchuen In AI ฿24,000.00 Enrollment is now closed"
+        },
+        {
+          "name": "Mini Data Science รุ่นที่ 10",
+          "url": "https://cbtumu.net/coursenew/minidatascience10/",
+          "listing_text": "Mini Data Science รุ่นที่ 10 15 By taweesak samanchuen In Data Science ฿28,000.00 Enrollment is now closed"
+        },
+        {
+          "name": "การวิเคราะห์ข้อมูลด้วย Microsoft Excel",
+          "url": "https://cbtumu.net/coursenew/analyticsmicrosoftexcel/",
+          "listing_text": "4.83 (6) การวิเคราะห์ข้อมูลด้วย Microsoft Excel 72 By กานต์นภัส ช้ำเกตุ ฿1,000.00 Add to Cart"
+        },
+        {
+          "name": "สร้างสื่อสวยด้วย Canva",
+          "url": "https://cbtumu.net/coursenew/creativemediadesignwithcanva/",
+          "listing_text": "4.57 (7) สร้างสื่อสวยด้วย Canva 115 By Apinya Chuchat In Design ฿1,000.00 Add to Cart"
+        },
+        {
+          "name": "Generative AI in Health Product Marketing",
+          "url": "https://cbtumu.net/coursenew/generativeaiinhealthproductmarketing/",
+          "listing_text": "4.92 (13) Generative AI in Health Product Marketing 39 5h By Samart Jamrat In AI ฿1,000.00 Add to Cart"
+        }
+      ],
+      "pagination": [
+        "Page 1 of 3"
+      ]
+    }
+  ],
+  "courses_menu_pagination": {
+    "pages_advertised": 3,
+    "pages_attempted": [
+      1,
+      2,
+      3
+    ],
+    "result": "Direct GET repeats first page. UI clicks 2 and 3 returned page indicator Page 1 of 3 and repeated entries; use successful Home UI pagination for coverage."
+  },
+  "detail_counts": {
+    "catalog_records": 20,
+    "public_details": 19,
+    "password_protected_details": 1
+  },
+  "completeness_limit": "Complete union of 4 successfully rendered Home pages on collection date; no claim about all historical/private courses."
+}

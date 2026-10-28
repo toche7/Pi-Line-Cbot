@@ -1,0 +1,36 @@
+{
+  "validated_at": "2026-10-23T12:45:16.789484+00:00",
+  "json_files_parsed": [
+    "listing_observations.json",
+    "catalog_observations.json",
+    "supporting_knowledge.json",
+    "courses.json",
+    "review_required.json"
+  ],
+  "catalog_records": 20,
+  "unique_normalized_canonical_urls": 20,
+  "courses": 19,
+  "bundles": 1,
+  "public_details": 19,
+  "password_protected_details": 1,
+  "home_page_record_counts": [
+    6,
+    6,
+    6,
+    2
+  ],
+  "checks": [
+    "JSON syntax",
+    "canonical URL deduplication including percent-decoding",
+    "unique IDs",
+    "all records have provenance and source refs",
+    "4 Home page union matches catalog",
+    "bundle course refs resolve",
+    "availability/offer verification remains false",
+    "collector Python syntax"
+  ],
+  "limitations": [
+    "Semantic summaries manually reviewed against fetched public marketing sections; no transaction or post-login validation",
+    "Courses menu pagination unreliable; successful Home UI pagination establishes observed catalog union"
+  ]
+}

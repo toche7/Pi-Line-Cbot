@@ -1,0 +1,126 @@
+{
+  "manifest_version": "1.0",
+  "scope": "Curated 19-course + 1-bundle manifest; no automatic discovery or removal",
+  "records": [
+    {
+      "id": "cbtu-01",
+      "canonical_url": "https://cbtumu.net/coursenew/dataanalysiswithai/",
+      "record_type": "course",
+      "name_at_review": "Data Analysis with AI"
+    },
+    {
+      "id": "cbtu-02",
+      "canonical_url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-research/",
+      "record_type": "course",
+      "name_at_review": "CBTU AI Day : AI for Research"
+    },
+    {
+      "id": "cbtu-03",
+      "canonical_url": "https://cbtumu.net/coursenew/cbtu-ai-day-ai-for-work/",
+      "record_type": "course",
+      "name_at_review": "CBTU AI Day : AI for Work"
+    },
+    {
+      "id": "cbtu-04",
+      "canonical_url": "https://cbtumu.net/coursenew/miniaiagentengineer/",
+      "record_type": "course",
+      "name_at_review": "Mini AI Agent Engineering"
+    },
+    {
+      "id": "cbtu-05",
+      "canonical_url": "https://cbtumu.net/coursenew/minidatascience10/",
+      "record_type": "course",
+      "name_at_review": "Mini Data Science รุ่นที่ 10"
+    },
+    {
+      "id": "cbtu-06",
+      "canonical_url": "https://cbtumu.net/coursenew/analyticsmicrosoftexcel/",
+      "record_type": "course",
+      "name_at_review": "การวิเคราะห์ข้อมูลด้วย Microsoft Excel"
+    },
+    {
+      "id": "cbtu-07",
+      "canonical_url": "https://cbtumu.net/coursenew/creativemediadesignwithcanva/",
+      "record_type": "course",
+      "name_at_review": "สร้างสื่อสวยด้วย Canva"
+    },
+    {
+      "id": "cbtu-08",
+      "canonical_url": "https://cbtumu.net/coursenew/generativeaiinhealthproductmarketing/",
+      "record_type": "course",
+      "name_at_review": "Generative AI in Health Product Marketing"
+    },
+    {
+      "id": "cbtu-09",
+      "canonical_url": "https://cbtumu.net/coursenew/aiagentwithn8n/",
+      "record_type": "course",
+      "name_at_review": "AI Agent with n8n"
+    },
+    {
+      "id": "cbtu-10",
+      "canonical_url": "https://cbtumu.net/coursenew/n8n-workshop/",
+      "record_type": "course",
+      "name_at_review": "AI Agent Workshop with n8n"
+    },
+    {
+      "id": "cbtu-11",
+      "canonical_url": "https://cbtumu.net/coursenew/basicpromptengineering2026/",
+      "record_type": "course",
+      "name_at_review": "Basic Prompt Engineering (2026)"
+    },
+    {
+      "id": "cbtu-12",
+      "canonical_url": "https://cbtumu.net/coursenew/aiagentforall/",
+      "record_type": "course",
+      "name_at_review": "AI Agent for ALL"
+    },
+    {
+      "id": "cbtu-13",
+      "canonical_url": "https://cbtumu.net/coursenew/ai-agents-in-action/",
+      "record_type": "course",
+      "name_at_review": "AI Agents in Action"
+    },
+    {
+      "id": "cbtu-14",
+      "canonical_url": "https://cbtumu.net/coursenew/ai-for-all/",
+      "record_type": "course",
+      "name_at_review": "AI for All"
+    },
+    {
+      "id": "cbtu-15",
+      "canonical_url": "https://cbtumu.net/coursenew/dataanalytic/",
+      "record_type": "course",
+      "name_at_review": "Data Analytics"
+    },
+    {
+      "id": "cbtu-16",
+      "canonical_url": "https://cbtumu.net/coursenew/datascienceessentials/",
+      "record_type": "course",
+      "name_at_review": "Data Science Essentials"
+    },
+    {
+      "id": "cbtu-17",
+      "canonical_url": "https://cbtumu.net/coursenew/data-analyst-level-4-รุ่นที่-4/",
+      "record_type": "course",
+      "name_at_review": "Data Analyst Level 4 รุ่นที่ 4"
+    },
+    {
+      "id": "cbtu-18",
+      "canonical_url": "https://cbtumu.net/coursenew/exambasicpromptengineeringupdate/",
+      "record_type": "course",
+      "name_at_review": "Basic Prompt Engineering (Update)"
+    },
+    {
+      "id": "cbtu-19",
+      "canonical_url": "https://cbtumu.net/coursenew/basic-prompt-engineering/",
+      "record_type": "course",
+      "name_at_review": "Basic Prompt Engineering"
+    },
+    {
+      "id": "cbtu-20",
+      "canonical_url": "https://cbtumu.net/course-bundle/mostcoursebundle/",
+      "record_type": "bundle",
+      "name_at_review": "Popular Course Bundle"
+    }
+  ]
+}
