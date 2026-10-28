@@ -39,7 +39,7 @@ export class ConversationMonitor {
 
 export function monitorHandler(monitor: ConversationMonitor, html = monitorPage) {
   return (req: IncomingMessage, res: ServerResponse) => {
-    const headers = { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff', 'Content-Security-Policy': "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; frame-ancestors 'none'" };
+    const headers = { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff', 'Content-Security-Policy': "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; frame-ancestors 'none'" };
     // The monitor has its own loopback listener. Reject DNS rebinding and cross-origin requests.
     if (!/^127\.0\.0\.1:\d+$/.test(req.headers.host || '') || (req.headers.origin && req.headers.origin !== `http://${req.headers.host}`)) {
       res.writeHead(403, headers).end(); return;

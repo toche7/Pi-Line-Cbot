@@ -1,9 +1,12 @@
+import { staffMessage } from './staff-message.js';
+import { handoverTranscript, type HandoverTranscript } from './handover-context.js';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { CustomerError, type CustomerStore } from './customers.js';
 import type { ConversationMonitor } from './monitor.js';
 import type { CourseRequestStore } from './course-requests.js';
 import { conversationKey, type ConversationControl } from './conversation-control.js';
 export type ConversationService = { control: ConversationControl; account: string; allowedUsers: Set<string>; dryRun: boolean;
+  resume?: (user: string, source: () => HandoverTranscript) => Promise<void>;
   push: (user: string, id: string, text: string) => Promise<void> };
 export function conversationsHandler(customers: CustomerStore, monitor: ConversationMonitor, requests: CourseRequestStore, token: string, service?: ConversationService) {
   return async (req: IncomingMessage, res: ServerResponse) => {
@@ -29,14 +32,23 @@ export function conversationsHandler(customers: CustomerStore, monitor: Conversa
       const key = conversationKey(service.account, c.identity.user);
       if (!Number.isSafeInteger(input.epoch)) throw new CustomerError(400, 'สถานะไม่ถูกต้อง');
       if (input.action === 'take' || input.action === 'release') {
-        respond(200, { mode: service.control.change(key, input.action === 'take', input.epoch) }); return;
+        const mode = input.action === 'take' ? service.control.change(key, true, input.epoch)
+          : await service.control.release(key, input.epoch, async () => {
+            if (!service.resume) throw new CustomerError(503, 'ยังไม่ได้เชื่อมบริบทก่อนคืนให้บอต ยังคงผู้ดูแลรับช่วงไว้');
+            await service.resume(c.identity.user, () => {
+              const mode = service.control.mode(key);
+              return handoverTranscript(service.account, c.identity.user, mode.epoch, mode.startedAt ?? mode.at,
+                monitor.snapshot().events, service.control.snapshot().deliveries);
+            });
+          });
+        respond(200, { mode }); return;
       }
       if (input.action !== 'send' || input.confirmed !== true) throw new CustomerError(400, 'กรุณาตรวจข้อความและยืนยันก่อนส่ง');
       if (service.dryRun) throw new CustomerError(403, 'ระบบอยู่ใน dry run จึงไม่ส่ง LINE');
       // Conservative eligibility: direct inbound message in the last seven days.
       if (!events.some(e => e.account === service.account && e.userId === c.identity.user && e.direction === 'in'
         && Date.now() - Date.parse(e.at) >= 0 && Date.now() - Date.parse(e.at) < 7 * 86400000)) throw new CustomerError(403, 'ไม่มีข้อความรับเข้าภายใน 7 วัน จึงยังไม่ส่งรายคน');
-      const delivery = await service.control.send(key, input.epoch, input.id, input.text, (id, text) => service.push(c.identity.user, id, text));
+      const delivery = await service.control.send(key, input.epoch, input.id, staffMessage(input.text), (id, text) => service.push(c.identity.user, id, text));
       respond(200, { delivery });
     } catch (e) { respond(e instanceof CustomerError ? e.status : 503, { error: e instanceof CustomerError ? e.message : 'โหลดหรือบันทึกบทสนทนาไม่ได้ กรุณาตรวจข้อมูล' }); }
   };

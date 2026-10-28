@@ -77,11 +77,11 @@ LINE persistent memory เปิดแล้ว: `.line-memory/` แยกจา
 - `src/chat.ts`, `src/main.ts`: Terminal adapters; `src/conversation.ts`: model streaming/progress/timeout/call limits
 - `src/line.ts`, `src/line-memory.ts`, `src/server.ts`: raw-body signature verification, async queue, dedupe, allowlist, bounded reply client และ safe operational logs
 
-Build และ runtime tests ล่าสุด 49 รายการผ่าน รวม semantic memory requests/commit-before-ack/no-data-loss และ host /help ทั้งTerminal/LINEและcancel pending forget, structured instructor reader/teacher search/semantic follow-up, reviewed briefs/job-first advice และ history replay/query operations/catalog acceptance/grounding/aliases/follow-up, persistence/restart, >20 turn/compaction, reset/forget confirm/cancel/physical deletion, isolation, safe memory และ failed summary/429 recovery เพิ่ม import tests9รายการตรวจ fail-closed/last-good แยกด้วย `npm run test:catalog-import` ดู dependency/ข้อจำกัดใน [COURSE_INSTRUCTORS_GUIDE.md](./COURSE_INSTRUCTORS_GUIDE.md) หาก dialogue ผิดรูปแบบ/ถูกตัด/ว่าง จะขอซ่อมได้หนึ่งครั้งภายใน deadline เดิม Tests ไม่เรียก LINE จริง
+Build และ runtime tests ในรอบพัฒนาช่วงนี้ 49 รายการผ่าน (ประวัติรอบก่อน; ล่าสุดแชตบทสนทนา29ต.ค.145/145 ดู CONVERSATIONS_GUIDE.md) รวม semantic memory requests/commit-before-ack/no-data-loss และ host /help ทั้งTerminal/LINEและcancel pending forget, structured instructor reader/teacher search/semantic follow-up, reviewed briefs/job-first advice และ history replay/query operations/catalog acceptance/grounding/aliases/follow-up, persistence/restart, >20 turn/compaction, reset/forget confirm/cancel/physical deletion, isolation, safe memory และ failed summary/429 recovery เพิ่ม import tests9รายการตรวจ fail-closed/last-good แยกด้วย `npm run test:catalog-import` ดู dependency/ข้อจำกัดใน [COURSE_INSTRUCTORS_GUIDE.md](./COURSE_INSTRUCTORS_GUIDE.md) หาก dialogue ผิดรูปแบบ/ถูกตัด/ว่าง จะขอซ่อมได้หนึ่งครั้งภายใน deadline เดิม Tests ไม่เรียก LINE จริง
 
 ทดสอบ `npm run chat` ผ่าน PTY จริงหลายรอบและหลาย turn แบบผสมแล้ว พบและแก้ routing ที่วน FAQ fallback และการแต่งตัวตน/เว็บ ไม่พบ process crash ในรอบที่ reproduce แต่พบ provider 429 จริงด้วย จึงแยกผล functional กับข้อจำกัด provider ไว้ใน TERMINAL_TEST_RESULTS.md การทดสอบ 2 turn เดิมไม่เพียงพอยืนยัน small talk หรือความเสถียรแชตยาว LINE OA/HTTPS ตรวจ Verify และ signature จริงผ่านแล้ว และ LINE reply API ยอมรับ reply จริง 7 ครั้งแล้ว (ยังไม่ได้ตรวจหน้าจอผู้รับ)
 
-สำหรับบริการจริงยังต้องเพิ่ม durable queue/dedupe และ customer verification ก่อนข้อมูลจริง, การประเมินคำตอบกว้างขึ้น และ cost monitoring แบบเงิน Local Terminal/LINE stores มี idle retention 90 วันและสิทธิ์ไฟล์จำกัด แต่ยังไม่ใช่ระบบหลายเครื่องหรือฐานข้อมูลเข้ารหัส ไม่มีการส่งต่อเจ้าหน้าที่หรือ action เปลี่ยนข้อมูลในรุ่นนี้
+สำหรับบริการจริงยังต้องเพิ่ม durable queue/dedupe และ customer verification ก่อนข้อมูลจริง, การประเมินคำตอบกว้างขึ้น และ cost monitoring แบบเงิน Local Terminal/LINE stores มี idle retention 90 วันและสิทธิ์ไฟล์จำกัด แต่ยังไม่ใช่ระบบหลายเครื่องหรือฐานข้อมูลเข้ารหัส รองรับคำขอรอเจ้าหน้าที่และStaffรับช่วงคุยในLINEแล้วตามCONVERSATIONS_GUIDE.md แต่ยังไม่ยืนยันผู้เรียน/ที่นั่ง/การชำระเงินหรือแจ้งเจ้าหน้าที่ภายนอกอัตโนมัติ
 
 ## แหล่งข้อมูล
 
@@ -96,7 +96,7 @@ Git local baseline เริ่มจาก `31365a3`; .env/secrets/runtime data
 
 ## ติดตามบทสนทนา
 
-หลังเริ่ม server รุ่นใหม่ เปิด http://127.0.0.1:3001 เพื่อดูบทสนทนา งานรอดูแลจากคำขอเดิม และจัดการลูกค้า/โปรไฟล์/โน้ต/แท็ก/กลุ่ม/สถานะรับข่าวสารบนเครื่องนี้ เมนูหลักมี5แท็บ โดยภาพรวมและส่งข่าวยังปิดไว้ ดู [CUSTOMERS_GUIDE.md](./CUSTOMERS_GUIDE.md) สำหรับวิธีใช้และข้อจำกัดเรื่องยังไม่มีlogin และ [MONITOR_GUIDE.md](./MONITOR_GUIDE.md) สำหรับประวัติสนทนา
+เปิด http://127.0.0.1:3001/#monitor เพื่อดูบทสนทนาและรายการรอเจ้าหน้าที่ รับช่วงตอบด้วย【Staff】และคืนให้บอตพร้อมบริบทได้ ลูกค้าพิมพ์ “ขอคุยกับเจ้าหน้าที่” เพื่อขึ้นรายการรอ หน้าเว็บอัปเดตทุก5วินาที ยังไม่มีเสียงหรือแจ้งเตือนนอกเว็บ ดู [คู่มือบทสนทนาและผลเจ้าของยืนยัน](./CONVERSATIONS_GUIDE.md) และ [ภาพรวมหลังบ้าน](./MONITOR_GUIDE.md) เว็บเดิมมีลูกค้าและกลุ่ม งานรอดูแล ส่งข่าว และจัดการบอตแล้ว ภาพรวมยังไม่พัฒนา ข้อจำกัดเรื่องไม่มีloginคงเดิม
 
 
 ### จัดการบอต

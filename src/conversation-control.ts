@@ -3,7 +3,8 @@ import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { localActor, CustomerError } from './customers.js';
 
-type Mode = { human: boolean; epoch: number; at: string; actor: string };
+export type HumanWaiting = { id: string; requestedAt: string; reason: string; stopBot: boolean };
+type Mode = { human: boolean; epoch: number; at: string; actor: string; startedAt?: string; waiting?: HumanWaiting };
 type Delivery = { id: string; key: string; text: string; at: string; status: 'pending' | 'accepted' | 'unknown'; actor: string };
 type State = { version: 1; modes: Record<string, Mode>; deliveries: Delivery[] };
 export const conversationKey = (account: string, user: string) => JSON.stringify([account, user]);
@@ -27,6 +28,9 @@ export class ConversationControl {
       for (const [key, m] of Object.entries(s.modes) as [string, Mode][]) {
         const parts = JSON.parse(key);
         if (!Array.isArray(parts) || parts.length !== 2 || parts.some(p => typeof p !== 'string') || typeof m.human !== 'boolean'
+          || (m.waiting !== undefined && (!m.waiting || typeof m.waiting.id !== 'string' || !/^[0-9a-f-]{36}$/.test(m.waiting.id)
+            || !Number.isFinite(Date.parse(m.waiting.requestedAt)) || typeof m.waiting.reason !== 'string' || m.waiting.reason.length > 200 || typeof m.waiting.stopBot !== 'boolean' || m.human))
+          || (m.startedAt !== undefined && !Number.isFinite(Date.parse(m.startedAt)))
           || !Number.isSafeInteger(m.epoch) || m.epoch < 0 || m.actor !== localActor || !Number.isFinite(Date.parse(m.at))) throw new Error();
       }
       const ids = new Set();
@@ -50,18 +54,55 @@ export class ConversationControl {
     } catch { this.fault = true; fail('บันทึกสถานะไม่ได้ ระบบพักการส่งไว้', 503); }
   }
   mode(key: string): Mode { return this.state.modes[key] ?? { human: false, epoch: 0, at: '', actor: localActor }; }
-  ticket(key: string) { return { epoch: this.mode(key).epoch, allowed: !this.fault && !this.mode(key).human }; }
-  valid(key: string, ticket: { epoch: number; allowed: boolean }) { return !this.fault && ticket.allowed && !this.mode(key).human && ticket.epoch === this.mode(key).epoch; }
+  ticket(key: string) { return { epoch: this.mode(key).epoch, allowed: !this.fault && !this.mode(key).human && !this.mode(key).waiting?.stopBot }; }
+  valid(key: string, ticket: { epoch: number; allowed: boolean }, allowWaiting = false, requestId?: string) {
+    const mode = this.mode(key);
+    return !this.fault && !mode.human && ticket.epoch === mode.epoch && (allowWaiting || (ticket.allowed && !mode.waiting?.stopBot))
+      && (!requestId || mode.waiting?.id === requestId);
+  }
+  requestHuman(key: string, stopBot: boolean) {
+    const mode = this.mode(key);
+    if (mode.human) return { waiting: undefined, changed: false };
+    if (mode.waiting && (!stopBot || mode.waiting.stopBot)) return { waiting: mode.waiting, changed: false };
+    if (!this.state.modes[key] && Object.keys(this.state.modes).length >= 10000) fail('จำนวนบทสนทนาเต็ม', 413);
+    const next = structuredClone(this.state), at = new Date().toISOString();
+    const waiting: HumanWaiting = { id: mode.waiting?.id ?? randomUUID(), requestedAt: mode.waiting?.requestedAt ?? at,
+      reason: stopBot ? 'ลูกค้าขอหยุดบอตและรอเจ้าหน้าที่' : 'ลูกค้าขอคุยกับเจ้าหน้าที่', stopBot };
+    // Pause immediately on intake, invalidating already queued/generating bot turns.
+    next.modes[key] = { ...mode, at, waiting, epoch: mode.epoch + (stopBot ? 1 : 0) };
+    this.commit(next); return { waiting, changed: true };
+  }
+  cancelHumanRequest(key: string) {
+    const mode = this.mode(key);
+    if (!mode.waiting || mode.human) return false;
+    const next = structuredClone(this.state);
+    const { waiting, ...remaining } = mode;
+    next.modes[key] = { ...remaining, at: new Date().toISOString(), epoch: mode.epoch + 1 };
+    this.commit(next); return true;
+  }
   change(key: string, human: boolean, epoch: number) {
     if (this.sending.has(key)) fail('กำลังส่งข้อความ กรุณารอให้ส่งจบก่อน');
     if (epoch !== this.mode(key).epoch) fail('สถานะเปลี่ยนแล้ว กรุณาโหลดล่าสุด');
     if (!this.state.modes[key] && Object.keys(this.state.modes).length >= 10000) fail('จำนวนบทสนทนาเต็ม', 413);
     const next = structuredClone(this.state);
-    next.modes[key] = { human, epoch: epoch + 1, at: new Date().toISOString(), actor: localActor };
+    const at = new Date().toISOString();
+    next.modes[key] = { human, epoch: epoch + 1, at, actor: localActor,
+      ...(human ? { startedAt: this.mode(key).human ? this.mode(key).startedAt ?? this.mode(key).at : this.mode(key).waiting?.requestedAt ?? at } : {}) };
     this.commit(next); return this.mode(key);
   }
-  beginBotSend(key: string, ticket: { epoch: number; allowed: boolean }) {
-    if (!this.valid(key, ticket) || this.sending.has(key)) return false;
+  async release(key: string, epoch: number, syncContext: () => Promise<void>) {
+    if (this.fault) fail('บันทึกสถานะไม่ได้ ระบบพักการส่งไว้', 503);
+    if (this.sending.has(key)) fail('กำลังส่งหรือคืนบทสนทนา กรุณารอให้จบก่อน');
+    if (!this.mode(key).human || this.mode(key).epoch !== epoch) fail('สถานะเปลี่ยนแล้ว กรุณาโหลดล่าสุด');
+    this.sending.add(key);
+    try {
+      await syncContext();
+      this.sending.delete(key);
+      return this.change(key, false, epoch);
+    } finally { this.sending.delete(key); }
+  }
+  beginBotSend(key: string, ticket: { epoch: number; allowed: boolean }, allowWaiting = false, requestId?: string) {
+    if (!this.valid(key, ticket, allowWaiting, requestId) || this.sending.has(key)) return false;
     this.sending.add(key); return true;
   }
   endSend(key: string) { this.sending.delete(key); }

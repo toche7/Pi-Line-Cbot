@@ -1,3 +1,5 @@
+import { humanSupportText, type HumanSupportStatus } from './human-request.js';
+import { validHandover, handoverLimit, type HandoverTranscript } from './handover-context.js';
 import { captureResponseSettings, settingsHash, type SettingsBinding } from './response-settings.js';
 import { responseSession } from './response-session.js';
 import { randomUUID } from 'node:crypto';
@@ -14,7 +16,7 @@ import type { CourseRequests } from './course-requests.js';
 
 export type Output = { text: (value: string) => void; status: (value: string) => void };
 export type Identity = { channel: 'terminal' | 'line'; scope: string; user: string };
-export type ChatClient = { send: (prompt: string, output: Output) => Promise<void>; abort: () => Promise<void>; reset?: () => Promise<void>; memory?: () => Promise<string>; requestForget?: () => Promise<string>; forget?: (token: string) => Promise<void>; cancelForget?: () => void; requestsEnabled?: boolean };
+export type ChatClient = { send: (prompt: string, output: Output) => Promise<void>; abort: () => Promise<void>; reset?: () => Promise<void>; memory?: () => Promise<string>; requestForget?: () => Promise<string>; forget?: (token: string) => Promise<void>; cancelForget?: () => void; requestsEnabled?: boolean; resumeFromHandover?: (source: () => HandoverTranscript) => Promise<void> };
 type Entry = { session: Promise<AgentSession>; tail: Promise<void>; pending: number; touched: number; lastTopic?: string; memory: Memory; memoryClarificationExpires?: number };
 
 export class CustomerCore {
@@ -30,6 +32,7 @@ export class CustomerCore {
     private summarizer?: Summarizer,
     private courseRequests?: CourseRequests,
     private responseSettings: () => SettingsBinding | undefined = captureResponseSettings,
+    private humanSupport?: (identity: Identity) => HumanSupportStatus | undefined,
   ) {}
 
   client(identity: Identity): ChatClient {
@@ -108,7 +111,7 @@ export class CustomerCore {
             let memoryHandled = false;
             let memoryClarified = false;
             const orderId = memoryRequest || directLearned ? undefined : prompt.match(/\bDEMO-[0-9]+\b/i)?.[0].toUpperCase();
-            const previousCatalog = current.memory.catalog ?? recoverCatalogState(current.memory.recent);
+            const previousCatalog = current.memory.catalog ?? recoverCatalogState(current.memory.recent.filter(t => !current.memory.handover || t.at > current.memory.handover.at));
             let routed = orderId || memoryRequest || directLearned ? undefined : routeCatalog(prompt, previousCatalog,
               current.lastTopic ?? (previousCatalog?.shownIds.length ? 'catalog:' + previousCatalog.shownIds.join(',') : undefined), current.memory.profile.interests);
             const catalog = routed?.selection;
@@ -138,6 +141,11 @@ export class CustomerCore {
             if (this.courseRequests && answer === identityAnswer) answer = identityAnswer.replace('และยังเข้าถึงข้อมูลผู้เรียนจริงหรือส่งเรื่องให้เจ้าหน้าที่ไม่ได้',
               'ฝากคำขอจองด้วย /book ชื่อคอร์ส หรือฝากเรื่องด้วย /contact ข้อความ ได้ โดยเก็บในระบบกลางหลังคุณยืนยัน ยังไม่ส่งต่อหรือยืนยันที่นั่ง และยังเข้าถึงข้อมูลผู้เรียนจริงไม่ได้');
             if (this.courseRequests && answer && topicForAnswer(answer) === 'contact') answer = 'ฝากเรื่องให้ทีมงานได้ด้วย /contact ตามด้วยเรื่องที่ต้องการครับ ระบบจะแสดงสรุปให้ยืนยันก่อนเก็บในระบบกลาง ยังไม่ส่งอีเมลหรือ LINE ให้ทีมงาน\nหากต้องการช่องทางติดต่อโดยตรง ดู https://cbtumu.net/faq/ ข้อมูลอีเมลในเว็บบางส่วนต่างกัน จึงยังไม่เลือกยืนยันอีเมลให้';
+            const support = this.humanSupport?.(identity);
+            if (support && answer && (answer.startsWith('ผมชื่อซีบอต') || topicForAnswer(answer) === 'contact')) {
+              answer = answer.replace('หรือส่งเรื่องให้เจ้าหน้าที่ไม่ได้', 'ไม่ได้');
+              answer += '\n' + humanSupportText(support);
+            }
             if (answer !== undefined) {
               hostTurn = true;
               output.status(memoryHandled ? '[กำลังตรวจคำขอความจำ]' : orderId ? '[ข้อมูลสมมติสำหรับทดสอบ]' : '[ตอบจากข้อมูลสาธารณะที่กำหนด]');
@@ -156,7 +164,7 @@ export class CustomerCore {
                     semanticRead = true;
                     nextCatalog = routed.state ?? previousCatalog;
                     return routed.answer!;
-                  } }, { previousUser: before.recent.at(-1)?.user, clarificationPending: resumeMemory, resolve: plan => {
+                  } }, { previousUser: before.recent.filter(t => !before.handover || t.at > before.handover.at).at(-1)?.user, clarificationPending: resumeMemory, resolve: plan => {
                     const decision = decideMemory(plan, prompt, before, resumeMemory);
                     const candidate = structuredClone(staged);
                     try { applyMemoryChanges(candidate, decision.changes); }
@@ -169,7 +177,7 @@ export class CustomerCore {
                     memoryHandled = true;
                     memoryClarified = !!decision.allowResume;
                     return decision.changes.length ? memoryConfirmation(before, candidate, !!this.store, decision.changes) : decision.answer;
-                  } });
+                  } }, support);
               } catch (error) {
                 if (error instanceof DemoFailure && /429/.test(error.message)) {
                   const last = [...session.messages].reverse().find(m => m.role === 'assistant');
@@ -211,6 +219,42 @@ export class CustomerCore {
             current.touched = this.now();
             this.log({ requestId, channel: identity.channel, outcome, ...(turnSettings ? { settingsVersion: turnSettings.version } : {}), ...(category ? { category } : {}), elapsedMs: this.now() - started });
           }
+        });
+        current.tail = job.catch(() => {});
+        try { await job; } finally { current.pending--; }
+      },
+      resumeFromHandover: async source => {
+        if (this.closed) throw new DemoFailure('Chat service closed.');
+        forgetChallenge = undefined;
+        this.expire();
+        let entry = this.entries.get(key);
+        if (!entry) {
+          if (this.entries.size >= 100) throw new DemoFailure('ขณะนี้มีผู้ใช้งานเต็ม กรุณาลองภายหลัง');
+          const memory = this.store?.load(key) ?? emptyMemory(this.now());
+          entry = { session: this.factory(memoryManager(memory), this.responseSettings()), tail: Promise.resolve(), pending: 0, touched: this.now(), memory, lastTopic: memory.lastTopic };
+          this.entries.set(key, entry);
+        }
+        const current = entry;
+        current.pending++;
+        const job = current.tail.then(async () => {
+          if (this.closed) throw new DemoFailure('Chat service closed.');
+          const session = await current.session;
+          // Read at the end of active core work, so an in-flight bot turn cannot overwrite this import.
+          const transcript = source();
+          if (!validHandover(transcript)) throw new DemoFailure('บริบทรับช่วงไม่ถูกต้อง');
+          if (current.memory.handover?.id === transcript.id) return;
+          const next = structuredClone(current.memory);
+          const messages = new Map([...(next.handover?.messages ?? []), ...transcript.messages].map(m => [m.id, m]));
+          next.handover = { ...transcript, messages: [...messages.values()].filter(m => m.at >= this.now()-90*86400000)
+            .sort((a,b) => a.at-b.at).slice(-handoverLimit) };
+          next.catalog = undefined; next.lastTopic = undefined; next.updatedAt = this.now();
+          try { this.store?.save(key, next); }
+          catch { throw new DemoFailure('บันทึกบริบทไม่สำเร็จ ยังคงผู้ดูแลรับช่วงไว้'); }
+          current.memory = next; current.lastTopic = undefined; current.memoryClarificationExpires = undefined;
+          // Fresh session carries the canonical, role-labelled transcript rather than stale bot topic state.
+          current.session = this.factory(memoryManager(next), this.responseSettings());
+          void current.session.catch(() => { if (this.entries.get(key) === current) this.entries.delete(key); });
+          session.dispose(); current.touched = this.now();
         });
         current.tail = job.catch(() => {});
         try { await job; } finally { current.pending--; }

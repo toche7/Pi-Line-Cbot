@@ -17,6 +17,7 @@ function memoryView(raw: string): string {
     `หัวข้อ: ${shorten(JSON.stringify(m.summary.topics), 250)}`,
     `เรื่องค้าง: ${shorten(JSON.stringify(m.summary.pending), 400)}`,
     `หัวข้อล่าสุด: ${m.lastTopic ?? 'ไม่มี'}`,
+    `บริบทช่วงผู้ดูแลรับช่วง ${m.handover?.messages.length ?? 0} ข้อความ (แยกลูกค้า/ผู้ดูแล ไม่ใช่ข้อมูลยืนยันหรือความจำระยะยาว)`,
     `ข้อความที่เก็บล่าสุด ${m.recent.length} คู่; ย่อบริบทแล้ว ${m.compactions} ครั้ง`,
     `ตัวอย่างล่าสุด (ย่อ): ${shorten(JSON.stringify(m.recent.slice(-2)), 700)}`,
     'ไม่ใช้งานเกิน 90 วันจะลบเมื่อตรวจ; /reset ล้างบทสนทนาแต่คงโปรไฟล์/ข้อมูลระยะยาว; /forget ลบทั้งหมดโดยต้องยืนยัน',
@@ -27,8 +28,13 @@ function memoryView(raw: string): string {
 // Restart discards pending confirmations; dedupe remains the adapter's responsibility.
 export class LineConversations {
   private entries = new Map<string, Entry>();
-  constructor(private core: Pick<CustomerCore, 'client'>, private now = () => Date.now()) {}
+  constructor(private core: Pick<CustomerCore, 'client'>, private now = () => Date.now(), private onClear?: (identity: Identity) => void) {}
   close() { for (const entry of this.entries.values()) entry.client.cancelForget?.(); this.entries.clear(); }
+
+  cancelPendingForget(identity: Identity) {
+    const entry = this.entries.get(JSON.stringify([identity.channel, identity.scope, identity.user]));
+    if (entry) { entry.forgetToken = undefined; entry.client.cancelForget?.(); }
+  }
 
   async send(identity: Identity, prompt: string, output: Output) {
     for (const [key, entry] of this.entries) {
@@ -55,6 +61,7 @@ export class LineConversations {
       if (!token || !client.forget) { output.text('ต้องใช้ /forget และอ่านคำอธิบายก่อนยืนยัน'); return; }
       try {
         await client.forget(token);
+        this.onClear?.(identity);
         output.text('ลืมทั้งหมดแล้ว ลบ persistent memory ของคุณเฉพาะ LINE OA นี้แล้ว ข้อมูล Terminal และคนอื่นไม่ถูกเปลี่ยน');
       } catch (error) {
         output.text(error instanceof DemoFailure && /ยืนยัน/.test(error.message)
@@ -74,6 +81,7 @@ export class LineConversations {
     if (command === '/memory' && client.memory) { output.text(memoryView(await client.memory())); return; }
     if (command === '/reset' && client.reset) {
       await client.reset();
+      this.onClear?.(identity);
       output.text('เริ่มบทสนทนาใหม่ ล้างข้อความ สรุป หัวข้อล่าสุด และเรื่องค้างแล้ว คงโปรไฟล์และข้อมูลที่ขอจำระยะยาวไว้ เฉพาะ LINE OA นี้');
       return;
     }

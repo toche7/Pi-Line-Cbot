@@ -1,3 +1,6 @@
+import { NewsMediaStore } from './news-media.js';
+import { newsPublicMedia, newsImageBase } from './news-public-media.js';
+import type { HandoverTranscript } from './handover-context.js';
 import { ResponseSettingsStore, configureResponseSettings } from './response-settings.js';
 import { ResponseSettingsService } from './response-settings-service.js';
 import { KnowledgeStore, configureKnowledge } from './knowledge-store.js';
@@ -15,8 +18,10 @@ import { resolve } from 'node:path';
 import { CourseRequestStore, CourseRequests } from './course-requests.js';
 import { CustomerStore } from './customers.js';
 import { LineProfiles } from './line-profile.js';
+import { LineGroupStore, LineGroupService } from './line-groups.js';
+import { LineGroupReplies } from './line-group-replies.js';
 
-function start() {
+async function start() {
   const secret = process.env.LINE_CHANNEL_SECRET || '';
   const token = process.env.LINE_CHANNEL_ACCESS_TOKEN || '';
   const dryRun = process.env.LINE_DRY_RUN !== 'false';
@@ -38,22 +43,33 @@ function start() {
   const responseSettingsStore = new ResponseSettingsStore(resolve('runtime/bot-settings'));
   configureResponseSettings(responseSettingsStore);
   const responseSettings = new ResponseSettingsService(responseSettingsStore);
-  const core = new CustomerCore(undefined, timeout, log, undefined, store, undefined, requests);
+  const core = new CustomerCore(undefined, timeout, log, undefined, store, undefined, requests, undefined, identity =>
+    identity.channel === 'line' && identity.scope === process.env.LINE_CHANNEL_ID + ':direct' ? { waiting: !!control.mode(JSON.stringify([process.env.LINE_CHANNEL_ID, identity.user])).waiting } : undefined);
   const monitor = new ConversationMonitor(resolve('.line-monitor'));
   const monitorPort = Number(process.env.MONITOR_PORT || '3001');
   if (!Number.isInteger(monitorPort) || monitorPort < 1 || monitorPort > 65535 || monitorPort === port) throw new Error('Invalid monitor port');
   const customerStore = new CustomerStore(resolve('runtime/customers'));
   const profiles = new LineProfiles(customerStore, process.env.LINE_CHANNEL_ID || '', token);
   const control = new ConversationControl(resolve('runtime/conversations'));
-  const conversationService = { control, account: process.env.LINE_CHANNEL_ID || '', allowedUsers, dryRun, push: linePush(token) };
-  // Default closed: the host must grant the exact persisted campaign/review first.
-  const news = new NewsService(new NewsStore(resolve('runtime/news')), customerStore, process.env.LINE_CHANNEL_ID || '', dryRun ? undefined : newsLineTransport(token), undefined, true);
+  const resume = (user: string, source: () => HandoverTranscript) => core.client({ channel: 'line', scope: process.env.LINE_CHANNEL_ID + ':direct', user }).resumeFromHandover!(source);
+  const conversationService = { control, resume, account: process.env.LINE_CHANNEL_ID || '', allowedUsers, dryRun, push: linePush(token) };
+  const groupStore = new LineGroupStore(resolve('runtime/line-groups'), process.env.LINE_CHANNEL_ID || '');
+  // Owner enabled web confirmation: each exact review must still be explicitly confirmed.
+  const imageBase = await newsImageBase(port,process.env.PUBLIC_BASE_URL||'');
+  const newsMedia = new NewsMediaStore(resolve('runtime/news-images'),imageBase);
+  const news = new NewsService(new NewsStore(resolve('runtime/news')), customerStore, process.env.LINE_CHANNEL_ID || '', dryRun ? undefined : newsLineTransport(token), undefined, false, groupStore, newsMedia);
   const newsWorker = new NewsWorker(news, () => log({ event: 'news_worker_suspended', reason: 'storage_or_dispatch_error' }));
-  const monitorServer = createServer(adminHandler(monitor, requestStore, customerStore, profiles, conversationService, news, knowledge, responseSettings));
+  const lineGroups = new LineGroupService(groupStore, token);
+  const groupMemory = new MemoryStore(resolve('runtime/line-group-memory'));
+  const groupCore = new CustomerCore(undefined, timeout, log, undefined, groupMemory);
+  const groupReplies = new LineGroupReplies(groupStore, groupCore, process.env.LINE_CHANNEL_ID || '', dryRun, lineReply(token), log);
+  const monitorServer = createServer(adminHandler(monitor, requestStore, customerStore, profiles, conversationService, news, knowledge, responseSettings, lineGroups));
   monitorServer.requestTimeout = 10000;
   monitorServer.headersTimeout = 10000;
-  const adapter = new LineAdapter({ secret, account: process.env.LINE_CHANNEL_ID || 'test-oa', allowedUsers, dryRun, core, control, observe: event => monitor.record(event), reply: lineReply(token), log });
-  const server = createServer(webhookHandler(adapter));
+  const adapter = new LineAdapter({ secret, account: process.env.LINE_CHANNEL_ID || 'test-oa', allowedUsers, dryRun, core, control,
+    groupReplies, observeGroup: event => groupStore.observe(event), observe: event => monitor.record(event), reply: lineReply(token), log });
+  const webhook = webhookHandler(adapter), media = newsPublicMedia(news);
+  const server = createServer((req,res)=>{if(req.url?.startsWith('/news-media/'))return media(req,res);return webhook(req,res)});
   server.requestTimeout = 10000;
   server.headersTimeout = 10000;
   server.on('error', () => { console.error('เริ่ม webhook server ไม่สำเร็จ ตรวจ port และ host'); void stop(); process.exitCode = 1; });
@@ -72,11 +88,11 @@ function start() {
     server.close();
     monitorServer.close();
     monitorServer.closeAllConnections();
-    try { await newsWorker.close(); await adapter.drain(); await core.dispose(); }
-    finally { store.close(); server.closeAllConnections(); }
+    try { await newsWorker.close(); await adapter.drain(); await core.dispose(); await groupCore.dispose(); }
+    finally { store.close(); groupMemory.close(); server.closeAllConnections(); }
   };
   try { newsWorker.start(); } catch (error) { void stop(); throw error; }
   process.once('SIGINT', () => { void stop(); });
   process.once('SIGTERM', () => { void stop(); });
 }
-try { start(); } catch { console.error('Configuration ไม่ถูกต้อง ตรวจ .env บนเครื่อง'); process.exitCode = 1; }
+void start().catch(()=>{console.error('Configuration ไม่ถูกต้อง ตรวจ .env บนเครื่อง');process.exitCode=1;});
