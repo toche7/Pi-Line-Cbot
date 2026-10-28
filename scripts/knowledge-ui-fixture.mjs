@@ -1,0 +1,23 @@
+// Local browser QA only: every store is temporary; no model, LINE adapter, or transport.
+import { createServer } from 'node:http';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { adminHandler } from '../dist/admin.js';
+import { ConversationMonitor } from '../dist/monitor.js';
+import { CourseRequestStore } from '../dist/course-requests.js';
+import { CustomerStore } from '../dist/customers.js';
+import { ResponseSettingsStore } from '../dist/response-settings.js';
+import { ResponseSettingsService } from '../dist/response-settings-service.js';
+import { KnowledgeStore } from '../dist/knowledge-store.js';
+import { NewsStore, NewsService } from '../dist/news.js';
+const root=mkdtempSync(join(tmpdir(),'km-browser-'));
+const customers=new CustomerStore(join(root,'customers'));
+const knowledge=new KnowledgeStore(join(root,'knowledge'));
+const settingsStore=new ResponseSettingsStore(join(root,'bot-settings'));
+const seed=settingsStore.binding().config;
+const models=[{provider:seed.provider,id:seed.model,name:'Current model (fixture)',configured:true,maxTokens:4096,text:true,api:'fixture'},{provider:'groq',id:'llama-3.1-8b-instant',name:'Alternate model (fixture)',configured:true,maxTokens:4096,text:true,api:'fixture'},{provider:'google',id:'fixture-unconfigured',name:'Unconfigured fixture',configured:false,maxTokens:2048,text:true,api:'fixture'}];
+const responseSettings=new ResponseSettingsService(settingsStore,async()=>models,{async run(binding){return {answer:'คำตอบโมเดลจำลองใน temp: '+(binding.config.personality||'ค่าเดิม'),tokens:8}},async prepare(){} });
+const server=createServer(adminHandler(new ConversationMonitor(join(root,'monitor')),new CourseRequestStore(join(root,'requests')),customers,undefined,undefined,new NewsService(new NewsStore(join(root,'news')),customers,'fixture'),knowledge,responseSettings));
+server.listen(0,'127.0.0.1',()=>{const address='http://127.0.0.1:'+server.address().port;writeFileSync('/tmp/km-browser-fixture.json',JSON.stringify({root,address}));console.log(address+'/#knowledge · TEMP QA ONLY')});
+let closing=false;function stop(){if(closing)return;closing=true;server.closeAllConnections();server.close(()=>{rmSync(root,{recursive:true,force:true});process.exit(0)})}process.on('SIGTERM',stop);process.on('SIGINT',stop);

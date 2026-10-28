@@ -1,3 +1,9 @@
+import { ResponseSettingsStore, configureResponseSettings } from './response-settings.js';
+import { ResponseSettingsService } from './response-settings-service.js';
+import { KnowledgeStore, configureKnowledge } from './knowledge-store.js';
+import { NewsService, NewsStore, newsLineTransport } from './news.js';
+import { NewsWorker } from './news-worker.js';
+import { ConversationControl, linePush } from './conversation-control.js';
 import { createServer } from 'node:http';
 import { adminHandler } from './admin.js';
 import { ConversationMonitor } from './monitor.js';
@@ -7,6 +13,8 @@ import { requestTimeout } from './diagnostics.js';
 import { MemoryStore } from './memory.js';
 import { resolve } from 'node:path';
 import { CourseRequestStore, CourseRequests } from './course-requests.js';
+import { CustomerStore } from './customers.js';
+import { LineProfiles } from './line-profile.js';
 
 function start() {
   const secret = process.env.LINE_CHANNEL_SECRET || '';
@@ -25,14 +33,26 @@ function start() {
   const store = new MemoryStore(resolve('.line-memory'));
   const requestStore = new CourseRequestStore(resolve('runtime/course-requests'));
   const requests = new CourseRequests(requestStore);
+  const knowledge = new KnowledgeStore(resolve('runtime/knowledge'));
+  configureKnowledge(knowledge);
+  const responseSettingsStore = new ResponseSettingsStore(resolve('runtime/bot-settings'));
+  configureResponseSettings(responseSettingsStore);
+  const responseSettings = new ResponseSettingsService(responseSettingsStore);
   const core = new CustomerCore(undefined, timeout, log, undefined, store, undefined, requests);
   const monitor = new ConversationMonitor(resolve('.line-monitor'));
   const monitorPort = Number(process.env.MONITOR_PORT || '3001');
   if (!Number.isInteger(monitorPort) || monitorPort < 1 || monitorPort > 65535 || monitorPort === port) throw new Error('Invalid monitor port');
-  const monitorServer = createServer(adminHandler(monitor, requestStore));
+  const customerStore = new CustomerStore(resolve('runtime/customers'));
+  const profiles = new LineProfiles(customerStore, process.env.LINE_CHANNEL_ID || '', token);
+  const control = new ConversationControl(resolve('runtime/conversations'));
+  const conversationService = { control, account: process.env.LINE_CHANNEL_ID || '', allowedUsers, dryRun, push: linePush(token) };
+  // Default closed: the host must grant the exact persisted campaign/review first.
+  const news = new NewsService(new NewsStore(resolve('runtime/news')), customerStore, process.env.LINE_CHANNEL_ID || '', dryRun ? undefined : newsLineTransport(token), undefined, true);
+  const newsWorker = new NewsWorker(news, () => log({ event: 'news_worker_suspended', reason: 'storage_or_dispatch_error' }));
+  const monitorServer = createServer(adminHandler(monitor, requestStore, customerStore, profiles, conversationService, news, knowledge, responseSettings));
   monitorServer.requestTimeout = 10000;
   monitorServer.headersTimeout = 10000;
-  const adapter = new LineAdapter({ secret, account: process.env.LINE_CHANNEL_ID || 'test-oa', allowedUsers, dryRun, core, observe: event => monitor.record(event), reply: lineReply(token), log });
+  const adapter = new LineAdapter({ secret, account: process.env.LINE_CHANNEL_ID || 'test-oa', allowedUsers, dryRun, core, control, observe: event => monitor.record(event), reply: lineReply(token), log });
   const server = createServer(webhookHandler(adapter));
   server.requestTimeout = 10000;
   server.headersTimeout = 10000;
@@ -52,9 +72,10 @@ function start() {
     server.close();
     monitorServer.close();
     monitorServer.closeAllConnections();
-    try { await adapter.drain(); await core.dispose(); }
+    try { await newsWorker.close(); await adapter.drain(); await core.dispose(); }
     finally { store.close(); server.closeAllConnections(); }
   };
+  try { newsWorker.start(); } catch (error) { void stop(); throw error; }
   process.once('SIGINT', () => { void stop(); });
   process.once('SIGTERM', () => { void stop(); });
 }

@@ -1,3 +1,5 @@
+import { captureResponseSettings, settingsHash, type SettingsBinding } from './response-settings.js';
+import { responseSession } from './response-session.js';
 import { randomUUID } from 'node:crypto';
 import { type AgentSession, type SessionManager } from '@earendil-works/pi-coding-agent';
 import { createDemo, orderTool } from './agent.js';
@@ -18,15 +20,16 @@ type Entry = { session: Promise<AgentSession>; tail: Promise<void>; pending: num
 export class CustomerCore {
   private entries = new Map<string, Entry>();
   private closed = false;
-  private modelCooldownUntil = 0;
+  private modelCooldowns = new Map<string, number>();
   constructor(
-    private factory: (manager?: SessionManager) => Promise<AgentSession> = async manager => (await createDemo({ sessionManager: manager })).session,
+    private factory: (manager?: SessionManager, settings?: SettingsBinding) => Promise<AgentSession> = async (manager, settings) => (await createDemo({ sessionManager: manager, settings })).session,
     private timeoutMs = 30000,
     private log: (record: object) => void = () => {},
     private now = () => Date.now(),
     private store?: MemoryStore,
     private summarizer?: Summarizer,
     private courseRequests?: CourseRequests,
+    private responseSettings: () => SettingsBinding | undefined = captureResponseSettings,
   ) {}
 
   client(identity: Identity): ChatClient {
@@ -43,7 +46,8 @@ export class CustomerCore {
       send: async (prompt, output) => {
         forgetChallenge = undefined; // A normal message cancels a pending destructive operation.
         if (this.closed) throw new DemoFailure('Chat service closed.');
-        if (!prompt.trim() || prompt.length > 2000) throw new DemoFailure('ข้อความต้องยาว 1–2000 ตัวอักษร');
+        const inputLimit = this.responseSettings()?.config.limits.inputChars ?? 2000;
+        if (!prompt.trim() || prompt.length > inputLimit) throw new DemoFailure(`ข้อความต้องยาว 1–${inputLimit} ตัวอักษร`);
         const isRequestCommand = /^\/(?:book|contact|request-note|confirm-request|cancel-request|requests)(?:\s|$)/.test(prompt.trim());
         const requestAnswer = this.courseRequests && (isRequestCommand || !mayRequestMemory(prompt))
           ? this.courseRequests.handle(identity, prompt, getMemory().catalog) : undefined;
@@ -56,7 +60,7 @@ export class CustomerCore {
         if (!entry) {
           if (this.entries.size >= 100) throw new DemoFailure('ขณะนี้มีผู้ใช้งานเต็ม กรุณาลองภายหลัง');
           const memory = this.store?.load(key) ?? emptyMemory(this.now());
-          const session = this.factory(memoryManager(memory));
+          const session = this.factory(memoryManager(memory), this.responseSettings());
           entry = { session, tail: Promise.resolve(), pending: 0, touched: this.now(), memory, lastTopic: memory.lastTopic };
           this.entries.set(key, entry);
           void session.catch(() => { if (this.entries.get(key) === entry) this.entries.delete(key); });
@@ -66,16 +70,27 @@ export class CustomerCore {
         current.pending++;
         const job = current.tail.then(async () => {
           if (this.closed) throw new DemoFailure('Chat service closed.');
+          const turnSettings = this.responseSettings();
+          const turnTimeout = turnSettings ? turnSettings.config.limits[identity.channel === 'line' ? 'lineTimeoutMs' : 'terminalTimeoutMs'] : this.timeoutMs;
+          const cooldownKey = turnSettings ? turnSettings.config.provider + ':' + turnSettings.config.model : 'legacy';
+          const cooldownUntil = () => this.modelCooldowns.get(cooldownKey) ?? 0;
           const started = this.now();
           const requestId = randomUUID();
           let outcome = 'ok';
           let category: string | undefined;
           try {
+            if (prompt.length > (turnSettings?.config.limits.inputChars ?? 2000)) throw new DemoFailure('ข้อความยาวกว่าข้อจำกัดล่าสุด กรุณาย่อแล้วลองใหม่');
             let session = await current.session;
+            const previousSettings = responseSession(session)?.binding;
+            if (turnSettings && previousSettings && (turnSettings.version !== previousSettings.version || settingsHash(turnSettings.config) !== settingsHash(previousSettings.config))) {
+              const replacement = await this.factory(memoryManager(current.memory), turnSettings);
+              session.dispose(); current.session = Promise.resolve(replacement); session = replacement;
+              output.status('[ใช้การตั้งค่าบอตเวอร์ชันใหม่ คงความจำและประวัติเดิม]');
+            }
             if (current.memory.recent.length >= 12 || JSON.stringify(session.messages).length > 24000) {
               const compacted = compactMemory(current.memory, this.summarizer);
               this.store?.save(key, compacted); // Commit bounded canonical data before releasing the old Pi session.
-              const replacement = await this.factory(memoryManager(compacted));
+              const replacement = await this.factory(memoryManager(compacted), turnSettings);
               session.dispose();
               current.session = Promise.resolve(replacement);
               current.memory = compacted;
@@ -129,14 +144,14 @@ export class CustomerCore {
               renderedAnswer = answer;
               if (!memoryHandled) nextTopic = routed?.topic ?? catalog?.topic ?? topicForAnswer(answer);
             } else {
-              if (!catalog && this.now() < this.modelCooldownUntil) {
-                throw new DemoFailure(`โมเดลถูกจำกัดการใช้งาน (429) รออีก ${Math.ceil((this.modelCooldownUntil - this.now()) / 1000)} วินาทีแล้วลองใหม่ ระหว่างนี้ FAQ ยังใช้ได้`);
+              if (!catalog && this.now() < cooldownUntil()) {
+                throw new DemoFailure(`โมเดลถูกจำกัดการใช้งาน (429) รออีก ${Math.ceil((cooldownUntil() - this.now()) / 1000)} วินาทีแล้วลองใหม่ ระหว่างนี้ FAQ ยังใช้ได้`);
               }
               let reply: string;
               let semanticRead = false;
               try {
-                reply = catalog && this.now() < this.modelCooldownUntil ? renderCatalog(catalog)
-                  : await runDialogue(session, prompt, this.timeoutMs, output, catalog, memoryRequest ? undefined : { state: nextCatalog, resolve: plan => {
+                reply = catalog && this.now() < cooldownUntil() ? renderCatalog(catalog)
+                  : await runDialogue(session, prompt, turnTimeout, output, catalog, memoryRequest ? undefined : { state: nextCatalog, resolve: plan => {
                     routed = executeCatalogQuery(parseCatalogQuery(plan), nextCatalog);
                     semanticRead = true;
                     nextCatalog = routed.state ?? previousCatalog;
@@ -159,7 +174,8 @@ export class CustomerCore {
                 if (error instanceof DemoFailure && /429/.test(error.message)) {
                   const last = [...session.messages].reverse().find(m => m.role === 'assistant');
                   const wait = rateLimitWaitMs(last?.errorMessage || '');
-                  this.modelCooldownUntil = this.now() + wait;
+                  this.modelCooldowns.set(cooldownKey, this.now() + wait);
+                  if (this.modelCooldowns.size > 40) this.modelCooldowns.delete(this.modelCooldowns.keys().next().value!);
                   if (!catalog) throw new DemoFailure(`โมเดลถูกจำกัดการใช้งาน (429) รอประมาณ ${Math.ceil(wait / 1000)} วินาทีแล้วลองใหม่ ระหว่างนี้ FAQ ยังใช้ได้`);
                 }
                 if (!catalog) throw error;
@@ -193,7 +209,7 @@ export class CustomerCore {
           } catch (error) { outcome = 'error'; category = failureCategory(error); throw error; }
           finally {
             current.touched = this.now();
-            this.log({ requestId, channel: identity.channel, outcome, ...(category ? { category } : {}), elapsedMs: this.now() - started });
+            this.log({ requestId, channel: identity.channel, outcome, ...(turnSettings ? { settingsVersion: turnSettings.version } : {}), ...(category ? { category } : {}), elapsedMs: this.now() - started });
           }
         });
         current.tail = job.catch(() => {});
@@ -213,7 +229,7 @@ export class CustomerCore {
         if (entry) (await entry.session).dispose();
         this.courseRequests?.cancel(identity);
         // Without a disk store, retain the profile in a fresh in-memory Pi session too.
-        if (!this.store) this.entries.set(key, { session: this.factory(memoryManager(memory)), tail: Promise.resolve(), pending: 0, touched: this.now(), memory });
+        if (!this.store) this.entries.set(key, { session: this.factory(memoryManager(memory), this.responseSettings()), tail: Promise.resolve(), pending: 0, touched: this.now(), memory });
       },
       memory: async () => JSON.stringify(getMemory(), null, 2),
       requestForget: async () => {

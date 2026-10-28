@@ -23,7 +23,7 @@ test('unified admin serves both panels and APIs on one origin with existing acce
     assert.match(root.body, /role="tablist"/);
     assert.match(root.body, /id="requests-search"/);
     assert.match(root.body, /fetch\('\/api\/requests'\)/);
-    assert.match(root.body, /fetch\('\/api\/monitor'\)/);
+    assert.match(root.body, /fetch\('\/api\/conversations'\)/);
     assert.doesNotMatch(root.body, /<iframe|127\.0\.0\.1:3002/);
     for (const url of ['/api/monitor', '/api/requests']) {
       assert.equal(request(url).status, 200);

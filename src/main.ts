@@ -1,3 +1,5 @@
+import { ResponseSettingsStore, configureResponseSettings, captureResponseSettings } from './response-settings.js';
+import { KnowledgeStore, configureKnowledge } from './knowledge-store.js';
 import { createDemo } from './agent.js';
 import { DemoFailure, requestTimeout } from './diagnostics.js';
 import { runChat } from './chat.js';
@@ -7,7 +9,9 @@ import { resolve } from 'node:path';
 import { CourseRequestStore, CourseRequests } from './course-requests.js';
 
 async function main() {
-  const timeoutMs = requestTimeout(process.env.PI_TIMEOUT_MS);
+  configureResponseSettings(new ResponseSettingsStore(resolve('runtime/bot-settings')));
+  configureKnowledge(new KnowledgeStore(resolve('runtime/knowledge')));
+  const timeoutMs = captureResponseSettings()?.config.limits.terminalTimeoutMs ?? requestTimeout(process.env.PI_TIMEOUT_MS);
   const { session, modelRuntime, provider, modelId } = await createDemo();
   try {
     console.log(`Model: ${provider}/${modelId}`);
@@ -20,7 +24,7 @@ async function main() {
     }
     const store = new MemoryStore(resolve('.customer-memory'));
     const requests = new CourseRequests(new CourseRequestStore(resolve('runtime/course-requests')));
-    const core = new CustomerCore(async manager => (await createDemo({ sessionManager: manager })).session, timeoutMs, undefined, undefined, store, undefined, requests);
+    const core = new CustomerCore(async (manager, settings) => (await createDemo({ sessionManager: manager, settings })).session, timeoutMs, undefined, undefined, store, undefined, requests);
     try {
       const userIndex = process.argv.indexOf('--user');
       const user = userIndex >= 0 ? process.argv[userIndex + 1] || '' : 'tester';

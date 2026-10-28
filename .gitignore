@@ -36,3 +36,7 @@ coverage/
 __pycache__/
 *.pyc
 admin-tabs-preview.png
+
+# Screenshots from the live local admin may contain private operational data.
+design/**/*-live.png
+design/news/menu-one-row.jpg

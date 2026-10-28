@@ -1,6 +1,21 @@
 # แผนและสถานะ ซีบอต — CBTU Customer Agent
 
-อัปเดต 23 ตุลาคม 2026 ใช้ชื่อเสียงอ่าน “ซีบอต” เท่านั้น รอยืนยัน spelling อังกฤษ
+อัปเดตสถานะ 28 ตุลาคม 2026 ใช้ชื่อเสียงอ่าน “ซีบอต” เท่านั้น รอยืนยัน spelling อังกฤษ
+
+
+## สถานะยืนยันล่าสุด 28 ตุลาคม 2026
+
+หลังรวมงานขนาน เปิดใช้เว็บพอร์ต3001แล้ว: ลูกค้าและกลุ่ม บทสนทนา/รับช่วงคุย งานรอดูแล ส่งข่าว และจัดการบอต โดยจัดการบอตมีตั้งค่าการตอบด้านบนและความรู้บอตด้านล่าง หน้า **ภาพรวมยังไม่พัฒนา** จึงไม่ถือว่าทั้งระบบเสร็จ
+
+ผลส่งงานรอบล่าสุดจากแชตจัดการบอต: Build ผ่าน runtime tests132/132 และ import9/9 ผ่าน ตรวจเว็บจอใหญ่/มือถือแล้ว ขั้นเปลี่ยนค่าทดสอบด้วยโมเดลจำลอง ไม่ได้เปลี่ยนprovider/model/promptจริงแทนเจ้าของ ค่าร่างต้องผ่านลอง→ตรวจ→ยืนยันใช้ การกดลองบนเว็บเรียกproviderจริงและใช้quota ตัวเลขtestsเป็นผลรอบส่งงาน ไม่ใช่การรันซ้ำจากการแก้เอกสารนี้
+
+ผล LINE ที่เจ้าของยืนยันไว้: FAQพร้อมลิงก์ ค้น/ดูต่อ ยืนยันคำขอขึ้นเว็บ และอ่านmemory; เคยrestartแล้วความจำยังอยู่และเคยทดลองเป็นกลุ่มแล้ว พฤติกรรม555เลื่อนหน้าเจ้าของยอมรับเป็นข้อสังเกต ชุดพัฒนาบทสนทนา/ส่งข่าว/ตั้งค่ารอบใหม่ใช้ข้อมูลชั่วคราวและtransport/โมเดลจำลอง ไม่เหมารวมว่าเจ้าหน้าที่ตอบหรือcampaignทุกเส้นทางผ่านLINEจริงแล้ว
+
+รายละเอียดแยกตามส่วน: [ลูกค้าและกลุ่ม](./CUSTOMERS_GUIDE.md), [บทสนทนา](./CONVERSATIONS_GUIDE.md), [งานรอดูแล](./COURSE_REQUESTS_GUIDE.md), [ส่งข่าว](./NEWS_GUIDE.md), [ความรู้บอต](./KM_GUIDE.md), [ตั้งค่าการตอบ](./RESPONSE_SETTINGS_GUIDE.md), [บันทึกตรวจเดิม](./CORE_STATUS_AUDIT_2026-10-28.md) ส่วนต่อไปที่เล่าผลเก่าเป็นประวัติ ไม่ใช่สถานะรันล่าสุดทุกย่อหน้า
+
+## ชื่อแสดงจาก LINE
+
+เชื่อม Get profile API ตามคำขอเจ้าของแล้ว แสดงชื่อจาก API ของลูกค้าที่มีอยู่1ราย แยกจากชื่อที่ทีมตั้ง มี cache24ชั่วโมงและปุ่มอัปเดตชื่อ ไม่เปลี่ยนสถานะรับข่าวสารหรือความจำบอต Build/runtime72/72 และ browserผ่าน รอบนี้ไม่ได้ส่งข้อความLINE ข้อจำกัดและผลจริงอยู่ใน CUSTOMERS_GUIDE.md
 
 ## Catalog retrieval milestone ล่าสุด
 
@@ -20,28 +35,105 @@ Build/tests27รายการผ่าน รวม5 acceptance cases, aliases
 
 ข้อมูลมาจากเว็บไซต์สาธารณะ https://cbtumu.net/ เท่านั้น ไม่ใช้ข้อมูล Notion ภายใน ไม่ถือ mock order เป็นข้อมูลผู้เรียน รุ่นทดลองนี้ตอบ FAQ การสมัคร/เข้าเรียน/เอกสาร/certificate แนะนำหน้าหลักสูตรและช่องทางเจ้าหน้าที่ พร้อม source URL และเวลาเก็บ snapshot
 
-เมื่อข้อมูลไม่พบหรือขัดกันให้บอกตรง ๆ ไม่ยืนยันเวลาอนุมัติ ราคา สถานะเปิดรับสมัคร หรือเลขบัญชีจากข้อมูลที่ยังไม่ตรวจสด การส่งต่อหมายถึงชี้ช่องทางหน้า FAQ เท่านั้น ไม่ส่งข้อความ เปิดเคส หรือแจ้งเจ้าหน้าที่จริง
+เมื่อข้อมูลไม่พบหรือขัดกันให้บอกตรง ๆ ไม่ยืนยันเวลาอนุมัติ ราคา สถานะเปิดรับสมัคร หรือเลขบัญชีจากข้อมูลที่ยังไม่ตรวจสด บอตชี้ช่องทางหน้า FAQ หรือรับคำขอไว้ในระบบกลางหลังผู้ใช้ยืนยันได้ แต่ยังไม่ส่งต่อหรือแจ้งเจ้าหน้าที่อัตโนมัติ
 
-## สถานะ DONE / PARTIAL / TODO
+## ภาพรวมระบบซีบอต — 4 ส่วนหลัก
 
-| สถานะ | งาน | หลักฐาน/ข้อจำกัด |
-|---|---|---|
-| DONE | M1: Git baseline | local main เริ่มจาก 31365a3; กัน .env/secrets/build/logs/customer runtime ออก; ไม่มี remote/push |
-| DONE | Pi SDK/Terminal | one-shot `npm start`, แชต `npm run chat`, check/build/tests; Terminal มี bounded persistent memory และ progress/error/timeout |
-| DONE | แยก channel/core | CustomerCore ไม่พิมพ์ stdout เอง รับ trusted identity + callbacks; Terminal/LINE ใช้ core เดียวกัน |
-| DONE | ข้อมูลสาธารณะ CBTU ชุดเริ่มต้น | FAQ/Home/About มี source/capturedAt; deterministic routing สำหรับ FAQ, unknown/conflict; ไม่เรียก Notion ไม่ crawler สด |
-| DONE | กติกาซีบอตและ tools | ชื่อไทย, read-only public knowledge tool และ mock order เดิม; ไม่มี shell/file tools |
-| DONE | Memory session isolation/queue | key แยก channel/OA/direct/user, FIFO รายลูกค้า; ทดสอบ A/B และ Terminal แยกกัน |
-| DONE | LINE adapter + mock tests | raw body HMAC, valid/invalid signature, immediate ACK, in-memory queue/dedupe, allowlist, mock reply; ไม่ส่ง LINE จริง |
-| DONE | Config/คู่มือ LINE | .env.example และ append keys ที่ขาดใน .env โดยไม่เขียนทับค่าเดิม; LINE_SETUP.md; local endpoint ยังต้องเติม config |
-| DONE | Limits เบื้องต้น | input 2000 chars, 100 active sessions, idle TTL 30 นาที, output 800 tokens, model/tool calls สูงสุด 4/turn; เปลี่ยนเพดาน 20 turn/100000 tokens เป็น bounded context+auto compaction; dry run ของ LINE ไม่เปลี่ยน |
-| PARTIAL | Logging/cost control | safe metadata และ token/call limits มีแล้ว; ยังไม่มี dashboard, monetary/daily budget หรือ billing reconciliation |
-| PARTIAL | การประเมินคุณภาพ | tests 10 รายการผ่าน รวมชุด FAQ 11 คำถาม แต่ยังไม่ใช่การประเมินทุกคำถาม/ทุกภาษา/ทุก prompt injection |
-| TODO | LINE end-to-end จริง | ผู้ใช้ต้องเติม test OA credentials/allowlist และมี HTTPS hosting; ยังไม่ deploy, ตั้ง tunnel หรือส่ง reply จริง |
-| DONE สำหรับ Terminal และ LINE local | Persistent memory | stores/locksแยกdirectory, keyแยกchannel/OA/direct/user, 0700/0600, retention90วัน, profile/recent/summary/long-term, resetคงprofile และforgetมีconfirmation; ยังไม่ใช่multi-hoststore |
-| TODO | Durable queue/dedupe | ปัจจุบัน restart อาจสูญงานที่ ACK หรือประมวลผล redelivery ใหม่; ยังไม่ production delivery guarantee |
-| TODO | Customer verification/ข้อมูลจริง | LINE identity ไม่เท่ากับสิทธิ์ข้อมูลผู้เรียน; ต้อง map/verify/check ownership ก่อนเพิ่ม real-data tools |
-| TODO | Handoff จริง | ยังไม่มี case store/destination/recipient/authorization; แนะนำช่องทางเท่านั้น |
+ส่วนช่องทางสนทนา แกนบอต ข้อมูล และเว็บหลังบ้านมีแล้ว เว็บแก้ทะเบียนลูกค้า ติดตามงาน รับช่วงคุย เตรียมส่งข่าว และจัดการความรู้/ค่าตอบได้ตามขอบเขตในคู่มือ หน้าแผนภาพนี้แสดงเส้นทางหลัก ไม่ได้แสดงAPIเขียนและทุกstoreของฟังก์ชันที่เพิ่มครบทั้งหมด
+
+```mermaid
+flowchart TB
+    subgraph channels["1 · ช่องทางสนทนา"]
+        LINE["ลูกค้าคุยผ่าน LINE"]
+        TERM["Terminal สำหรับทดสอบ"]
+    end
+    subgraph engine["2 · Core และฝั่งเซิร์ฟเวอร์"]
+        ADAPTER["รับข้อความ ตรวจตัวตนช่องทาง และเข้าคิว"]
+        CORE["แกนบอต: ตีความ ตอบคำถาม จัดการความจำและคำขอ"]
+        MODEL["โมเดล AI"]
+        ADAPTER --> CORE
+        CORE <--> MODEL
+    end
+    subgraph storage["3 · ข้อมูลในเครื่อง"]
+        KNOWLEDGE["FAQ และข้อมูลหลักสูตร"]
+        MEMORY["ความจำแยกผู้ใช้"]
+        HISTORY["ประวัติรับ–ตอบ"]
+        REQUESTS["คำขอจองและฝากเรื่อง"]
+        CUSTOMERS["ทะเบียนลูกค้า โปรไฟล์ โน้ต แท็ก กลุ่ม และสถานะรับข่าว"]
+    end
+    subgraph admin["4 · เว็บหลังบ้าน"]
+        API["API อ่านประวัติ/คำขอ และอ่าน–เขียนทะเบียนลูกค้า"]
+        WEB["ศูนย์ดูแล: บทสนทนา ลูกค้าและกลุ่ม งานรอดูแล"]
+        API --> WEB
+    end
+    LINE <-->|"รับและตอบข้อความ"| ADAPTER
+    TERM <--> CORE
+    KNOWLEDGE --> CORE
+    CORE <--> MEMORY
+    CORE <--> REQUESTS
+    ADAPTER --> HISTORY
+    HISTORY --> API
+    REQUESTS --> API
+    CUSTOMERS <--> API
+```
+
+**สองสายงานพัฒนา:** Core/Backend ดูแลการตอบ ความจำ คิว ข้อมูลและAPI; Frontend ดูแลหน้าศูนย์ควบคุม โดยสั่งงานผ่านBackend ทั้งสองสายใช้ข้อมูลลูกค้าชุดเดียวกัน ไม่ได้เป็นบอตคนละตัว
+
+## งานย่อยและสถานะปัจจุบัน
+
+คงรายละเอียดงานย่อยแบบเดิม และเพิ่มคอลัมน์ **Milestone** เพื่อบอกว่างานนั้นอยู่ในเป้าหมาย M ใด มีตารางสรุป milestone แยกด้านล่างเพื่อดูภาพรวม โดยอ้างอิงงานย่อยชุดนี้
+
+**DONE** = ทำครบขอบเขตที่ระบุ · **PARTIAL** = ทำบางส่วนและยังมีงานค้าง · **TODO** = ยังไม่ทำ สถานะเป็นของงานย่อยในแต่ละแถว ไม่ใช่การประกาศว่าทำผ่านทุก milestone เรียงกันแล้ว
+
+| สถานะ | งานย่อย | Milestone | หลักฐาน / ข้อจำกัด |
+|---|---|---|---|
+| DONE | Git baseline | M1 | local main เริ่มจาก 31365a3; กัน .env/secrets/build/logs/customer runtime ออก; ไม่มี remote/push |
+| DONE | Pi SDK/Terminal | M2 | one-shot `npm start`, แชต `npm run chat`, check/build/tests; Terminal มี bounded persistent memory และ progress/error/timeout |
+| DONE | แยก channel/core | M2 | CustomerCore ไม่พิมพ์ stdout เอง รับ trusted identity + callbacks; Terminal/LINE ใช้ core เดียวกัน |
+| DONE | ข้อมูลสาธารณะ CBTU ชุดเริ่มต้น | M4 | FAQ/Home/About มี source/capturedAt; deterministic routing สำหรับ FAQ, unknown/conflict; ไม่เรียก Notion ไม่ crawler สด |
+| DONE | กติกาซีบอตและ tools | M2 | ชื่อไทย, read-only public knowledge tool และ mock order เดิม; ไม่มี shell/file tools |
+| DONE | Memory session isolation/queue | M3 | key แยก channel/OA/direct/user, FIFO รายลูกค้า; ทดสอบ A/B และ Terminal แยกกัน |
+| DONE | LINE adapter + mock tests | M6 | raw body HMAC, valid/invalid signature, immediate ACK, in-memory queue/dedupe, allowlist และ mock reply ผ่าน; testsชุดนี้จำลองการส่ง แยกจากผล LINE จริงด้านล่าง |
+| DONE | Config/คู่มือ LINE | M6 | .env.example และ LINE_SETUP.md มีแล้ว; credentials/allowlist ตั้งแล้วและรับ–ตอบจริงได้ PUBLIC_BASE_URL ไม่ตั้งใน.env ทำให้ readiness script ไม่ผ่าน ไม่ใช่ข้อสรุปว่าLINEใช้ไม่ได้ |
+| DONE | Limits เบื้องต้น | M5 | มีค่าเข้า/ออก/deadline/modelและtool callsที่บังคับฝั่งhost; ปรับร่างและยืนยันใช้ผ่านหน้าตั้งค่าการตอบได้ตามขอบเขต RESPONSE_SETTINGS_GUIDE.md |
+| PARTIAL | Logging/cost control | M5 | safe metadata, token/call limits และหน้า monitor มีแล้ว; monetary/daily budget และ billing reconciliation ยังไม่มี |
+| PARTIAL | การประเมินคุณภาพ | M5 / M7 | ผลส่งงานล่าสุด Build/runtime132/132 และimport9/9ผ่าน มีbrowserQAจอใหญ่/มือถือ; ไม่เท่ากับทดสอบทุกprovider/คำถาม/ภาษา/โหลดหรือLINEจริงทุกworkflow |
+| DONE สำหรับเส้นทางทดลองที่ยืนยัน | LINE end-to-end จริง | M6 | รับ–ตอบ LINE จริงแล้ว; รอบนี้เจ้าของยืนยัน FAQ/ลิงก์/ค้นและดูต่อ/คำขอ/memory และคำขอขึ้นเว็บ ไม่ได้หมายถึงทดสอบทุกเส้นทางหรือ hosting ถาวร |
+| DONE สำหรับ Terminal และ LINE local | Persistent memory | M3 | stores/locksแยกdirectory, keyแยกchannel/OA/direct/user,0700/0600,retention90วัน,profile/recent/summary/long-term,resetคงprofileและforgetมีconfirmation; เจ้าของยืนยันอ่านmemoryและเคยrestartผ่าน; ยังไม่ใช่multi-hoststore |
+| TODO | Durable queue/dedupe | M5 | ปัจจุบัน restart อาจสูญงานที่ ACK หรือประมวลผล redelivery ใหม่; ยังไม่ production delivery guarantee |
+| TODO | Customer verification/ข้อมูลจริง | M3 | LINE identity ไม่เท่ากับสิทธิ์ข้อมูลผู้เรียน; ต้อง map/verify/check ownership ก่อนเพิ่ม real-data tools |
+| PARTIAL | Handoff จริง | M4 | พัฒนาUIรับช่วงรายคน พักบอต/คืนให้บอต ป้องกันตอบซ้อนและยืนยันก่อนเจ้าหน้าที่ตอบแล้ว; testsใช้transportจำลอง ยังไม่ยืนยันเจ้าหน้าที่ส่งจริงทุกเส้นทางหรือแจ้งทีมภายนอกอัตโนมัติ |
+| DONE สำหรับ snapshot ปัจจุบัน | ค้น/แนะนำหลักสูตรและถามต่อ | M4 | มีข้อมูล19หลักสูตร+1bundle,แหล่งอ้างอิง,briefs,job-first advice,list/count/price/sort/more/read และcatalog contextข้ามrestart; ค้น/ดูต่อLINEจริงผ่าน พฤติกรรม555เลื่อนหน้าเจ้าของยอมรับเป็นข้อสังเกต ไม่ใช่งานแก้รอบนี้ |
+| DONE ตามขอบเขตรับฝากคำขอ | รับคำขอจองและฝากเรื่อง | M4 | preview→confirmพร้อมรหัส→บันทึกstoreและเลขอ้างอิง→แสดงหลังบ้านผ่านตามเจ้าของ; ยังไม่ใช่สมัครเรียน ยืนยันที่นั่ง ชำระเงิน หรือส่งเรื่องให้ทีมงานอัตโนมัติ |
+| DONE ตามขอบเขตที่พัฒนาแล้ว | เว็บหลังบ้านรวม | M6 | เปิดบทสนทนา ลูกค้าและกลุ่ม งานรอดูแล ส่งข่าว และจัดการบอตแล้ว; ภาพรวมยังไม่พัฒนา การส่งข่าวจริงต้องผ่านเงื่อนไขอนุญาตcampaign ไม่ใช่เปิดให้ส่งอัตโนมัติ |
+| DONE ตามขอบเขตผู้ใช้บนเครื่อง | ลูกค้าและกลุ่ม | M3 / M6 | รายชื่อ/ค้น/กรอง โปรไฟล์และที่มาแยกช่อง โน้ต2ประเภทพร้อมเวลา/ผู้ทำรายการ/ประวัติแก้ลบ แท็ก หลายกลุ่มและbulkสมาชิก สถานะรับข่าวพร้อมหลักฐาน; storeแยกmemory ไม่มีlogin/สิทธิ์รายเจ้าหน้าที่ ไม่มีข้อมูลตัวอย่างในstoreจริง รายละเอียด CUSTOMERS_GUIDE.md |
+| PARTIAL | ทดลองเป็นกลุ่มและสรุปผล | M7 | เจ้าของยืนยันเคยทดลองเป็นกลุ่มแล้ว ยังไม่ได้รวบรวมผลเทียบคำตอบ/เวลาตอบ/error/costและrollbackครบ ไม่ถือว่าไม่เคยทดสอบเพียงเพราะไม่มีบันทึกครบ |
+| DONE ระดับ local ที่ทดสอบ | บทสนทนาและรับช่วงคุย | M4 / M6 | หน้ารายชื่อ/แชต/โปรไฟล์3คอลัมน์ รับช่วง/คืนบอต ตอบพร้อมยืนยันและป้องกันส่งซ้ำ; ทดสอบจำลอง ไม่อ้างLINEส่งจริงใหม่ |
+| DONE ระดับ local ที่ทดสอบ | งานรอดูแล | M4 / M6 | ค้น/กรอง รับงาน มอบหมาย สถานะใหม่→กำลังดูแล→เสร็จแล้ว โน้ต/timeline และเชื่อมลูกค้า/แชต คงคำขอต้นฉบับ |
+| PARTIAL | ส่งข่าว | M6 | มีร่าง/กลุ่มและรายคน/consent/review/ประวัติ/outboxและworker; เส้นทางส่งทดสอบจำลอง การส่งจริงขึ้นกับtransportและสิทธิ์campaignเฉพาะ ยังไม่ใช่E2Eจริงครบ |
+| DONE สำหรับ FAQ; หลักสูตรอ่านอย่างเดียว | ความรู้บอต (KM) | M4 / M6 | เพิ่ม/แก้/เลิกใช้ร่าง ทดลองคำตอบ ตรวจและยืนยันเผยแพร่ ย้อนเวอร์ชัน; หลักสูตรยังใช้validatorและแสดงหลักฐาน ไม่แก้ข้ามขั้นนำเข้า |
+| DONE ตามขอบเขตใช้งาน local | ตั้งค่าการตอบ | M2 / M5 / M6 | provider/model บุคลิก/คำสั่งเพิ่มเติม limits; ร่าง→ลอง→ตรวจและยืนยันใช้→ย้อนเวอร์ชัน; คงกติกาhostที่ล็อก ไม่เผยsecret ไม่เปลี่ยนค่าจริงแทนเจ้าของ Testsรอบล่าสุด132/132+import9/9ผ่าน ใช้โมเดลจำลองตรวจflow |
+| TODO | หน้าภาพรวม | M6 | ยังไม่พัฒนา dashboard รวมตัวเลขลูกค้า/บทสนทนา/งานค้าง/ผลส่งข่าว |
+
+ความหมายรหัส: M1 ตั้งต้นและGit · M2 แกนบอตร่วม/กติกา · M3 ความจำ/แยกผู้ใช้/สิทธิ์ข้อมูล · M4 FAQ/หลักสูตร/คำขอและส่งต่อ · M5 ความเสถียร/คุณภาพ/ค่าใช้จ่าย · M6 LINEและเว็บหลังบ้านทดลอง · M7 ทดลองกลุ่ม/สรุปผล
+
+ผลตรวจล่าสุด: [บันทึกตรวจสถานะ 28 ตุลาคม](./CORE_STATUS_AUDIT_2026-10-28.md) รายละเอียดเชิงเทคนิคและประวัติเดิมยังอยู่ในส่วนถัดไป
+
+## สรุป Milestone M1–M7
+
+ตารางนี้สรุปภาพรวมจากงานย่อยด้านบน งานที่อยู่ระหว่างทำไม่ถือว่าเสร็จเพียงเพราะ milestone ถัดไปมีส่วนที่ใช้งานได้แล้ว
+
+| Milestone | เป้าหมาย | สถานะภาพรวม | ทำถึงไหน / เหลืออะไร |
+|---|---|---|---|
+| **M1** | ตั้งต้นโปรเจกต์และ Git | **ทำแล้วในเครื่อง** | มีประวัติโค้ดและกันข้อมูลลับ; ยังไม่ได้กำหนด remote ซึ่งอยู่นอกขอบเขตเดิม |
+| **M2** | แกนบอตร่วมและกติกา CBTU | **ทำแล้วระดับต้นแบบ** | Terminal/LINE ใช้ core เดียวกัน ความรู้สาธารณะและสิทธิ์เครื่องมือชัดเจน |
+| **M3** | ความจำ แยกผู้ใช้ และสิทธิ์ข้อมูล | **ทำบางส่วน** | ความจำและการแยกผู้ใช้บนเครื่องนี้ทำแล้ว เจ้าของยืนยันเคยรีสตาร์ตผ่าน; การยืนยันสิทธิ์ข้อมูลผู้เรียนจริงและรองรับหลายเครื่องยังไม่ทำ |
+| **M4** | FAQ หลักสูตร คำขอ และส่งต่อทีม | **ทำบางส่วน** | FAQ/หลักสูตร/คำขอ/KMและรับช่วงแชตพัฒนาแล้ว; ยังต้องเพิ่มcoverageคำตอบและยืนยันรับช่วงส่งจริง/การส่งต่อทีมภายนอก |
+| **M5** | ความเสถียร คุณภาพ และค่าใช้จ่าย | **ทำบางส่วน** | มีlimits/error handling/monitorและผลtests72+9ผ่าน; คิวถาวร กันซ้ำข้ามรีสตาร์ต งบเป็นเงิน และload/fault testsยังค้าง |
+| **M6** | เชื่อม LINE และเว็บหลังบ้านทดลอง | **ทำแล้วตามขอบเขตทดลอง** | LINEมีผลยืนยันรอบก่อน เว็บเดิมมีเมนู5แท็บ/ทะเบียนลูกค้าแล้ว เปิด3ส่วน; hostingถาวร login ภาพรวม ส่งข่าว และรับช่วงคุยยังค้าง |
+| **M7** | ทดลองเป็นกลุ่มและสรุปผล | **ทำบางส่วน** | เจ้าของยืนยันเคยทดลองเป็นกลุ่มแล้ว; ยังต้องรวบรวมผลเทียบเกณฑ์คำตอบ เวลาตอบ error/cost และrollbackให้ครบ |
+
+M3 มีงานความจำที่ DONE และงานสิทธิ์ข้อมูลจริงที่ TODO จึงสรุปภาพรวมเป็นทำบางส่วน การทำงานคนละส่วนอาจคืบหน้าไม่เรียงตามหมายเลข M
 
 ## องค์ประกอบปัจจุบัน
 
@@ -63,26 +155,12 @@ Build/tests27รายการผ่าน รวม5 acceptance cases, aliases
 - action เปลี่ยนข้อมูลธุรกิจในอนาคตต้องมี preview/confirmation ที่ผูกพารามิเตอร์และผู้ใช้ พร้อมตรวจสิทธิ์ซ้ำก่อน execute
 - ไม่เก็บ secrets ใน Git/logs และไม่ขอให้ส่ง credentials ผ่านแชต
 
-## Milestones และ acceptance criteria ต่อจากนี้
-
-| ลำดับ | สถานะ/งาน | เกณฑ์ผ่าน |
-|---|---|---|
-| M1 | DONE — Git | baseline local, staged secret scan, clean working tree, ไม่มี remote/push |
-| M2 | DONE สำหรับ prototype — shared core/CBTU policy | ทั้งสอง adapter ใช้ core/policy/tools เดียวกัน, Terminal ยังรันได้, knowledge มาจาก public URL เท่านั้น |
-| M3 | DONE สำหรับ local Terminal; production ยัง PARTIAL | ทดสอบ persistence/restart/day/isolation/reset/forget ผ่าน; ใช้ Pi compaction entry กับ bounded store; LINE persistence ยังไม่เชื่อม และ real-data access ต้อง verify ownership |
-| M4 | PARTIAL — FAQ/contact | ชุดคำถามเริ่มต้นผ่าน found/unknown/conflict/source; เพิ่ม dataset ที่เจ้าของรับรองและชุดคำถามทดสอบจริง; handoff ลดขอบเขตเป็นชี้ช่องทางตามคำสั่งผู้ใช้ ไม่ถือว่าทำส่งต่อจริงเสร็จ |
-| M5 | PARTIAL — reliability/cost | timeout/cancellation/empty response/tool denial และ limits เริ่มต้นผ่าน; ยังต้อง fault/load tests, monetary budget และตรวจคุณภาพคำตอบกว้างขึ้น |
-| M6 | พร้อมตั้งค่า/ยังไม่ E2E — LINE | เมื่อมี test OA/HTTPS: Verify events=[] ได้ 200, invalid signature ได้ 401, allowlist ทำงาน, A/B ไม่รั่ว, redelivery ไม่ซ้ำในโปรเซสเดียว, reply จริงสำเร็จ โดยผู้ใช้เปิดส่งเอง |
-| M7 | TODO — กลุ่มทดสอบ | ตกลง expected answers/latency/error/cost thresholds, retention และ rollback ก่อนทดลอง; เก็บผลจริงเพื่อเลือกงานถัดไป |
-
-ข้ามขั้น production reliability ไม่ได้เพียงเพราะ mock tests ผ่าน การเตรียม LINE adapter รอบนี้ยังไม่ถือว่าเปิดให้บริการ LINE แล้ว
-
 ## ข้อมูล/การตัดสินใจที่ยังขาด
 
-- Test LINE OA: channel ID/secret/access token, tester IDs และ HTTPS hosting เจ้าของระบบจะเติมเองบนเครื่อง
+- LINE OA/tester credentials ตั้งแล้วและมีการลองรับ–ตอบจริง; hosting ถาวรและการบันทึก public endpoint ปัจจุบันยังต้องจัดให้ชัด ไม่ขอ secrets ในแชต
 - แหล่ง public knowledge เลือกแล้ว: FAQ/Home/About; ยังต้องให้เจ้าของข้อมูลทบทวนข้อขัดแย้ง อัปเดต snapshot และอนุมัติ coverage ที่ต้องตอบ
 - วิธี map/verify learner และ ownership ก่อนใช้ข้อมูลจริง ไม่มีการรวมตัวตนข้ามช่องทางอัตโนมัติ
-- Retention และ storage: Terminal demo เก็บไฟล์แบบมีขอบเขตจน inactive เกิน 90 วัน (purge ตอนเปิด/load), Pi active idle 30 นาที; ทบทวน production retention และ LINE persistence ก่อนใช้งานจริง
+- Retention และ storage: Terminal demo เก็บไฟล์แบบมีขอบเขตจน inactive เกิน 90 วัน (purge ตอนเปิด/load), Pi active idle 30 นาที; LINE persistence เชื่อมแล้ว; ยังต้องทบทวน production retention ก่อนขยายบริการ
 - Handoff destination/recipient และการอนุญาตส่งจริง ยังไม่กำหนด ไม่มีการส่งออก
 - งบรายวัน/ลูกค้า, คุณภาพและ SLA, persistent queue/dedupe และ monitoring ก่อน production
 - Remote Git ยังไม่กำหนด จึงไม่ตั้งหรือ push
@@ -145,3 +223,14 @@ local dry-run serverเริ่มได้แล้ว: health200, unsigned401
 ตามการอนุญาตล่าสุด LINEserverใช้MemoryStoreค่าเดียวกับTerminalใน.line-memory แยกdirectory/lockและtrustedidentity ไม่แตะTerminalstoreหรือconfigcredentials เพิ่มLineConversationsเก็บclient/challengeเฉพาะuser/OA/adapter มีidle30นาที/cap100 และmemorycommandsที่ไม่เรียกโมเดล /memoryเป็นsnapshotย่อ /resetคงprofile/long-termล้างpending /forgetต้องconfirm60วินาทีและcancel/ข้อความอื่นยกเลิก ไม่ให้confirmข้ามคน/OA/restart
 
 Build/tests22รายการผ่าน รวมsignedadapter→persistentstore/restart/profile/summary/compaction32turn, OA/user/channelisolation, Terminalอีกprocess/storeเปิดพร้อมLINE, resetpreservesfacts, forgetcancel/expiry/physicaldelete/no-revival/retention และregressionเดิม LocalHTTPmockผ่าน ไม่ใช้ข้อมูลจริงเพื่อdelete tests ServerเปิดstoreจริงและLINE Verifyผ่านหลังrestart ผู้ใช้ส่งชื่อสำเร็จและมีrecord0600จริง จากนั้นrestartและผู้ใช้ส่ง/memoryยืนยันprofileกับrecentยังอยู่จริง ประวัติRAMก่อนเปิดstoreไม่ได้ย้ายอัตโนมัติ คิว/dedupeยังไม่durable
+
+
+## จัดการบอต: KM และตั้งค่าการตอบ — 28 ตุลาคม 2026
+
+เปิดบนเว็บเดิม3001แล้ว เมนูจัดการบอตอยู่แถวเดียวกับห้าแท็บงานเดิม ภายในตั้งค่าการตอบอยู่บนและความรู้บอตอยู่ล่างเป็นสองsection ไม่มีแท็บย่อย #knowledgeเดิมยังใช้ได้
+
+KMเพิ่ม/แก้/เลิกใช้FAQในร่าง ค้น/ดูความต่าง ลองFAQโดยไม่เรียกโมเดล ตรวจและยืนยันpublishแบบrevision+digest ประวัติและrollback ผ่านactive storeเดียวกันทุกhost/semantic/tool มีlast-goodและsourcevalidation หลักสูตรอ่านอย่างเดียวคงvalidator/evidenceเดิม
+
+ตั้งค่าการตอบเลือกคู่provider/modelจากSDKและสถานะcredentialsโดยไม่เปิดkey แก้presentation preferences/limitsภายใต้policyและhostguardsที่คงที่ ร่าง→ลองโมเดลแบบexplicitใช้quotaในsandbox→ตรวจdiff→ยืนยันapply→version/rollback มีCAS/atomic/lock/last-good เมื่อapplyแล้วงานที่กำลังตอบคงค่าเดิม งานถัดไปทั้งTerminal/LINEใช้ใหม่โดยรักษาcanonicalmemory ไม่ต้องrestartเพื่อapplysettings
+
+Build/regression132/132/import9/9 และbrowsertempdesktop/mobileผ่าน เปิดruntimeแล้วตรวจGET/UIจริงแบบอ่าน active initial/revision0/Qwenเดิม ไม่มีการใช้ค่าร่างทดสอบกับบอตจริง ไม่มีการเรียกproviderหรือส่งLINEจากรอบทดสอบนี้ ไม่อ้างLINEE2Eหรือทุกmodelผ่านจริง รายละเอียดข้อจำกัด [KM_GUIDE.md](./KM_GUIDE.md) และ [RESPONSE_SETTINGS_GUIDE.md](./RESPONSE_SETTINGS_GUIDE.md)

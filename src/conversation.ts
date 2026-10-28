@@ -1,3 +1,4 @@
+import { responseSession } from './response-session.js';
 import type { AgentSession } from '@earendil-works/pi-coding-agent';
 import { DemoFailure, describeFailure } from './diagnostics.js';
 
@@ -6,6 +7,7 @@ export async function runConversation(
   output: { text: (value: string) => void; status: (value: string) => void },
   progressMs = 5000,
 ) {
+  const limits = responseSession(session)?.binding.config.limits;
   const started = Date.now();
   let timedOut = false;
   let streamedFinalText = '';
@@ -15,8 +17,8 @@ export async function runConversation(
   let budgetExceeded = false;
   output.status('[กำลังส่งข้อความและรอคำตอบ…]');
   const unsubscribe = session.subscribe(event => {
-    if ((event.type === 'message_start' && event.message.role === 'assistant' && ++modelTurns > 4)
-      || (event.type === 'tool_execution_start' && ++toolCalls > 4)) {
+    if ((event.type === 'message_start' && event.message.role === 'assistant' && ++modelTurns > (limits?.modelCalls ?? 4))
+      || (event.type === 'tool_execution_start' && ++toolCalls > (limits?.toolCalls ?? 4))) {
       budgetExceeded = true;
       void session.abort();
     }
