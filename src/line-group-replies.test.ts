@@ -49,6 +49,28 @@ test('CBOT prefix accepts case-insensitive deliberate calls only, without LINE n
   const restart=new LineGroupStore(join(f.dir,'rooms'),'oa');assert.equal(restart.replyMode(groupId),'cbot');
  }finally{replies.close();f.clean()}
 });
+test('CBOT rooms accept native self mentions as a second trigger and reject plain @names, all, other users and disabled rooms',async()=>{
+ const f=setup();f.store.enableCallWord(groupId);const questions:string[]=[],tokens:string[]=[];
+ const service=new LineGroupReplies(f.store,{client:()=>({send:async(p,out)=>{questions.push(p);out.text('fixture response')},abort:async()=>{}})},'oa',false,async(token)=>{tokens.push(token)});
+ try{
+  const word=event('word');word.message.text='cBoTสมัครสมาชิกอย่างไร';delete(word.message as any).mention;
+  const native=event('native','ราคาเท่าไร');
+  const bare=event('bare','');
+  const middle=event('middle');middle.message.text='ช่วยหน่อย @bot เวลาเรียน';middle.message.mention.mentionees[0].index=10;
+  const plain=event('plain');delete(plain.message as any).mention;
+  const all=event('all');all.message.mention.mentionees[0].type='all';
+  const other=event('other');other.message.mention.mentionees[0].isSelf=false;other.message.mention.mentionees[0].userId=otherUser;
+  const wrongDestination=event('wrong-destination');
+  const disabled=event('disabled');disabled.source.groupId=otherGroup;
+  for(const e of [word,native,bare,middle,plain,all,other,disabled])service.accept(e,botId);
+  service.accept(wrongDestination,otherUser);
+  service.accept(native,botId); // Same native event must never reply twice.
+  await service.drain();
+  assert.deepEqual(questions,['สมัครสมาชิกอย่างไร','ราคาเท่าไร','ช่วยหน่อย  เวลาเรียน']);
+  assert.equal(tokens.length,4);assert.equal(tokens.filter(t=>t==='fixture-reply-native').length,1);
+  assert.equal(f.store.list().find(r=>r.groupId===otherGroup)?.messages?.length,0);
+ }finally{service.close();f.clean()}
+});
 test('only enabled rooms reply to native tags; signed adapter keeps direct monitor/control separate and reply redelivery is durable',async()=>{
  const f=setup();const calls:{identity:Identity;prompt:string}[]=[],sent:string[]=[];
  const core={client:(identity:Identity)=>({send:async(prompt:string,out:any)=>{calls.push({identity,prompt});out.text('คำตอบจากกลุ่ม fixture')},abort:async()=>{}})};

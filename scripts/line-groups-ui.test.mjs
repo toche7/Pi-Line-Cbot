@@ -43,6 +43,7 @@ try {
   rooms.enableCallWord(groupId);
   await page.getByRole('button', { name: 'โหลดห้องล่าสุด', exact: true }).click();
   await page.waitForFunction(() => document.getElementById('line-rooms-mode').textContent.includes('พิมพ์ CBOT'));
+  assert.ok((await page.locator('#line-rooms-mode').textContent()).includes('แตะเลือกบัญชีบอต'));
   await page.setViewportSize({ width: 390, height: 844 });
   assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
   assert.equal(customers.snapshot({ events: [], requests: [] }).customers.length, 0);

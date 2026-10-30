@@ -45,7 +45,10 @@ export class LineGroupReplies {
     private dryRun: boolean, private reply: (replyToken: string, text: string) => Promise<void>, private log: (record: object) => void = () => {}) {}
   accept(event: any, destination: unknown): boolean {
     const mode = event?.source?.groupId ? this.store.replyMode(event.source.groupId) : undefined;
-    const prompt = mode === 'cbot' ? groupCallWordPrompt(event) : groupMentionPrompt(event, destination);
+    // Existing CBOT rooms accept either trigger. Prefer the real mention so its
+    // display-name token is removed, and resolve one prompt for one reply only.
+    const mentionedPrompt = groupMentionPrompt(event, destination);
+    const prompt = mentionedPrompt ?? (mode === 'cbot' ? groupCallWordPrompt(event) : undefined);
     if (prompt === undefined || this.closed || this.dryRun || !this.store.mentionsEnabled(event.source.groupId)) return true;
     if (this.tasks.size >= 16) return false;
     if (!this.store.reserveReply(event.source.groupId, event.webhookEventId)) return true;
@@ -54,7 +57,7 @@ export class LineGroupReplies {
     const task = this.tail.then(async () => {
       if (this.closed || Date.now() - receivedAt > 20000 || !this.store.mentionsEnabled(groupId)) { finish('', 'cancelled'); return; }
       let text = '';
-      if (!prompt) text = mode === 'cbot' ? 'เรียกซีบอตแล้วครับ พิมพ์ CBOT ตามด้วยคำถามได้เลยครับ' : 'เรียกซีบอตแล้วครับ พิมพ์คำถามต่อท้ายแท็กได้เลยครับ';
+      if (!prompt) text = mode === 'cbot' ? 'เรียกซีบอตแล้วครับ พิมพ์ CBOT หรือแท็กบัญชีบอต แล้วตามด้วยคำถามได้เลยครับ' : 'เรียกซีบอตแล้วครับ พิมพ์คำถามต่อท้ายแท็กได้เลยครับ';
       else if (prompt.startsWith('/')) text = 'คำสั่งจัดการความจำและคำขอ กรุณาใช้แชตส่วนตัวกับซีบอตครับ ในกลุ่มให้แท็กพร้อมคำถามได้เลย';
       else {
         try {

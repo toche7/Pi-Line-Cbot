@@ -47,6 +47,8 @@ FAQ ที่ระบุหัวข้อตอบจาก snapshot พร้
 
 ## LINE local
 
+เปิด ngrok และอัปเดต LINE webhook อัตโนมัติด้วย `npm run ngrok` หลังเปิด Server แล้ว ดู [คู่มือเปิดระบบและกรณี URL เปลี่ยน](./NGROK_GUIDE.md)
+
 ตรวจ config โดยไม่แสดงค่า secrets: `npm run line:check` (หลัง build) ผลล่าสุดยืนยัน OA **DemoB1**, token/channel และ allowlist 1คน เปิด ngrok เฉพาะพอร์ต3000แล้ว Public signature checks และ LINE Verify ผ่าน เปลี่ยน webhook/readback active=true และเริ่มโหมด reply จริงเฉพาะ allowlist แล้ว รับ inbound จริงและ LINE reply API ยอมรับ reply 7 ครั้งแล้ว อ่าน [สถานะและวิธีหยุด/rollback](./LINE_SETUP.md)
 
 เติม LINE_CHANNEL_SECRET และค่าทดสอบตาม [LINE_SETUP.md](./LINE_SETUP.md) แล้ว:
