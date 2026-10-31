@@ -10,6 +10,7 @@ export async function runChat(
   session: AgentSession | ChatClient, timeoutMs: number,
   input: Readable = process.stdin, output: Writable = process.stdout,
   status: Writable = process.stderr,
+  options: { temporary?: boolean } = {},
 ) {
   const terminal = Boolean((input as NodeJS.ReadStream).isTTY && (output as NodeJS.WriteStream).isTTY);
   const rl = createInterface({ input, output, terminal, prompt: 'คุณ > ' });
@@ -34,7 +35,7 @@ export async function runChat(
       if (prompt === '/exit' || prompt === '/quit') break;
       if (prompt === '/forget' && 'requestForget' in session && session.requestForget) {
         forgetToken = await session.requestForget();
-        if ('requestsEnabled' in session && session.requestsEnabled) output.write('[การยืนยันนี้จะลบคำขอของคุณในระบบกลางด้วย]\n');
+        if ('requestsEnabled' in session && session.requestsEnabled) output.write(options.temporary ? '[การยืนยันนี้จะลบคำขอทดลองใน temp ของรอบนี้ด้วย]\n' : '[การยืนยันนี้จะลบคำขอของคุณในระบบกลางด้วย]\n');
         output.write('[จะลบข้อความ สรุป เรื่องค้าง และโปรไฟล์ของคุณทั้งหมดจาก memory บนเครื่อง พิมพ์ /confirm-forget ภายใน 60 วินาทีเพื่อยืนยัน หรือ /cancel เพื่อยกเลิก]\n');
         if (terminal) rl.prompt();
         continue;
@@ -59,7 +60,8 @@ export async function runChat(
       if ('cancelForget' in session) session.cancelForget?.();
       if (prompt === '/help') {
         if (cancelledForget) output.write('[ยกเลิกคำขอ /forget ที่รอยืนยันแล้ว ข้อมูลยังอยู่]\n');
-        output.write(commandHelp('terminal', 'send' in session ? session : undefined) + '\n');
+        const help = commandHelp('terminal', 'send' in session ? session : undefined);
+        output.write((options.temporary ? help.replaceAll('ระบบกลาง', 'พื้นที่ทดลองชั่วคราว') : help) + '\n');
         if (terminal) rl.prompt();
         continue;
       }
@@ -98,6 +100,6 @@ export async function runChat(
     process.removeListener('SIGINT', interrupt);
     rl.removeListener('SIGINT', interrupt);
     rl.close();
-    output.write('\nจบแชตแล้ว (memory ที่บันทึกไว้ยังอยู่สำหรับครั้งถัดไป)\n');
+    output.write(options.temporary ? '\nจบแชตทดลองแล้ว (ข้อมูลชั่วคราวจะถูกลบเมื่อปิดโปรแกรม)\n' : '\nจบแชตแล้ว (memory ที่บันทึกไว้ยังอยู่สำหรับครั้งถัดไป)\n');
   }
 }

@@ -1,0 +1,71 @@
+{
+  "date": "2026-10-30T23:16:06.877Z",
+  "base": "37114e8",
+  "environment": "Terminal core, model-first, temp stores, no LINE transport",
+  "requestCap": 6,
+  "provider": "groq",
+  "model": "qwen/qwen3.8-27b",
+  "version": "initial",
+  "limits": {
+    "inputChars": 2000,
+    "maxTokens": 800,
+    "lineTimeoutMs": 25000,
+    "terminalTimeoutMs": 45000,
+    "modelCalls": 4,
+    "toolCalls": 4
+  },
+  "status": "completed",
+  "calls": 3,
+  "turns": [
+    {
+      "user": "มีอะไรเกี่ยวกับ ai บ้าง",
+      "answer": "พบ 12 รายการ แสดง 1–5\n1. CBTU AI Day : AI for Research\nใช้กับงาน: ค้นคว้าและวางโครงบทความวิชาการ\nการเรียน: มีวิดีโอบรรยายย้อนหลังและเอกสารประกอบ · 1 ชั่วโมง 30 นาที\nhttps://cbtumu.net/coursenew/cbtu-ai-day-ai-for-research/\n\n2. CBTU AI Day : AI for Work\nใช้กับงาน: ช่วยร่างงานและทำสื่อสำหรับงานประจำ\nการเรียน: มีวิดีโอบรรยายย้อนหลังและเอกสารประกอบ · 2 ชั่วโมง\nhttps://cbtumu.net/coursenew/cbtu-ai-day-ai-for-work/\n\n3. AI Agent for ALL\nใช้กับงาน: รู้จักการใช้ AI Agent เชื่อมงานและเครื่องมือ\nการเรียน: วิดีโอออนไลน์ · 2 ชั่วโมง 30 นาที\nhttps://cbtumu.net/coursenew/aiagentforall/\n\n4. Data Analysis with AI\nใช้กับงาน: เตรียมและสำรวจข้อมูลโดยใช้ AI ช่วย\nการเรียน: Online workshop ผ่าน Zoom · 4 สัปดาห์ / 4 วัน / 12 ชั่วโมง\nhttps://cbtumu.net/coursenew/dataanalysiswithai/\n\n5. Mini AI Agent Engineering\nใช้กับงาน: พัฒนา AI Agent เป็นโครงงานต่อเนื่อง\nการเรียน: Hybrid workshop / Onsite สลับ Online ผ่าน Zoom · 14 สัปดาห์ สัปดาห์ละ 6 ชั่วโมง\nhttps://cbtumu.net/coursenew/miniaiagentengineer/\n\nยังมีรายการต่อ พิมพ์ “ดูต่อ” ได้\nข้อมูลเว็บที่เก็บ 2026-10-23 · บางรายการเป็นรุ่นเก่า ต้องตรวจรอบใหม่",
+      "elapsedMs": 520,
+      "calls": 1,
+      "statuses": [
+        "[กำลังส่งข้อความและรอคำตอบ…]",
+        "[ตอบแล้วใน 495 ms]"
+      ]
+    },
+    {
+      "user": "มีหลักสูตรอะไรบ้าง",
+      "answer": "พบ 20 รายการ แสดง 1–10\n1. Data Analysis with AI\nใช้กับงาน: เตรียมและสำรวจข้อมูลโดยใช้ AI ช่วย\nการเรียน: Online workshop ผ่าน Zoom · 4 สัปดาห์ / 4 วัน / 12 ชั่วโมง\nhttps://cbtumu.net/coursenew/dataanalysiswithai/\n\n2. CBTU AI Day : AI for Research\nใช้กับงาน: ค้นคว้าและวางโครงบทความวิชาการ\nการเรียน: มีวิดีโอบรรยายย้อนหลังและเอกสารประกอบ · 1 ชั่วโมง 30 นาที\nhttps://cbtumu.net/coursenew/cbtu-ai-day-ai-for-research/\n\n3. CBTU AI Day : AI for Work\nใช้กับงาน: ช่วยร่างงานและทำสื่อสำหรับงานประจำ\nการเรียน: มีวิดีโอบรรยายย้อนหลังและเอกสารประกอบ · 2 ชั่วโมง\nhttps://cbtumu.net/coursenew/cbtu-ai-day-ai-for-work/\n\n4. Mini AI Agent Engineering\nใช้กับงาน: พัฒนา AI Agent เป็นโครงงานต่อเนื่อง\nการเรียน: Hybrid workshop / Onsite สลับ Online ผ่าน Zoom · 14 สัปดาห์ สัปดาห์ละ 6 ชั่วโมง\nhttps://cbtumu.net/coursenew/miniaiagentengineer/\n\n5. Mini Data Science รุ่นที่ 10\nใช้กับงาน: ศึกษางาน Data Science ตั้งแต่โมเดลถึงการประยุกต์ธุรกิจ\nการเรียน: Hybrid workshop · 17 วัน วันละ 6 ชั่วโมง รวม 102 ชั่วโมง\nhttps://cbtumu.net/coursenew/minidatascience10/\n\n6. การวิเคราะห์ข้อมูลด้วย Microsoft Excel\nใช้กับงาน: สรุปยอดขายหรือข้อมูลจากตาราง Excel\nการเรียน: วิดีโอออนไลน์ เรียนด้วยตนเอง\nhttps://cbtumu.net/coursenew/analyticsmicrosoftexcel/\n\n7. สร้างสื่อสวยด้วย Canva\nใช้กับงาน: ทำโปสเตอร์และสไลด์นำเสนอ\nการเรียน: วิดีโอ เรียนด้วยตนเองและทบทวนซ้ำได้\nhttps://cbtumu.net/coursenew/creativemediadesignwithcanva/\n\n8. Generative AI in Health Product Marketing\nใช้กับงาน: ใช้ AI ช่วยงานการตลาดผลิตภัณฑ์สุขภาพ\nการเรียน: วิดีโอออนไลน์ · 5 ชั่วโมง\nhttps://cbtumu.net/coursenew/generativeaiinhealthproductmarketing/\n\n9. AI Agent with n8n\nใช้กับงาน: เชื่อมงานซ้ำและเครื่องมือด้วย workflow\nการเรียน: เรียนจากวิดีโอเนื้อหาหลัก พร้อมตัวอย่างปฏิบัติ\nhttps://cbtumu.net/coursenew/aiagentwithn8n/\n\n10. AI Agent Workshop with n8n\nใช้กับงาน: ฝึกสร้าง AI workflow ในรูปแบบ workshop\nการเรียน: Onsite hands-on workshop · 2 วัน\nhttps://cbtumu.net/coursenew/n8n-workshop/\n\nยังมีรายการต่อ พิมพ์ “ดูต่อ” ได้\nข้อมูลเว็บที่เก็บ 2026-10-23 · บางรายการเป็นรุ่นเก่า ต้องตรวจรอบใหม่",
+      "elapsedMs": 551,
+      "calls": 1,
+      "statuses": [
+        "[กำลังส่งข้อความและรอคำตอบ…]",
+        "[ตอบแล้วใน 546 ms]"
+      ]
+    },
+    {
+      "user": "เยอะเลยนะ",
+      "answer": "เยอะจริง ๆ เลยครับ อยากให้ช่วยคัดตามความสนใจหรือรูปแบบเรียนไหมครับ เช่น เรียนออนไลน์อย่างเดียว หรือเน้น AI/ข้อมูล",
+      "elapsedMs": 711,
+      "calls": 1,
+      "statuses": [
+        "[กำลังส่งข้อความและรอคำตอบ…]",
+        "[ตอบแล้วใน 705 ms]"
+      ]
+    }
+  ],
+  "trace": [
+    {
+      "intent": "catalog_query",
+      "operation": "list",
+      "tokens": 2321,
+      "stopReason": "stop"
+    },
+    {
+      "intent": "catalog_query",
+      "operation": "list",
+      "tokens": 4164,
+      "stopReason": "stop"
+    },
+    {
+      "intent": "chat",
+      "reply": "เยอะจริง ๆ เลยครับ อยากให้ช่วยคัดตามความสนใจหรือรูปแบบเรียนไหมครับ เช่น เรียนออนไลน์อย่างเดียว หรือเน้น AI/ข้อมูล",
+      "tokens": 6383,
+      "stopReason": "stop"
+    }
+  ]
+}

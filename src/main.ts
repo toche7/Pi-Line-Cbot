@@ -3,7 +3,7 @@ import { KnowledgeStore, configureKnowledge } from './knowledge-store.js';
 import { createDemo } from './agent.js';
 import { DemoFailure, requestTimeout } from './diagnostics.js';
 import { runChat } from './chat.js';
-import { CustomerCore } from './core.js';
+import { createCustomerCore } from './customer-runtime.js';
 import { MemoryStore } from './memory.js';
 import { resolve } from 'node:path';
 import { CourseRequestStore, CourseRequests } from './course-requests.js';
@@ -17,6 +17,7 @@ async function main() {
     console.log(`Model: ${provider}/${modelId}`);
     console.log(`Allowed tools: ${session.getActiveToolNames().join(', ')}`);
     console.log(`Request deadline: ${timeoutMs} ms`);
+    console.log('Conversation routing: model-first');
     if (process.argv.includes('--check')) {
       console.log(`Credentials configured: ${modelRuntime.hasConfiguredAuth(provider)}`);
       console.log('Session initialized; no model request made.');
@@ -24,7 +25,10 @@ async function main() {
     }
     const store = new MemoryStore(resolve('.customer-memory'));
     const requests = new CourseRequests(new CourseRequestStore(resolve('runtime/course-requests')));
-    const core = new CustomerCore(async (manager, settings) => (await createDemo({ sessionManager: manager, settings })).session, timeoutMs, undefined, undefined, store, undefined, requests);
+    const core = createCustomerCore({
+      factory: async (manager, settings) => (await createDemo({ sessionManager: manager, settings })).session,
+      timeoutMs, store, requests,
+    });
     try {
       const userIndex = process.argv.indexOf('--user');
       const user = userIndex >= 0 ? process.argv[userIndex + 1] || '' : 'tester';

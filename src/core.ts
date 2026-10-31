@@ -12,7 +12,8 @@ import { type Memory, type MemoryStore, type Summarizer, emptyMemory, memoryMana
 import { renderCatalog, catalogTopicForAnswer } from './catalog.js';
 import { routeCatalog, recoverCatalogState, executeCatalogQuery, parseCatalogQuery } from './catalog-query.js';
 import { safeMemoryInput, mayRequestMemory, canLearnDirectly, canResumeMemory, decideMemory, applyMemoryChanges, memoryConfirmation, MemoryCapacityError } from './memory-request.js';
-import type { CourseRequests } from './course-requests.js';
+import { requestCapabilityAnswer, type CourseRequests } from './course-requests.js';
+import { renderCapabilities } from './capabilities.js';
 
 export type Output = { text: (value: string) => void; status: (value: string) => void };
 export type Identity = { channel: 'terminal' | 'line'; scope: string; user: string };
@@ -33,7 +34,11 @@ export class CustomerCore {
     private courseRequests?: CourseRequests,
     private responseSettings: () => SettingsBinding | undefined = captureResponseSettings,
     private humanSupport?: (identity: Identity) => HumanSupportStatus | undefined,
+    // Application entrypoints select model-first; low-level callers retain legacy compatibility.
+    private dialogueMode: 'rules-first' | 'model-first' = 'rules-first',
   ) {}
+
+  get faqWithoutModel() { return this.dialogueMode === 'rules-first'; }
 
   client(identity: Identity): ChatClient {
     // Identity is supplied by the adapter, never extracted from a customer's message.
@@ -107,12 +112,12 @@ export class CustomerCore {
             if (before.longTerm.some(v => !staged.longTerm.includes(v))) { staged = structuredClone(before); directLearned = false; }
             const resumeMemory = (current.memoryClarificationExpires ?? 0) > this.now() && canResumeMemory(prompt);
             current.memoryClarificationExpires = undefined;
-            const memoryRequest = mayRequestMemory(prompt) || resumeMemory;
+            const memoryHint = mayRequestMemory(prompt) || resumeMemory;
             let memoryHandled = false;
             let memoryClarified = false;
-            const orderId = memoryRequest || directLearned ? undefined : prompt.match(/\bDEMO-[0-9]+\b/i)?.[0].toUpperCase();
+            const orderId = memoryHint || directLearned ? undefined : prompt.match(/\bDEMO-[0-9]+\b/i)?.[0].toUpperCase();
             const previousCatalog = current.memory.catalog ?? recoverCatalogState(current.memory.recent.filter(t => !current.memory.handover || t.at > current.memory.handover.at));
-            let routed = orderId || memoryRequest || directLearned ? undefined : routeCatalog(prompt, previousCatalog,
+            let routed = this.dialogueMode === 'model-first' || orderId || memoryHint || directLearned ? undefined : routeCatalog(prompt, previousCatalog,
               current.lastTopic ?? (previousCatalog?.shownIds.length ? 'catalog:' + previousCatalog.shownIds.join(',') : undefined), current.memory.profile.interests);
             const catalog = routed?.selection;
             let nextCatalog = routed?.state ?? previousCatalog;
@@ -130,18 +135,21 @@ export class CustomerCore {
             } else {
               // A personal preference containing "video", for example, is not a
               // playback-support question. Keep it available as user context.
-              answer = memoryRequest || (!routed && canResumeMemory(prompt)) ? undefined : routed ? routed.answer : publicAnswer(prompt);
+              answer = this.dialogueMode === 'model-first' || memoryHint || (!routed && canResumeMemory(prompt)) ? undefined : routed ? routed.answer : publicAnswer(prompt);
               // General course/certificate FAQ must not mask a factual follow-up
               // about the displayed course. The planner can still choose knowledge
               // for a general FAQ or read for course-specific public fields.
               if (!routed && previousCatalog?.shownIds.length && answer
                 && ['certificate', 'courses'].includes(topicForAnswer(answer) ?? '')) answer = undefined;
             }
-            if (!memoryRequest && !routed && answer === undefined && current.lastTopic && !current.lastTopic.startsWith('catalog:') && isTopicFollowup(prompt)) answer = renderKnowledge(current.lastTopic);
+            if (this.dialogueMode === 'rules-first' && !memoryHint && !routed && answer === undefined && current.lastTopic && !current.lastTopic.startsWith('catalog:') && isTopicFollowup(prompt)) answer = renderKnowledge(current.lastTopic);
             if (this.courseRequests && answer === identityAnswer) answer = identityAnswer.replace('และยังเข้าถึงข้อมูลผู้เรียนจริงหรือส่งเรื่องให้เจ้าหน้าที่ไม่ได้',
               'ฝากคำขอจองด้วย /book ชื่อคอร์ส หรือฝากเรื่องด้วย /contact ข้อความ ได้ โดยเก็บในระบบกลางหลังคุณยืนยัน ยังไม่ส่งต่อหรือยืนยันที่นั่ง และยังเข้าถึงข้อมูลผู้เรียนจริงไม่ได้');
             if (this.courseRequests && answer && topicForAnswer(answer) === 'contact') answer = 'ฝากเรื่องให้ทีมงานได้ด้วย /contact ตามด้วยเรื่องที่ต้องการครับ ระบบจะแสดงสรุปให้ยืนยันก่อนเก็บในระบบกลาง ยังไม่ส่งอีเมลหรือ LINE ให้ทีมงาน\nหากต้องการช่องทางติดต่อโดยตรง ดู https://cbtumu.net/faq/ ข้อมูลอีเมลในเว็บบางส่วนต่างกัน จึงยังไม่เลือกยืนยันอีเมลให้';
             const support = this.humanSupport?.(identity);
+            const capabilities = { channel: identity.channel,
+              commands: !(identity.channel === 'line' && identity.scope.includes(':group:')),
+              requests: !!this.courseRequests, humanSupport: !!support };
             if (support && answer && (answer.startsWith('ผมชื่อซีบอต') || topicForAnswer(answer) === 'contact')) {
               answer = answer.replace('หรือส่งเรื่องให้เจ้าหน้าที่ไม่ได้', 'ไม่ได้');
               answer += '\n' + humanSupportText(support);
@@ -153,14 +161,14 @@ export class CustomerCore {
               if (!memoryHandled) nextTopic = routed?.topic ?? catalog?.topic ?? topicForAnswer(answer);
             } else {
               if (!catalog && this.now() < cooldownUntil()) {
-                throw new DemoFailure(`โมเดลถูกจำกัดการใช้งาน (429) รออีก ${Math.ceil((cooldownUntil() - this.now()) / 1000)} วินาทีแล้วลองใหม่ ระหว่างนี้ FAQ ยังใช้ได้`);
+                throw new DemoFailure(`โมเดลถูกจำกัดการใช้งาน (429) รออีก ${Math.ceil((cooldownUntil() - this.now()) / 1000)} วินาทีแล้วลองใหม่${this.dialogueMode === 'rules-first' ? ' ระหว่างนี้ FAQ ยังใช้ได้' : ''}`);
               }
               let reply: string;
               let semanticRead = false;
               try {
                 reply = catalog && this.now() < cooldownUntil() ? renderCatalog(catalog)
-                  : await runDialogue(session, prompt, turnTimeout, output, catalog, memoryRequest ? undefined : { state: nextCatalog, resolve: plan => {
-                    routed = executeCatalogQuery(parseCatalogQuery(plan), nextCatalog);
+                  : await runDialogue(session, prompt, turnTimeout, output, catalog, memoryHint && this.dialogueMode === 'rules-first' ? undefined : { state: nextCatalog, resolve: plan => {
+                    routed = executeCatalogQuery(parseCatalogQuery(plan, this.dialogueMode === 'model-first' ? 'model' : 'strict'), nextCatalog);
                     semanticRead = true;
                     nextCatalog = routed.state ?? previousCatalog;
                     return routed.answer!;
@@ -177,22 +185,23 @@ export class CustomerCore {
                     memoryHandled = true;
                     memoryClarified = !!decision.allowResume;
                     return decision.changes.length ? memoryConfirmation(before, candidate, !!this.store, decision.changes) : decision.answer;
-                  } }, support);
+                  } }, support, this.dialogueMode, this.courseRequests?.support(identity), capabilities);
               } catch (error) {
                 if (error instanceof DemoFailure && /429/.test(error.message)) {
                   const last = [...session.messages].reverse().find(m => m.role === 'assistant');
                   const wait = rateLimitWaitMs(last?.errorMessage || '');
                   this.modelCooldowns.set(cooldownKey, this.now() + wait);
                   if (this.modelCooldowns.size > 40) this.modelCooldowns.delete(this.modelCooldowns.keys().next().value!);
-                  if (!catalog) throw new DemoFailure(`โมเดลถูกจำกัดการใช้งาน (429) รอประมาณ ${Math.ceil(wait / 1000)} วินาทีแล้วลองใหม่ ระหว่างนี้ FAQ ยังใช้ได้`);
+                  if (!catalog) throw new DemoFailure(`โมเดลถูกจำกัดการใช้งาน (429) รอประมาณ ${Math.ceil(wait / 1000)} วินาทีแล้วลองใหม่${this.dialogueMode === 'rules-first' ? ' ระหว่างนี้ FAQ ยังใช้ได้' : ''}`);
                 }
                 if (!catalog) throw error;
                 // Ranked, host-rendered facts remain useful when model ordering fails.
                 this.log({ requestId, channel: identity.channel, outcome: 'catalog_model_fallback', category: failureCategory(error) });
                 reply = renderCatalog(catalog);
               }
-              if (memoryRequest && !memoryHandled) reply = 'ยังไม่ได้บันทึกข้อมูลเพิ่มครับ กรุณาระบุข้อเท็จจริงที่ต้องการให้จำอย่างชัดเจน';
               renderedAnswer = reply;
+              // The model sees the grounded answer on the next turn, not just its own topic ID.
+              if (this.dialogueMode === 'model-first' && (semanticRead || topicForAnswer(reply) || reply === requestCapabilityAnswer || reply === renderCapabilities(capabilities))) hostTurn = true;
               if (!memoryHandled) nextTopic = semanticRead ? routed?.topic : catalog ? catalogTopicForAnswer(reply, catalog) : routed?.topic ?? topicForAnswer(reply);
               if (!semanticRead && catalog && nextCatalog && nextTopic?.startsWith('catalog:')) nextCatalog = { ...nextCatalog, shownIds: nextTopic.slice(8).split(',') };
             }
@@ -217,7 +226,7 @@ export class CustomerCore {
           } catch (error) { outcome = 'error'; category = failureCategory(error); throw error; }
           finally {
             current.touched = this.now();
-            this.log({ requestId, channel: identity.channel, outcome, ...(turnSettings ? { settingsVersion: turnSettings.version } : {}), ...(category ? { category } : {}), elapsedMs: this.now() - started });
+            this.log({ requestId, channel: identity.channel, dialogueMode: this.dialogueMode, outcome, ...(turnSettings ? { settingsVersion: turnSettings.version } : {}), ...(category ? { category } : {}), elapsedMs: this.now() - started });
           }
         });
         current.tail = job.catch(() => {});

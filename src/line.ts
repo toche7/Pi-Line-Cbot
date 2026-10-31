@@ -30,9 +30,10 @@ type LineOptions = {
   secret: string; account: string; allowedUsers: Set<string>; dryRun: boolean;
   reply: (token: string, text: string) => Promise<void>;
   control?: ConversationControl;
-  core: Pick<CustomerCore, 'client'>;
+  core: Pick<CustomerCore, 'client'> & Partial<Pick<CustomerCore, 'faqWithoutModel'>>;
   log?: (record: object) => void;
   observe?: (event: MonitorEvent) => void;
+  observePendingUser?: (account: string, userId: string) => void;
   observeGroupId?: (groupId: string) => void;
   observeGroup?: (event: import('./line-groups.js').GroupObservation) => void;
   groupReplies?: import('./line-group-replies.js').LineGroupReplies;
@@ -55,6 +56,14 @@ export class LineAdapter {
     let body: any;
     try { body = JSON.parse(raw.toString('utf8')); } catch { return 400; }
     if (!body || !Array.isArray(body.events) || body.events.length > 20) return 400;
+    for (const event of body.events) {
+      if (event?.type === 'message' && event.mode !== 'standby' && event.source?.type === 'user'
+        && typeof event.source.userId === 'string' && /^U[0-9a-f]{32}$/i.test(event.source.userId)
+        && !this.options.allowedUsers.has(event.source.userId)) {
+        try { this.options.observePendingUser?.(this.options.account, event.source.userId); }
+        catch { this.options.log?.({ channel: 'line', outcome: 'pending_user_metadata_failed' }); }
+      }
+    }
     // Group events never enter the direct-chat path. A dedicated opt-in service
     // can respond to verified native mentions in explicitly enabled rooms only.
     for (const event of body.events) {
@@ -137,7 +146,7 @@ export class LineAdapter {
         } catch (error) {
           fallback = true;
           record('core_failed', failureCategory(error));
-          text = lineFailureReply(error);
+          text = lineFailureReply(error, this.options.core.faqWithoutModel ?? true);
         }
         if (!text.trim()) text = 'ยังไม่พบคำตอบที่ยืนยันได้ กรุณาดู https://cbtumu.net/faq/';
         if (this.closed) return;

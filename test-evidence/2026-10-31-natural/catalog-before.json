@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-30T23:24:43.269Z",
+  "base": "37114e8",
+  "environment": "Terminal core, model-first, temp stores, no LINE transport",
+  "requestCap": 2,
+  "provider": "groq",
+  "model": "qwen/qwen3.8-27b",
+  "version": "initial",
+  "limits": {
+    "inputChars": 2000,
+    "maxTokens": 800,
+    "lineTimeoutMs": 25000,
+    "terminalTimeoutMs": 45000,
+    "modelCalls": 4,
+    "toolCalls": 4
+  },
+  "status": "stopped",
+  "calls": 2,
+  "turns": [],
+  "trace": [
+    {
+      "plan": {
+        "intent": "catalog_query",
+        "operation": "list",
+        "scope": "all",
+        "query": "",
+        "fields": [
+          "name"
+        ],
+        "filters": [],
+        "limit": 10,
+        "order": "asc"
+      },
+      "tokens": 2324,
+      "stopReason": "stop"
+    },
+    {
+      "plan": {
+        "intent": "catalog_query",
+        "operation": "list",
+        "scope": "all",
+        "query": "",
+        "fields": [
+          "name"
+        ],
+        "filters": [],
+        "limit": 10,
+        "order": "asc"
+      },
+      "tokens": 3709,
+      "stopReason": "stop"
+    }
+  ],
+  "error": "โมเดลยังส่งรูปแบบคำตอบไม่ถูกต้องหลังซ่อมหนึ่งครั้ง ลองใหม่หรือ /reset ได้"
+}

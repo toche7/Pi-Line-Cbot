@@ -21,7 +21,14 @@ export function validCatalogState(value: unknown): value is CatalogState {
     && typeof s.query === 'string' && s.query.length <= 200 && ['list', 'price', 'summary', 'details'].includes(s.field)
     && (s.advice === undefined || validAdvice(s.advice)) && (s.readFields === undefined || validCourseFields(s.readFields));
 }
-export function parseCatalogQuery(value: any): CatalogQuery {
+export class CatalogQueryValidationError extends Error {}
+
+export function parseCatalogQuery(value: any, mode: 'strict' | 'model' = 'strict'): CatalogQuery {
+  // In the opt-in model-first experiment, [] means no filter, just like an omitted field.
+  // Never discard a nonempty filter or relax its allowed public fields/values.
+  if (mode === 'model' && Array.isArray(value?.filters) && value.filters.length === 0) {
+    value = { ...value }; delete value.filters;
+  }
   if (!value || !['list', 'count', 'price', 'sort_price', 'more', 'summary', 'advise', 'read'].includes(value.operation)
     || !['all', 'previous', 'search'].includes(value.scope) || (value.query !== undefined && (typeof value.query !== 'string' || value.query.length > 200))
     || (value.scope === 'search' && !value.query?.trim())
@@ -30,7 +37,10 @@ export function parseCatalogQuery(value: any): CatalogQuery {
     || (value.fields !== undefined && !validCourseFields(value.fields))
     || (value.filters !== undefined && !validCourseFilters(value.filters))
     || (value.limit !== undefined && (!Number.isInteger(value.limit) || value.limit < 1 || value.limit > 10))
-    || (value.order !== undefined && !['asc', 'desc'].includes(value.order))) throw new Error('Invalid catalog operation');
+    || (value.order !== undefined && !['asc', 'desc'].includes(value.order))) {
+    if (mode === 'model') throw new CatalogQueryValidationError('Invalid catalog operation');
+    throw new Error('Invalid catalog operation');
+  }
   return { operation: value.operation, scope: value.scope, query: value.query, limit: value.limit, order: value.order, fields: value.fields, filters: value.filters };
 }
 function search(query: string) {

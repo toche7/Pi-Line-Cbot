@@ -1,0 +1,19 @@
+✔ Thai paraphrases persist normalized preferences; temporary requests remain pending; profile updates are host-confirmed (77.568ms)
+✔ references use only a single immediately previous personal fact; ambiguity clarifies and reset/new topics cancel context (98.563208ms)
+✔ store failure never confirms or changes canonical memory; retry succeeds once the write succeeds (19.423167ms)
+✔ provider/malformed extraction cannot save or promise success; secrets and policy instructions are not retained (67.936083ms)
+✔ clarification permission expires and does not survive a new core; capacity cannot evict existing preferences (56.35925ms)
+✔ host guards reject foreign ownership, assistant facts, unrequested writes, fabricated evidence and identity overrides (0.577375ms)
+✔ signed LINE and Terminal adapters confirm actual stored facts and retain user/OA/channel isolation (27.231167ms)
+✔ semantic recall reads actual owner facts without changing them; later explicit saves still work (33.861291ms)
+✔ memory keyword does not override a semantic chat answer or permit an unsolicited save (35.848834ms)
+✔ recall cannot select another owner or carry write payloads; identities stay isolated (34.818458ms)
+✔ recall cancels pending write clarification instead of granting the next message write permission (37.8615ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1076.571375

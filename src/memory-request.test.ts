@@ -20,7 +20,7 @@ class FaultStore extends MemoryStore {
   fail = false;
   override save(key: string, memory: Memory) { if (this.fail) throw new Error('private write failure'); super.save(key, memory); }
 }
-function fixture(plans: any[], channel: 'terminal' | 'line' = 'line') {
+function fixture(plans: any[], channel: 'terminal' | 'line' = 'line', mode: 'rules-first' | 'model-first' = 'rules-first') {
   const dir = mkdtempSync(join(tmpdir(), 'cbot-semantic-memory-'));
   let clock = Date.now(); const store = new FaultStore(dir, () => clock), requests: string[] = [];
   const factory = async (manager?: import('@earendil-works/pi-coding-agent').SessionManager) => {
@@ -40,7 +40,7 @@ function fixture(plans: any[], channel: 'terminal' | 'line' = 'line') {
   };
   const identity: Identity = { channel, scope: channel === 'line' ? 'fixture:direct' : 'local', user: 'A' };
   const key = JSON.stringify([identity.channel, identity.scope, identity.user]);
-  const core = new CustomerCore(factory, 1000, undefined, () => clock, store); const client = core.client(identity);
+  const core = new CustomerCore(factory, 1000, undefined, () => clock, store, undefined, undefined, undefined, undefined, mode); const client = core.client(identity);
   const send = async (text: string) => { let answer = ''; await client.send(text, { text: s => { answer += s; }, status: () => {} }); return answer; };
   return { dir, store, core, client, identity, key, factory, requests, send, tick: (ms: number) => { clock += ms; },
     close: async () => { await core.dispose(); store.close(); rmSync(dir, { recursive: true, force: true }); } };
@@ -186,4 +186,63 @@ test('signed LINE and Terminal adapters confirm actual stored facts and retain u
     assert.match(text, /บันทึกแล้ว[\s\S]*สะดวกเรียนวันเสาร์/);
     assert.deepEqual(terminal.store.load(terminal.key).longTerm, ['สะดวกเรียนวันเสาร์']);
   } finally { await terminal.close(); }
+});
+
+
+test('semantic recall reads actual owner facts without changing them; later explicit saves still work', async () => {
+  const f = fixture([{ intent: 'memory', action: 'recall' },
+    { intent: 'memory', action: 'recall', fields: ['name'] }, save('สะดวกเรียนวันเสาร์')], 'line', 'model-first');
+  try {
+    const original = emptyMemory(Date.now()); original.profile.name = 'Memory-Fixture';
+    original.longTerm = ['ชอบตัวอย่างไทย']; original.summary.pending = ['พรุ่งนี้ค่อยเลือกคอร์ส'];
+    original.summary.notes = ['internal-summary-fixture']; f.store.save(f.key, original);
+    const answer = await f.send('จำไรได้บ้าง');
+    assert.match(answer, /Memory-Fixture/); assert.match(answer, /ชอบตัวอย่างไทย/); assert.match(answer, /พรุ่งนี้ค่อยเลือกคอร์ส/);
+    assert.doesNotMatch(answer, /internal-summary-fixture|ยังไม่ได้บันทึกข้อมูลเพิ่ม|บันทึกแล้ว/);
+    const name = await f.send('จำชื่อฉันได้ไหม');
+    assert.match(name, /Memory-Fixture/); assert.doesNotMatch(name, /ชอบตัวอย่างไทย/);
+    const after = f.store.load(f.key);
+    assert.deepEqual(after.profile, original.profile); assert.deepEqual(after.longTerm, original.longTerm);
+    assert.deepEqual(after.summary, original.summary);
+    assert.match(await f.send('ช่วยจำว่าฉันสะดวกเรียนวันเสาร์'), /บันทึกแล้ว/);
+    assert.deepEqual(f.store.load(f.key).longTerm, ['ชอบตัวอย่างไทย', 'สะดวกเรียนวันเสาร์']);
+  } finally { await f.close(); }
+});
+
+test('memory keyword does not override a semantic chat answer or permit an unsolicited save', async () => {
+  const f = fixture([{ intent: 'chat', reply: 'ค่อย ๆ ทบทวนทีละนิดได้ครับ' },
+    { intent: 'chat', reply: 'อยากทบทวนส่วนไหนครับ' }, save('ชอบออนไลน์')], 'terminal', 'model-first');
+  try {
+    assert.equal((await f.send('เรื่องนี้จำยากจัง')).trim(), 'ค่อย ๆ ทบทวนทีละนิดได้ครับ');
+    assert.equal((await f.send('จำไรได้บ้าง')).trim(), 'อยากทบทวนส่วนไหนครับ');
+    assert.doesNotMatch(await f.send('จำได้ไหมว่าฉันชอบออนไลน์'), /บันทึกแล้ว/);
+    assert.deepEqual(f.store.load(f.key).longTerm, []);
+  } finally { await f.close(); }
+});
+
+test('recall cannot select another owner or carry write payloads; identities stay isolated', async () => {
+  const original = emptyMemory(Date.now()); original.profile.name = 'Only-A';
+  for (const extra of [{ owner: 'A' }, { explicit: true }, { entries: [] }, { fields: ['recent'] }, { fields: [] }, { fields: null }, { fields: ['name', 'name'] }]) {
+    assert.throws(() => decideMemory({ intent: 'memory', action: 'recall', ...extra }, 'จำอะไรได้บ้าง', original));
+  }
+  const f = fixture(Array.from({ length: 3 }, () => ({ intent: 'memory', action: 'recall' })), 'line', 'model-first');
+  try {
+    f.store.save(f.key, original);
+    assert.match(await f.send('จำอะไรได้บ้าง'), /Only-A/);
+    for (const identity of [{ ...f.identity, user: 'B' }, { ...f.identity, channel: 'terminal' as const }]) {
+      let reply = ''; await f.core.client(identity).send('จำอะไรได้บ้าง', { text: s => { reply += s; }, status: () => {} });
+      assert.match(reply, /ยังไม่มีข้อมูล/); assert.doesNotMatch(reply, /Only-A/);
+    }
+  } finally { await f.close(); }
+});
+
+test('recall cancels pending write clarification instead of granting the next message write permission', async () => {
+  const f = fixture([{ intent: 'memory', action: 'clarify', explicit: true },
+    { intent: 'memory', action: 'recall' }, save('ชอบออนไลน์')], 'terminal', 'model-first');
+  try {
+    await f.send('จำอันนั้นไว้');
+    assert.match(await f.send('จำอะไรได้บ้าง'), /ยังไม่มีข้อมูล/);
+    assert.doesNotMatch(await f.send('ฉันชอบออนไลน์'), /บันทึกแล้ว/);
+    assert.deepEqual(f.store.load(f.key).longTerm, []);
+  } finally { await f.close(); }
 });

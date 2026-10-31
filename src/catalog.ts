@@ -30,6 +30,12 @@ const aliases: Record<string, string[]> = {
 };
 const stop = new Set(['หลักสูตร', 'คอร์ส', 'course', 'courses', 'เรียน', 'อยาก', 'สนใจ', 'แนะนำ', 'อะไร', 'มี', 'บ้าง', 'ไหม', 'ครับ', 'ค่ะ', 'ราคา', 'เท่าไร', 'เท่าไหร่', 'เปรียบเทียบ', 'compare', 'and', 'with', 'for', 'the', 'please',
   'ขอ', 'ดู', 'ด้วย', 'ตัว', 'อัน', 'รายการ', 'ทุก', 'แต่ละ', 'ทั้งหมด', 'จำนวน', 'กี่', 'มากกว่า', 'แพง', 'ถูก', 'ที่สุด', 'ได้', 'ตรวจสอบ', 'ทำไม', 'ไม่', 'ละ', 'หน่อย', 'สรุป', 'เขียน', 'กระชับ', 'บอก', 'รู้', 'ช่วย', 'เพิ่มเติม', 'list', 'count', 'price', 'prices', 'sort', 'all', 'more', 'most', 'expensive', 'cheapest', 'highest', 'lowest']);
+
+// A reply consisting of a known name/alias is a selection, unlike a question mentioning it.
+export function isExactCourseName(query: string) {
+  const q = normalize(query);
+  return courseCatalog.courses.some(c => [c.name, ...(aliases[c.id] ?? [])].some(name => normalize(name) === q));
+}
 function terms(query: string) {
   const words = [...new Intl.Segmenter('th', { granularity: 'word' }).segment(normalize(query))]
     .filter(s => s.isWordLike).map(s => s.segment).filter(s => s.length > 1 && !stop.has(s));

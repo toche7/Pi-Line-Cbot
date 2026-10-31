@@ -4,7 +4,7 @@ import { randomUUID, randomBytes } from 'node:crypto';
 import type { Identity } from './core.js';
 import type { CatalogState } from './catalog-query.js';
 import { courseCatalog, type Course } from './course-catalog.js';
-import { retrieveCourses } from './catalog.js';
+import { isExactCourseName, retrieveCourses } from './catalog.js';
 import { safeMemoryInput } from './memory-request.js';
 
 export type CourseRequest = {
@@ -76,13 +76,33 @@ export class CourseRequestStore {
 
 type Draft = { id: string; kind: CourseRequest['kind']; courses: Course[]; course?: Course; message?: string; token?: string; expires: number; record?: CourseRequest };
 const guidance = 'ใช้ /book ชื่อหลักสูตร เพื่อขอจอง หรือ /contact เรื่องที่ต้องการฝาก ให้ตรวจสรุปและยืนยันก่อนบันทึก';
-export const mayRequestCourseAction = (q: string) => !/ไม่อยาก|ไม่ต้อง|อย่าจอง|ยังไม่|ไม่สนใจ|ยกเลิก/.test(q)
-  && (/จอง|สำรองที่|ฝากเรื่อง|ส่งเรื่อง|ส่งข้อมูลให้ทีมงาน|(?:ทีมงาน|เจ้าหน้าที่).{0,12}ติดต่อกลับ/i.test(q));
+export function mayRequestCourseAction(text: string) {
+  const q = text.trim();
+  if (/ไม่อยาก|ไม่ต้อง|อย่าจอง|ยังไม่|ไม่สนใจ|ยกเลิก/.test(q)) return false;
+  // Host actions require an explicit request, not a keyword inside a capability question/quote.
+  const action = q.match(/^(?:(?:ผม|ฉัน|เรา)\s*)?(?:(?:อยาก|ต้องการ|ขอ|ช่วย)\s*)?(จอง|สำรองที่|ฝากเรื่อง|ส่งเรื่อง|ส่งข้อมูลให้ทีมงาน)([\s\S]*)$/);
+  if (action) return !/^(?:ได้|ไม่ได้|ทำได้|คือ|หมายถึง|ยังไง|อย่างไร|อย่างเดียว|เท่านั้น|หรือ|ไหม|มั้ย|ใช่ไหม)/.test(action[2].trim());
+  return /^(?:(?:ผม|ฉัน|เรา)\s*)?(?:ขอ|ช่วย|ต้องการ|อยาก)ให้(?:ทีมงาน|เจ้าหน้าที่).{0,12}ติดต่อกลับ/.test(q);
+}
+
+export type RequestSupport = { enabled: true; pendingStage?: 'booking-course' | 'contact-note' | 'confirmation' };
+export const requestCapabilityTopic = { id: 'host:course-requests', title: 'บอตรับคำขอจอง/ฝากเรื่องได้ แต่ไม่สมัครเรียนหรือยืนยันที่นั่งแทน' };
+export const requestCapabilities = Object.freeze({
+  prepareBookingRequest: true, prepareContactRequest: true, saveOnlyAfterHostConfirmation: true,
+  completeEnrollment: false, createWebsiteAccount: false, confirmSeat: false, pay: false, automaticallyDispatchToStaff: false,
+});
+export const requestCapabilityAnswer = 'รับคำขอจองได้ครับ ใช้ /book ชื่อคอร์ส หรือฝากเรื่องด้วย /contact ข้อความ ระบบจะให้ตรวจสรุปและยืนยันก่อนบันทึกคำขอให้ทีมงาน ยังไม่ส่งต่ออัตโนมัติ ไม่ใช่การยืนยันที่นั่ง และยังสมัครสมาชิก ลงทะเบียนเรียน หรือชำระเงินแทนไม่ได้ครับ';
 
 export class CourseRequests {
   private drafts = new Map<string, Draft>();
   private receipts = new Map<string, { token: string; record: CourseRequest; expires: number }>();
   constructor(readonly store: CourseRequestStore, private now = () => Date.now()) {}
+  support(owner: Identity): RequestSupport {
+    const draft = this.drafts.get(ownerKey(owner));
+    return { enabled: true, pendingStage: !draft || draft.expires <= this.now() ? undefined
+      : draft.kind === 'booking' && !draft.course ? 'booking-course'
+      : draft.kind === 'contact' && !draft.message ? 'contact-note' : 'confirmation' };
+  }
   cancel(owner: Identity) { const key = ownerKey(owner); this.drafts.delete(key); this.receipts.delete(key); }
   forget(owner: Identity) { this.store.deleteOwner(owner); this.cancel(owner); }
   handle(owner: Identity, text: string, catalog?: CatalogState): string | undefined {
@@ -148,10 +168,14 @@ export class CourseRequests {
       return;
     }
     if (draft.kind === 'booking' && !draft.course) {
-      if (safeMemoryInput(q) !== q) return 'กรุณาระบุเฉพาะชื่อหลักสูตร ไม่ต้องใส่ข้อมูลส่วนตัวหรือข้อมูลชำระเงิน';
       const number = /^\d+$/.test(q) ? Number(q) - 1 : -1;
       if (number >= 0 && number < draft.courses.length) { draft.course = draft.courses[number]; return this.preview(draft); }
-      return this.chooseCourse(draft, q);
+      const name = q.replace(/^(?:เลือก|เอา|ขอ)(?:หลักสูตร|คอร์ส)?\s*/, '')
+        .replace(/\s*(?:นะครับ|นะคะ|ครับ|ค่ะ|คะ)[.!\s]*$/, '').trim();
+      if (isExactCourseName(name)) return this.chooseCourse(draft, name);
+      // Keep the unsigned draft until expiry, but let ordinary dialogue/questions continue.
+      // Do not turn an arbitrary mention or a question about a course into a selection.
+      return;
     }
     if (draft.kind === 'contact' && !draft.message) {
       if (!noteOK(q)) return 'กรุณาสรุปเรื่องไม่เกิน500ตัวอักษรโดยไม่ใส่ข้อมูลลับหรือข้อมูลติดต่อ';

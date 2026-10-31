@@ -11,6 +11,7 @@ import { createServer } from 'node:http';
 import { adminHandler } from './admin.js';
 import { ConversationMonitor } from './monitor.js';
 import { CustomerCore } from './core.js';
+import { createCustomerCore } from './customer-runtime.js';
 import { LineAdapter, lineReply, webhookHandler } from './line.js';
 import { requestTimeout } from './diagnostics.js';
 import { MemoryStore } from './memory.js';
@@ -20,12 +21,15 @@ import { CustomerStore } from './customers.js';
 import { LineProfiles } from './line-profile.js';
 import { LineGroupStore, LineGroupService } from './line-groups.js';
 import { LineGroupReplies } from './line-group-replies.js';
+import { PendingLineUsers } from './line-pending-users.js';
+import { LineAccess } from './line-access.js';
 
 async function start() {
   const secret = process.env.LINE_CHANNEL_SECRET || '';
   const token = process.env.LINE_CHANNEL_ACCESS_TOKEN || '';
   const dryRun = process.env.LINE_DRY_RUN !== 'false';
   const allowedUsers = new Set((process.env.LINE_ALLOWED_USER_IDS || '').split(',').map(s => s.trim()).filter(Boolean));
+  const lineAccess = new LineAccess(resolve('runtime/line-access'), process.env.LINE_CHANNEL_ID || '', allowedUsers);
   const port = Number(process.env.PORT || '3000');
   const host = process.env.HOST || '127.0.0.1';
   if (!secret || !process.env.LINE_CHANNEL_ID || (!dryRun && (!token || !allowedUsers.size))) {
@@ -43,8 +47,8 @@ async function start() {
   const responseSettingsStore = new ResponseSettingsStore(resolve('runtime/bot-settings'));
   configureResponseSettings(responseSettingsStore);
   const responseSettings = new ResponseSettingsService(responseSettingsStore);
-  const core = new CustomerCore(undefined, timeout, log, undefined, store, undefined, requests, undefined, identity =>
-    identity.channel === 'line' && identity.scope === process.env.LINE_CHANNEL_ID + ':direct' ? { waiting: !!control.mode(JSON.stringify([process.env.LINE_CHANNEL_ID, identity.user])).waiting } : undefined);
+  const core = createCustomerCore({ timeoutMs: timeout, log, store, requests, humanSupport: identity =>
+    identity.channel === 'line' && identity.scope === process.env.LINE_CHANNEL_ID + ':direct' ? { waiting: !!control.mode(JSON.stringify([process.env.LINE_CHANNEL_ID, identity.user])).waiting } : undefined });
   const monitor = new ConversationMonitor(resolve('.line-monitor'));
   const monitorPort = Number(process.env.MONITOR_PORT || '3001');
   if (!Number.isInteger(monitorPort) || monitorPort < 1 || monitorPort > 65535 || monitorPort === port) throw new Error('Invalid monitor port');
@@ -63,10 +67,12 @@ async function start() {
   const groupMemory = new MemoryStore(resolve('runtime/line-group-memory'));
   const groupCore = new CustomerCore(undefined, timeout, log, undefined, groupMemory);
   const groupReplies = new LineGroupReplies(groupStore, groupCore, process.env.LINE_CHANNEL_ID || '', dryRun, lineReply(token), log);
-  const monitorServer = createServer(adminHandler(monitor, requestStore, customerStore, profiles, conversationService, news, knowledge, responseSettings, lineGroups));
+  const pendingLineUsers = new PendingLineUsers(resolve('runtime/line-pending-users'));
+  const monitorServer = createServer(adminHandler(monitor, requestStore, customerStore, profiles, conversationService, news, knowledge, responseSettings, lineGroups, { store: pendingLineUsers, account: process.env.LINE_CHANNEL_ID || '', allowedUsers, access: lineAccess }));
   monitorServer.requestTimeout = 10000;
   monitorServer.headersTimeout = 10000;
   const adapter = new LineAdapter({ secret, account: process.env.LINE_CHANNEL_ID || 'test-oa', allowedUsers, dryRun, core, control,
+    observePendingUser: (account, userId) => pendingLineUsers.record(account, userId),
     groupReplies, observeGroup: event => groupStore.observe(event), observe: event => monitor.record(event), reply: lineReply(token), log });
   const webhook = webhookHandler(adapter), media = newsPublicMedia(news);
   const server = createServer((req,res)=>{if(req.url?.startsWith('/news-media/'))return media(req,res);return webhook(req,res)});
@@ -77,6 +83,7 @@ async function start() {
     console.log(`ซีบอต local webhook: http://${host}:${port}/webhook/line`);
     console.log(`LINE dry run: ${dryRun}; allowlist configured: ${allowedUsers.size > 0}; no public deployment configured`);
     console.log('LINE persistent memory enabled; separate directory/lock from Terminal; retention 90 days');
+    console.log('Direct LINE conversation routing: model-first; group routing unchanged');
   });
   monitorServer.on('error', () => { console.error('Monitor server unavailable'); void stop(); process.exitCode = 1; });
   monitorServer.listen(monitorPort, '127.0.0.1', () => console.log(`ติดตามบทสนทนา: http://127.0.0.1:${monitorPort}`));

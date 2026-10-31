@@ -13,13 +13,16 @@ export function failureCategory(error: unknown): string {
   return 'core_failure';
 }
 
-export function lineFailureReply(error: unknown): string {
+export function lineFailureReply(error: unknown, faqWithoutModel = true): string {
+  const help = faqWithoutModel
+    ? 'ระหว่างนี้ยังถาม FAQ ได้ เช่น “สมัครสมาชิกอย่างไร” หรือดู https://cbtumu.net/faq/'
+    : 'ดูข้อมูลเบื้องต้นได้ที่ https://cbtumu.net/faq/';
   if (failureCategory(error) === 'memory_write') return 'ยังบันทึกข้อมูลเพิ่มไม่สำเร็จครับ ข้อมูลเดิมยังอยู่ กรุณาลองใหม่ และตรวจสิ่งที่บันทึกด้วย /memory';
   if (failureCategory(error) === 'model_rate_limit') {
-    return 'ขณะนี้โมเดลสนทนาถูกจำกัดโควตาชั่วคราว กรุณารอสักครู่แล้วลองใหม่ ระหว่างนี้ยังถาม FAQ ได้ เช่น “สมัครสมาชิกอย่างไร” หรือดู https://cbtumu.net/faq/';
+    return 'ขณะนี้โมเดลสนทนาถูกจำกัดโควตาชั่วคราว กรุณารอสักครู่แล้วลองใหม่ ' + help;
   }
-  if (failureCategory(error) === 'model_timeout') return 'โมเดลใช้เวลาตอบนานเกินไป กรุณาลองใหม่ ระหว่างนี้ยังถาม FAQ ได้ เช่น “สมัครสมาชิกอย่างไร” หรือดู https://cbtumu.net/faq/';
-  if (failureCategory(error) === 'model_format') return 'โมเดลจัดรูปแบบคำตอบไม่สำเร็จ กรุณาส่งข้อความใหม่อีกครั้ง ระหว่างนี้ยังถาม FAQ ได้ เช่น “สมัครสมาชิกอย่างไร” หรือดู https://cbtumu.net/faq/';
+  if (failureCategory(error) === 'model_timeout') return 'โมเดลใช้เวลาตอบนานเกินไป กรุณาลองใหม่ ' + help;
+  if (failureCategory(error) === 'model_format') return 'โมเดลจัดรูปแบบคำตอบไม่สำเร็จ กรุณาส่งข้อความใหม่อีกครั้ง ' + help;
   return 'ขณะนี้ซีบอตยังตอบไม่ได้ กรุณาลองใหม่ภายหลัง หรือติดต่อเจ้าหน้าที่ผ่าน https://cbtumu.net/faq/';
 }
 export function rateLimitWaitMs(raw: string): number {

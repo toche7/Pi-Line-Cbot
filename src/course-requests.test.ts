@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createHmac } from 'node:crypto';
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { CourseRequestStore, CourseRequests, type CourseRequest } from './course-requests.js';
+import { CourseRequestStore, CourseRequests, mayRequestCourseAction, type CourseRequest } from './course-requests.js';
 import { requestsAdminHandler } from './requests-admin.js';
 import { CustomerCore, type Identity } from './core.js';
 import { MemoryStore } from './memory.js';
@@ -74,6 +74,41 @@ test('confirmation is bound to user/OA/channel and expires; a restart discards u
     assert.equal(f.store.list().length, 0);
     const second = token(f.send('/book Excel')!); f.send('ขอคุยเรื่องอื่นก่อน');
     assert.match(f.send('/confirm-request ' + second)!, /ไม่มีคำขอ/);
+  } finally { f.close(); }
+});
+
+test('booking mentions and capability questions do not start requests; pending course selection does not trap ordinary dialogue', () => {
+  const f = fixture();
+  try {
+    for (const q of ['จองได้แต่สมัครไม่ได้ใช่ไหม', 'เธอจองให้ได้ไหม', 'ถ้าอยากจองต้องทำอย่างไร', 'ตัวอย่าง อยากจอง Excel', 'ยังไม่อยากจอง']) {
+      assert.equal(mayRequestCourseAction(q), false, q);
+      assert.equal(f.send(q), undefined, q);
+    }
+    for (const q of ['อยากจองคอร์ส Excel', 'ขอจอง Canva', 'จอง', 'ขอให้ทีมงานติดต่อกลับ']) assert.equal(mayRequestCourseAction(q), true, q);
+    assert.match(f.send('/book')!, /ต้องการขอจองหลักสูตรไหน/);
+    for (const q of ['จองได้แต่สมัครไม่ได้ใช่ไหม', 'เธอทำอะไรได้บ้าง', 'อ้าว', 'Excel เรียนเกี่ยวกับอะไร']) {
+      assert.equal(f.send(q), undefined, q);
+      assert.equal(f.requests.support(owner).pendingStage, 'booking-course');
+      assert.equal(f.store.list().length, 0);
+    }
+    const preview = f.send('เอา Excel ครับ')!;
+    assert.match(preview, /Microsoft Excel/); assert.equal(f.store.list().length, 0);
+    f.send('/confirm-request ' + token(preview));
+    assert.equal(f.store.list().length, 1);
+  } finally { f.close(); }
+});
+
+test('unrelated dialogue preserves pending numbered course choices without treating a question as a selection', () => {
+  const f = fixture();
+  try {
+    assert.match(f.send('/book n8n')!, /เลือกหลักสูตร/);
+    assert.equal(f.send('n8n มีใครสอน'), undefined);
+    assert.equal(f.send('เธอทำอะไรได้บ้าง'), undefined);
+    const preview = f.send('2')!;
+    assert.match(preview, /Workshop/);
+    assert.equal(f.store.list().length, 0);
+    f.send('/confirm-request ' + token(preview));
+    assert.equal(f.store.list().length, 1);
   } finally { f.close(); }
 });
 

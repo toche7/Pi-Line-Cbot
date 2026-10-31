@@ -83,7 +83,8 @@ async function main() {
       child.on('error', () => { exited = true; });
       child.on('exit', () => { exited = true; });
       const deadline = Date.now() + 20000;
-      while (list === null && !exited && !interrupted && Date.now() < deadline) {
+      // The local API can start before ngrok has registered its public tunnel.
+      while ((list === null || !list.some(t => t.config?.addr === upstream && t.public_url?.startsWith('https://'))) && !exited && !interrupted && Date.now() < deadline) {
         await new Promise(resolve => setTimeout(resolve, 500));
         list = await tunnels();
       }
