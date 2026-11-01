@@ -81,7 +81,9 @@ test('HTTP Google flow, API role/CSRF gates, replayed bodies, actor context, rev
   f.store.mutate(owner,{action:'invite',revision:f.store.snapshot().revision,email:'staff@example.test',role:'staff',enabled:true,extras:[]});
   nextIdentity='staff-sub';nextEmail='staff@example.test';const staffCookie=await login(),staffMe=await(await fetch(base+'/auth/me',{headers:{Cookie:staffCookie}})).json() as any;
   const sh={Cookie:staffCookie,Origin:base,'X-Staff-Token':staffMe.csrf,'Content-Type':'application/json'};
-  for(const path of ['/api/staff','/api/response-settings','/api/knowledge','/api/system-status','/api/line-pending-users','/api/news'])assert.equal((await fetch(base+path,{headers:sh})).status,403,path);
+  for(const path of ['/api/staff','/api/response-settings','/api/knowledge','/api/system-status','/api/line-pending-users','/api/news','/api/browse/staff?page=1','/api/browse/staff-history?q=owner','/api/browse/knowledge?selected=fixture','/api/browse/news-recipients?selected=fixture','/api/browse/grants?page=1'])assert.equal((await fetch(base+path,{headers:sh})).status,403,path);
+  assert.equal((await fetch(base+'/api/browse/customers?page=2&q=fixture',{headers:sh})).status,200);
+  assert.equal((await fetch(base+'/api/browse/customers?size=9999',{headers:sh})).status,400);
   assert.equal((await fetch(base+'/api/response-settings',{method:'POST',headers:sh,body:JSON.stringify({action:'apply',role:'admin'})})).status,403);
   const staff=f.store.snapshot().accounts.find(a=>a.subject==='staff-sub')!;
   f.store.mutate(owner,{action:'update',revision:f.store.snapshot().revision,id:staff.id,role:'content',enabled:true,extras:[]});

@@ -1,0 +1,9 @@
+# Explicit allowlist: local secrets, operational data and research never enter build context.
+**
+!Dockerfile
+!.dockerignore
+!package.json
+!package-lock.json
+!tsconfig.json
+!src/
+!src/**

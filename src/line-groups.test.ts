@@ -100,3 +100,19 @@ test('room API enforces local access, CSRF and refresh-only operations; integrat
     assert.ok(html.includes('/api/line-groups')); assert.equal((html.match(/role="tab"/g) ?? []).length, 5);
   } finally { server.closeAllConnections(); await new Promise<void>(resolve => server.close(() => resolve())); f.clean(); }
 });
+
+test('room mode revisions persist independently of incoming messages, reject stale changes and departed rooms', () => {
+  const f=setup();try{
+    f.store.observe({groupId,type:'join',at:new Date(f.now()).toISOString()});
+    const saved=f.store.setReplyMode(groupId,'cbot','initial','staff:owner');
+    f.store.observe({groupId,type:'message',eventId:'keep',userId,text:'retain context',at:new Date(f.now()).toISOString()});
+    assert.equal(f.store.modeRevision(groupId),saved.revision);
+    assert.throws(()=>f.store.setReplyMode(groupId,'off','initial'),/เปลี่ยนโหมด/);
+    f.store.setReplyMode(groupId,'off',saved.revision);
+    const restored=new LineGroupStore(f.root,'oa',f.now);
+    assert.equal(restored.replyMode(groupId),undefined);assert.equal(restored.list()[0].messages?.[0].text,'retain context');
+    assert.throws(()=>restored.setReplyMode(groupId,'invalid' as any,restored.modeRevision(groupId)),/ไม่ถูกต้อง/);
+    f.advance(1);restored.observe({groupId,type:'leave',at:new Date(f.now()).toISOString()});
+    assert.throws(()=>restored.setReplyMode(groupId,'mention',restored.modeRevision(groupId)),/ออกจากห้อง/);
+  }finally{f.clean()}
+});

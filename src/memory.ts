@@ -92,11 +92,11 @@ export function memoryManager(memory: Memory): SessionManager {
 export class MemoryStore {
   private lock: string;
   private closed = false;
-  constructor(readonly root: string, private now = () => Date.now()) {
+  constructor(readonly root: string, private now = () => Date.now(), lockFile?: string) {
     mkdirSync(root, { recursive: true, mode: 0o700 });
     if (lstatSync(root).isSymbolicLink()) throw new DemoFailure('Memory directory must not be a symlink.');
     chmodSync(root, 0o700);
-    this.lock = join(root, '.lock');
+    this.lock = lockFile || join(root, '.lock');
     if (existsSync(this.lock)) {
       if (lstatSync(this.lock).isSymbolicLink()) throw new DemoFailure('Unsafe memory lock.');
       const pid = Number(readFileSync(this.lock, 'utf8'));

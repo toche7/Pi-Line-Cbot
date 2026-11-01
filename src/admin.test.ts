@@ -14,7 +14,7 @@ test('unified admin serves both panels and APIs on one origin with existing acce
     const handler = adminHandler(new ConversationMonitor(join(dir, 'monitor')), new CourseRequestStore(join(dir, 'requests')));
     const request = (url: string, host = '127.0.0.1:3001') => {
       let status = 0, body = '';
-      handler({ url, method: 'GET', headers: { host } } as IncomingMessage,
+      handler({ url, method: 'GET', headers: { host }, socket: {remoteAddress:'127.0.0.1'} } as IncomingMessage,
         { writeHead(n: number) { status = n; return this; }, end(s = '') { body = s; } } as unknown as ServerResponse);
       return { status, body };
     };
@@ -23,12 +23,14 @@ test('unified admin serves both panels and APIs on one origin with existing acce
     assert.match(root.body, /role="tablist"/);
     assert.match(root.body, /id="requests-search"/);
     assert.match(root.body, /fetch\('\/api\/requests'\)/);
-    assert.match(root.body, /fetch\('\/api\/conversations'\)/);
+    assert.match(root.body, /CBOT_PAGES\.read\('conversations'/);
     assert.doesNotMatch(root.body, /<iframe|127\.0\.0\.1:3002/);
-    for (const url of ['/api/monitor', '/api/requests']) {
+    for (const url of ['/api/monitor', '/api/requests','/api/browse/requests?page=1&size=25']) {
       assert.equal(request(url).status, 200);
       assert.equal(request(url, 'foreign.invalid').status, 403);
     }
     assert.deepEqual(JSON.parse(request('/api/requests').body).requests, []);
+    const paged=JSON.parse(request('/api/browse/requests?page=99').body);assert.equal(paged.pagination.page,1);assert.equal(paged.pagination.total,0);
+    assert.equal(request('/api/browse/requests?size=1000000').status,400);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });

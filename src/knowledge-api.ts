@@ -33,7 +33,7 @@ export function knowledgeHandler(store: KnowledgeStore, token: string) {
         return reply(200,{revision:s.revision,digest:knowledgeDigest(s.draft),draft:publicAnswer(input.query,draft) ?? unknownAnswer,published:publicAnswer(input.query,active) ?? unknownAnswer,
           draftStatus:searchKnowledge(input.query,draft).status,publishedStatus:searchKnowledge(input.query,active).status, scope:'ตัวค้นและคำตอบ FAQ เท่านั้น ไม่จำลองบทสนทนา ความจำ คำขอ หรือหลักสูตร ไม่เรียกโมเดลและไม่ส่ง LINE'});
       }
-      store.mutate(input); return reply(200,knowledgeSnapshot(store));
+      store.mutate(input); return reply(200,req.headers['x-paged-reply']==='1'?{ok:true,revision:store.snapshot().revision}:knowledgeSnapshot(store));
     } catch (e) { return reply(e instanceof KnowledgeError ? e.status : 503,{error:e instanceof KnowledgeError ? e.message : 'อ่านหรือบันทึกความรู้ไม่ได้ ข้อมูลใช้งานเดิมยังคงอยู่'}); }
   };
 }

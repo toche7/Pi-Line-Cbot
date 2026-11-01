@@ -111,3 +111,5 @@ Git local baseline เริ่มจาก `31365a3`; .env/secrets/runtime data
 ### จัดการบอต
 
 เปิด [จัดการบอต](http://127.0.0.1:3001/#bot) บนเว็บเดิม ส่วนตั้งค่าการตอบอยู่บนและความรู้บอตอยู่ล่าง แก้FAQผ่านdraft/review/publish/rollback และตั้งmodel/บุคลิก/limitsผ่านdraft/ลอง/ตรวจ/ยืนยันใช้จริงได้ โดยต้องให้เจ้าของยืนยันเอง การลองโมเดลใช้providerจริงและquotaแต่ไม่ส่งLINE รายละเอียด [KM_GUIDE.md](./KM_GUIDE.md) และ [RESPONSE_SETTINGS_GUIDE.md](./RESPONSE_SETTINGS_GUIDE.md) ค่าใช้งานจริงยังเป็นinitialเดิมหลังเปิดฟังก์ชัน ไม่ได้applyค่าทดสอบให้เอง
+
+- [การแบ่งหน้าและขอบเขตการรองรับรายการจำนวนมาก](PAGINATION_GUIDE.md)

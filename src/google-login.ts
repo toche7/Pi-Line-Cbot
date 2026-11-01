@@ -1,6 +1,7 @@
 import { OAuth2Client, CodeChallengeMethod } from 'google-auth-library';
 import { createHash, randomBytes } from 'node:crypto';
 import type { StaffPrincipal } from './staff-policy.js';
+import { publicOrigin } from './deployment.js';
 
 export type GoogleLoginConfig = { clientId: string; clientSecret: string; redirectUri: string };
 export function googleLoginConfig(env: NodeJS.ProcessEnv): GoogleLoginConfig | undefined {
@@ -9,8 +10,8 @@ export function googleLoginConfig(env: NodeJS.ProcessEnv): GoogleLoginConfig | u
   if (values.some(v => !v?.trim())) throw Error('Google login configuration is incomplete');
   const [clientId, clientSecret, redirectUri] = values as string[];
   const url = new URL(redirectUri);
-  // Current admin APIs intentionally remain loopback-only. Hosting is a separate task.
-  if (url.origin !== 'http://127.0.0.1:3001' || url.pathname !== '/auth/google/callback'
+  const origin = env.DEPLOYMENT_MODE === 'cloud' ? publicOrigin(env.PUBLIC_BASE_URL || '') : 'http://127.0.0.1:3001';
+  if (url.origin !== origin || url.pathname !== '/auth/google/callback'
     || url.username || url.password || url.search || url.hash) throw Error('Unsupported admin callback');
   return { clientId, clientSecret, redirectUri };
 }

@@ -130,3 +130,14 @@ test('real core group identity uses dedicated persistent memory and cannot load 
   assert.ok(readdirSync(join(f.dir,'group-memory')).length>0);
  }finally{await privateCore.dispose();await groupCore.dispose();privateStore.close();groupStore.close();f.clean()}
 });
+
+test('changing mode off then on while generating cancels the old reply, without sending to LINE',async()=>{
+ const f=setup();let begin!:()=>void,release!:()=>void,sent=0;
+ const started=new Promise<void>(r=>begin=r),waiting=new Promise<void>(r=>release=r);
+ const replies=new LineGroupReplies(f.store,{client:()=>({send:async(_p,out)=>{begin();await waiting;out.text('old answer')},abort:async()=>{}})},'oa',false,async()=>{sent++});
+ try{
+  replies.accept(event('changing'),botId);await started;
+  f.store.setReplyMode(groupId,'off',f.store.modeRevision(groupId));f.store.enableMentions(groupId);release();await replies.drain();
+  assert.equal(sent,0);assert.equal(f.store.list().find(r=>r.groupId===groupId)?.messages?.find(m=>m.eventId==='changing'&&m.direction==='out')?.status,'cancelled');
+ }finally{release?.();replies.close();await replies.drain();f.clean()}
+});

@@ -9,7 +9,7 @@ export class NewsWorker {
   private stopped = false;
   private fd?: number;
   private lock: string;
-  constructor(private service: NewsService, private onError: () => void = () => {}) { this.lock = join(service.store.root, '.worker-lock'); }
+  constructor(private service: NewsService, private onError: () => void = () => {}, lockFile?: string) { this.lock = lockFile || join(service.store.root, '.worker-lock'); }
   start() {
     if (this.fd !== undefined) throw Error('News worker already started');
     this.fd = openSync(this.lock, 'wx', 0o600);

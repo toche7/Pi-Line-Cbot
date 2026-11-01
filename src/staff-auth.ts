@@ -5,11 +5,19 @@ import { GoogleStaffLogin, googleIdentityClient, type GoogleLoginConfig, type Go
 import { StaffStore, StaffError } from './staff-store.js';
 import { hasPermission, type Permission, type StaffPrincipal } from './staff-policy.js';
 import { runAsStaff } from './staff-context.js';
+import { pageQuery } from './pagination.js';
 export type AdminRequestHandler = (req: IncomingMessage, res: ServerResponse) => unknown;
 const cookie = (req: IncomingMessage, key: string) => (req.headers.cookie || '').split(';').map(v => v.trim()).find(v => v.startsWith(key + '='))?.slice(key.length + 1) || '';
 const send = (res: ServerResponse, status: number, data: unknown) => res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' }).end(JSON.stringify(data));
 const loginPage = `<!doctype html><html lang="th"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>เข้าสู่ระบบ · CBot</title><style>body{font:17px system-ui;background:#eef4f8;color:#163249;margin:0;padding:12vh 6%}main{max-width:480px;margin:auto;padding:32px;background:white;border:1px solid #dce6ef;border-radius:16px}a{display:inline-block;background:#176e65;color:white;padding:12px 20px;border-radius:8px;text-decoration:none}</style><main><h1>CBot · Care Center</h1><h2>เข้าสู่ระบบเจ้าหน้าที่</h2><p>ใช้บัญชี Google ที่ผู้ดูแลระบบอนุมัติไว้ บัญชีลูกค้า LINE ไม่ใช่บัญชีเจ้าหน้าที่</p><a href="/auth/google/start">เข้าสู่ระบบด้วย Google</a></main></html>`;
 export function routePermission(path: string, method: string, action?: unknown): Permission | undefined {
+  if(path.startsWith('/api/browse/')){
+    if(method!=='GET')return;
+    const aliases:Record<string,string>={customers:'/api/customers',conversations:'/api/conversations',requests:'/api/requests',news:'/api/news','news-deliveries':'/api/news','news-recipients':'/api/news','news-history':'/api/news',rooms:'/api/line-groups',pending:'/api/line-pending-users',grants:'/api/line-pending-users',staff:'/api/staff','staff-history':'/api/staff',membership:'/api/customers',options:'/api/customers'};
+    const resource=path.slice('/api/browse/'.length);
+    if(['knowledge','knowledge-changes','knowledge-history','knowledge-versions','knowledge-version'].includes(resource))return 'knowledge.draft';
+    const alias=aliases[resource];return alias?routePermission(alias,'GET'):undefined;
+  }
   if (path === '/api/staff') return 'staff.manage';
   if (path === '/api/response-settings') return 'ai.manage';
   if (path === '/api/system-status' || path === '/api/system-status/check') return 'system.inspect';
@@ -24,6 +32,7 @@ export function routePermission(path: string, method: string, action?: unknown):
   }
   if (path === '/api/conversations') return method === 'GET' ? 'work.read' : ['take','release','send'].includes(String(action)) ? 'conversation.takeover' : undefined;
   if (['/api/overview','/api/monitor'].includes(path)) return method === 'GET' ? 'work.read' : undefined;
+  if (path === '/api/line-groups' && method === 'POST' && action === 'set-reply-mode') return 'ai.manage';
   if (['/api/customers','/api/requests','/api/line-groups'].includes(path)) return method === 'GET' ? 'work.read' : 'work.write';
 }
 export class StaffAuth {
@@ -40,12 +49,13 @@ export class StaffAuth {
   }
   private async handle(req: IncomingMessage, res: ServerResponse, next: AdminRequestHandler, page: (principal: StaffPrincipal, csrf: string) => string) {
     const host = new URL(this.origin).host;
-    if (!['127.0.0.1','::1','::ffff:127.0.0.1'].includes(req.socket.remoteAddress || '') || req.headers.host !== host) return send(res, 403, { error: 'อนุญาตเฉพาะเว็บหลังบ้านบนเครื่องนี้' });
+    const secure = this.origin.startsWith('https://');
+    if ((!secure && !['127.0.0.1','::1','::ffff:127.0.0.1'].includes(req.socket.remoteAddress || '')) || req.headers.host !== host) return send(res, 403, { error: 'Host ของเว็บหลังบ้านไม่ถูกต้อง' });
     let url: URL; try { url = new URL(req.url || '/', this.origin); } catch { return send(res, 400, { error: 'URL ไม่ถูกต้อง' }); }
     if (url.origin !== this.origin) return send(res, 403, { error: 'Origin ไม่ถูกต้อง' });
     const path = url.pathname;
     const session = cookie(req, 'cbot_staff_session');
-    const setCookie = (key: string, value: string, maxAge: number) => `${key}=${value}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${maxAge}`;
+    const setCookie = (key: string, value: string, maxAge: number) => `${key}=${value}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${maxAge}${secure ? '; Secure' : ''}`;
     if (path === '/auth/google/callback' && req.method === 'GET') {
       try {
         const result = await this.login.finish(cookie(req, 'cbot_staff_flow'), url.searchParams.get('state') || '', url.searchParams.get('code') || '');
@@ -72,7 +82,8 @@ export class StaffAuth {
     if (path === '/auth/logout' && req.method === 'POST') { this.login.logout(session); res.setHeader('Set-Cookie', setCookie('cbot_staff_session','',0)); return send(res, 200, { ok: true }); }
     if (path === '/auth/me' && req.method === 'GET' && !url.search) return send(res,200,{ principal, csrf });
     if (path === '/' && req.method === 'GET' && !url.search) { res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Frame-Options': 'DENY' }).end(page(principal, csrf)); return; }
-    if (url.search || !['GET','POST'].includes(req.method || '')) return send(res, 404, { error: 'ไม่พบเส้นทาง' });
+    if (url.search && (!path.startsWith('/api/browse/')||req.method!=='GET') || !['GET','POST'].includes(req.method || '')) return send(res, 404, { error: 'ไม่พบเส้นทาง' });
+    if(path.startsWith('/api/browse/')){try{pageQuery(req.url||'');}catch{return send(res,400,{error:'ตัวกรองหรือเลขหน้าไม่ถูกต้อง'});}}
     let input: any, replay = req;
     if (req.method === 'POST') {
       if (path !== '/api/system-status/check' && req.headers['content-type']?.split(';')[0].trim() !== 'application/json') return send(res,415,{error:'ต้องส่ง JSON'});
@@ -90,10 +101,10 @@ export class StaffAuth {
     principal = this.login.current(session);
     if (!principal) return send(res,401,{error:'session หมดอายุหรือบัญชีถูกปิด กรุณาเข้าสู่ระบบใหม่'});
     const permission = routePermission(path, req.method || '', input?.action);
-    const allowed = permission && (hasPermission(principal, permission) || req.method === 'GET' && path.startsWith('/api/news') && hasPermission(principal,'news.send'));
+    const allowed = permission && (hasPermission(principal, permission) || req.method === 'GET' && (path.startsWith('/api/news')||/^\/api\/browse\/news(?:$|-)/.test(path)) && hasPermission(principal,'news.send'));
     if (!allowed) return send(res,403,{error:'บัญชีนี้ไม่มีสิทธิ์ทำรายการนี้'});
     if (path === '/api/staff') {
-      try { if (req.method === 'POST') this.store.mutate(principal,input); return send(res,200,this.store.snapshot()); }
+      try { if (req.method === 'POST') {this.store.mutate(principal,input);return send(res,200,{ok:true,revision:this.store.snapshot().revision});} return send(res,200,this.store.snapshot()); }
       catch(e) { return send(res,e instanceof StaffError ? e.status : 503,{error:e instanceof StaffError ? e.message : 'จัดการบัญชีไม่สำเร็จ'}); }
     }
     if (req.method === 'POST') {

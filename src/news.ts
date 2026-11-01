@@ -122,9 +122,10 @@ export class NewsService {
     if (recipients.length > 1000) fail('ปลายทางรวมมากเกิน 1,000 รายการ');
     return { recipients, excluded: wanted.length - personCount };
   }
-  snapshot() {
-    const s = this.customers.snapshot({ events: [], requests: [] });
-    return { selfServiceConfirmation: !this.gated, imageUploadEnabled: this.media?.ready ?? false, enabled: this.enabled, actor: currentStaffActor(localActor), customers: s.customers.map(c => ({ id: c.id, name: c.profile.nickname || c.displayName || c.id, consent: c.consent, groupIds: c.groupIds })), lineRooms: (this.rooms?.list() ?? []).filter(r => r.account === this.account && !r.leftAt && ['joined','observed'].includes(r.status ?? '')).map(r => ({ id: r.groupId, name: r.name || 'ห้อง LINE ' + r.groupId })), groups: s.groups.map(g => ({ id: g.id, name: g.name })), campaigns: this.store.list().map(c => ({ ...c, canConfirm: this.enabled && c.status === 'reviewed' && (!this.gated || this.authorized(c)) && !!c.review && this.now() - c.review.at <= 600000 })) };
+  snapshot(includeRecipients = true) {
+    const s = includeRecipients ? this.customers.snapshot({ events: [], requests: [] }) : {customers:[],groups:[]};
+    const enabled = this.enabled;
+    return { selfServiceConfirmation: !this.gated, imageUploadEnabled: this.media?.ready ?? false, enabled, actor: currentStaffActor(localActor), customers: s.customers.map(c => ({ id: c.id, name: c.profile.nickname || c.displayName || c.id, consent: c.consent, groupIds: c.groupIds })), lineRooms: (includeRecipients ? (this.rooms?.list() ?? []) : []).filter(r => r.account === this.account && !r.leftAt && ['joined','observed'].includes(r.status ?? '')).map(r => ({ id: r.groupId, name: r.name || 'ห้อง LINE ' + r.groupId })), groups: s.groups.map(g => ({ id: g.id, name: g.name })), campaigns: this.store.list().map(c => ({ ...c, canConfirm: enabled && c.status === 'reviewed' && (!this.gated || this.authorized(c)) && !!c.review && this.now() - c.review.at <= 600000 })) };
   }
   mutate(input: any) {
     if (!input || typeof input !== 'object') fail('ข้อมูลไม่ถูกต้อง');
@@ -162,7 +163,7 @@ export class NewsService {
         if (!r.recipients.length) fail('ไม่มีผู้รับที่ยินยอมรับข่าว');
         campaign.deliveries = r.recipients.map(r => ({ ...r, key: randomUUID(), status: 'pending', attempts: 0, nextAt: this.now() }));
         campaign.deadline = this.now() + 900000; campaign.status = 'queued';
-        if(!this.gated){campaign.authorization={digest:campaign.review!.digest,at:this.now(),expiresAt:this.now()+1800000};campaign.history.push({at:this.now(),event:'web-confirmed',actor:currentStaffActor(localActor)});}
+        if(!this.gated){const at=this.now();campaign.authorization={digest:campaign.review!.digest,at,expiresAt:at+1800000};campaign.history.push({at,event:'web-confirmed',actor:currentStaffActor(localActor)});}
       } else if (input.action === 'cancel') {
         if (['complete','cancelled'].includes(campaign.status)) fail('ข่าวสิ้นสุดแล้ว', 409);
         for (const d of campaign.deliveries) if (d.status === 'pending') { d.status = 'cancelled'; d.result = 'ยกเลิกก่อนส่ง'; }

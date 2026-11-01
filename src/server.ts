@@ -1,4 +1,9 @@
-import { existsSync } from 'node:fs';
+import { existsSync, mkdirSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { createHash } from 'node:crypto';
+import { join } from 'node:path';
+import { deploymentConfig, bindCloudChannel } from './deployment.js';
+import { cloudRouting } from './cloud-routing.js';
 import { StaffAuth } from './staff-auth.js';
 import { StaffStore } from './staff-store.js';
 import { googleLoginConfig } from './google-login.js';
@@ -31,13 +36,22 @@ import { PendingLineUsers } from './line-pending-users.js';
 import { LineAccess } from './line-access.js';
 
 async function start() {
+  const deployment = deploymentConfig(process.env);
+  const { cloud, dataPath } = deployment;
+  const loginConfig = googleLoginConfig(process.env);
+  if (cloud && (!loginConfig || !process.env.ADMIN_BOOTSTRAP_EMAIL?.trim())) throw Error('Cloud requires Google login and bootstrap admin');
+  if (cloud) bindCloudChannel(process.env.DATA_ROOT!, process.env.LINE_CHANNEL_ID || '');
+  // Railway mounts a volume to only one active deployment. Process-lifetime
+  // locks stay off that volume so container PID reuse cannot block restart.
+  const lockRoot = cloud ? join(tmpdir(), 'cbot-cloud-locks-' + createHash('sha256').update(process.env.DATA_ROOT!).digest('hex')) : undefined;
+  if (lockRoot) mkdirSync(lockRoot, { recursive: true, mode: 0o700 });
   const secret = process.env.LINE_CHANNEL_SECRET || '';
   const token = process.env.LINE_CHANNEL_ACCESS_TOKEN || '';
   const dryRun = process.env.LINE_DRY_RUN !== 'false';
   const allowedUsers = new Set((process.env.LINE_ALLOWED_USER_IDS || '').split(',').map(s => s.trim()).filter(Boolean));
-  const lineAccess = new LineAccess(resolve('runtime/line-access'), process.env.LINE_CHANNEL_ID || '', allowedUsers);
+  const lineAccess = new LineAccess(dataPath('runtime/line-access'), process.env.LINE_CHANNEL_ID || '', allowedUsers);
   const port = Number(process.env.PORT || '3000');
-  const host = process.env.HOST || '127.0.0.1';
+  const host = deployment.host;
   if (!secret || !process.env.LINE_CHANNEL_ID || (!dryRun && (!token || !allowedUsers.size))) {
     console.error('ตั้ง LINE_CHANNEL_ID/LINE_CHANNEL_SECRET ก่อนเริ่ม และตั้ง access token/allowed user IDs ก่อนปิด dry run');
     process.exitCode = 1; return;
@@ -45,39 +59,39 @@ async function start() {
   if (!Number.isInteger(port) || port < 1 || port > 65535) { console.error('PORT ไม่ถูกต้อง'); process.exitCode = 1; return; }
   const log = (record: object) => console.log(JSON.stringify(record));
   const timeout = Math.min(requestTimeout(process.env.PI_TIMEOUT_MS), 25000);
-  const store = new MemoryStore(resolve('.line-memory'));
-  const requestStore = new CourseRequestStore(resolve('runtime/course-requests'));
+  const store = new MemoryStore(dataPath('.line-memory'), undefined, lockRoot ? join(lockRoot, 'direct') : undefined);
+  const requestStore = new CourseRequestStore(dataPath('runtime/course-requests'));
   const requests = new CourseRequests(requestStore);
-  const knowledge = new KnowledgeStore(resolve('runtime/knowledge'));
+  const knowledge = new KnowledgeStore(dataPath('runtime/knowledge'));
   configureKnowledge(knowledge);
-  const responseSettingsStore = new ResponseSettingsStore(resolve('runtime/bot-settings'));
+  const responseSettingsStore = new ResponseSettingsStore(dataPath('runtime/bot-settings'));
   configureResponseSettings(responseSettingsStore);
   const responseSettings = new ResponseSettingsService(responseSettingsStore);
   const core = createCustomerCore({ timeoutMs: timeout, log, store, requests, humanSupport: identity =>
     identity.channel === 'line' && identity.scope === process.env.LINE_CHANNEL_ID + ':direct' ? { waiting: !!control.mode(JSON.stringify([process.env.LINE_CHANNEL_ID, identity.user])).waiting } : undefined });
-  const monitor = new ConversationMonitor(resolve('.line-monitor'));
+  const monitor = new ConversationMonitor(dataPath('.line-monitor'));
   const monitorPort = Number(process.env.MONITOR_PORT || '3001');
-  if (!Number.isInteger(monitorPort) || monitorPort < 1 || monitorPort > 65535 || monitorPort === port) throw new Error('Invalid monitor port');
-  const customerStore = new CustomerStore(resolve('runtime/customers'));
+  if (!cloud && (!Number.isInteger(monitorPort) || monitorPort < 1 || monitorPort > 65535 || monitorPort === port)) throw new Error('Invalid monitor port');
+  const customerStore = new CustomerStore(dataPath('runtime/customers'));
   const profiles = new LineProfiles(customerStore, process.env.LINE_CHANNEL_ID || '', token);
-  const control = new ConversationControl(resolve('runtime/conversations'));
+  const control = new ConversationControl(dataPath('runtime/conversations'));
   const resume = (user: string, source: () => HandoverTranscript) => core.client({ channel: 'line', scope: process.env.LINE_CHANNEL_ID + ':direct', user }).resumeFromHandover!(source);
   const conversationService = { control, resume, account: process.env.LINE_CHANNEL_ID || '', allowedUsers, dryRun, push: linePush(token) };
-  const groupStore = new LineGroupStore(resolve('runtime/line-groups'), process.env.LINE_CHANNEL_ID || '');
+  const groupStore = new LineGroupStore(dataPath('runtime/line-groups'), process.env.LINE_CHANNEL_ID || '');
   // Owner enabled web confirmation: each exact review must still be explicitly confirmed.
   const imageBase = await newsImageBase(port,process.env.PUBLIC_BASE_URL||'');
-  const newsMedia = new NewsMediaStore(resolve('runtime/news-images'),imageBase);
-  const news = new NewsService(new NewsStore(resolve('runtime/news')), customerStore, process.env.LINE_CHANNEL_ID || '', dryRun ? undefined : newsLineTransport(token), undefined, false, groupStore, newsMedia);
-  const newsWorker = new NewsWorker(news, () => log({ event: 'news_worker_suspended', reason: 'storage_or_dispatch_error' }));
-  const lineGroups = new LineGroupService(groupStore, token);
-  const groupMemory = new MemoryStore(resolve('runtime/line-group-memory'));
+  const newsMedia = new NewsMediaStore(dataPath('runtime/news-images'),imageBase);
+  const news = new NewsService(new NewsStore(dataPath('runtime/news')), customerStore, process.env.LINE_CHANNEL_ID || '', dryRun ? undefined : newsLineTransport(token), undefined, false, groupStore, newsMedia);
+  const newsWorker = new NewsWorker(news, () => log({ event: 'news_worker_suspended', reason: 'storage_or_dispatch_error' }), lockRoot ? join(lockRoot, 'news') : undefined);
+  const lineGroups = new LineGroupService(groupStore, token, fetch, () => Date.now(), { name: (process.env.SERVER_NAME || process.env.RAILWAY_SERVICE_NAME || 'ซีบอต').slice(0,100), environment: deployment.cloud ? 'cloud'+(process.env.RAILWAY_ENVIRONMENT_NAME ? ' · '+process.env.RAILWAY_ENVIRONMENT_NAME.slice(0,80) : '') : 'local' });
+  const groupMemory = new MemoryStore(dataPath('runtime/line-group-memory'), undefined, lockRoot ? join(lockRoot, 'group') : undefined);
   const groupCore = new CustomerCore(undefined, timeout, log, undefined, groupMemory);
   const groupReplies = new LineGroupReplies(groupStore, groupCore, process.env.LINE_CHANNEL_ID || '', dryRun, lineReply(token), log);
-  const pendingLineUsers = new PendingLineUsers(resolve('runtime/line-pending-users'));
-  const statusWork = new RequestWorkStore(resolve('runtime/request-work'), requestStore);
+  const pendingLineUsers = new PendingLineUsers(dataPath('runtime/line-pending-users'));
+  const statusWork = new RequestWorkStore(dataPath('runtime/request-work'), requestStore);
   const systemStatus = new SystemStatusService({
-    startedAt: Date.now() - Math.floor(process.uptime() * 1000), webhookPort: port, adminPort: monitorPort,
-    listeners: () => ({ webhook: server.listening, admin: monitorServer.listening }),
+    startedAt: Date.now() - Math.floor(process.uptime() * 1000), webhookPort: port, adminPort: cloud ? port : monitorPort,
+    listeners: () => ({ webhook: server.listening, admin: cloud ? server.listening : monitorServer.listening }),
     token, channelConfigured: !!process.env.LINE_CHANNEL_ID, secretConfigured: !!secret, dryRun, publicBase: process.env.PUBLIC_BASE_URL || '', settings: responseSettings,
     stores: [
       { name: 'ความจำ LINE', check: () => store.readHealth() && groupMemory.readHealth() },
@@ -88,30 +102,30 @@ async function start() {
       { name: 'ตั้งค่าบอตและความรู้', check: () => responseSettingsStore.snapshot().healthy && knowledge.snapshot().healthy },
     ], worker: () => newsWorker.status(),
   });
-  const loginConfig = googleLoginConfig(process.env);
-  if (loginConfig && new URL(loginConfig.redirectUri).port !== String(monitorPort)) throw new Error('Google callback port must match admin port');
-  if (!loginConfig && existsSync(resolve('runtime/staff/accounts.json'))) throw new Error('Google login config missing for existing staff registry');
-  const staffAuth = loginConfig ? new StaffAuth(new StaffStore(resolve('runtime/staff'), process.env.ADMIN_BOOTSTRAP_EMAIL || ''), loginConfig) : undefined;
-  const monitorServer = createServer(adminHandler(monitor, requestStore, customerStore, profiles, conversationService, news, knowledge, responseSettings, lineGroups, { store: pendingLineUsers, account: process.env.LINE_CHANNEL_ID || '', allowedUsers, access: lineAccess }, systemStatus, staffAuth));
+  if (!cloud && loginConfig && new URL(loginConfig.redirectUri).port !== String(monitorPort)) throw new Error('Google callback port must match admin port');
+  if (!loginConfig && existsSync(dataPath('runtime/staff/accounts.json'))) throw new Error('Google login config missing for existing staff registry');
+  const staffAuth = loginConfig ? new StaffAuth(new StaffStore(dataPath('runtime/staff'), process.env.ADMIN_BOOTSTRAP_EMAIL || ''), loginConfig) : undefined;
+  const admin = adminHandler(monitor, requestStore, customerStore, profiles, conversationService, news, knowledge, responseSettings, lineGroups, { store: pendingLineUsers, account: process.env.LINE_CHANNEL_ID || '', allowedUsers, access: lineAccess }, systemStatus, staffAuth);
+  const monitorServer = createServer(admin);
   monitorServer.requestTimeout = 10000;
   monitorServer.headersTimeout = 10000;
   const adapter = new LineAdapter({ secret, account: process.env.LINE_CHANNEL_ID || 'test-oa', allowedUsers, dryRun, core, control,
     observePendingUser: (account, userId) => pendingLineUsers.record(account, userId),
     groupReplies, observeGroup: event => groupStore.observe(event), observe: event => monitor.record(event), reply: lineReply(token), log });
   const webhook = webhookHandler(adapter), media = newsPublicMedia(news);
-  const server = createServer((req,res)=>{if(req.url?.startsWith('/news-media/'))return media(req,res);return webhook(req,res)});
+  const server = createServer(cloud ? cloudRouting({ webhook, media, admin, ready: () => !closing && newsWorker.status().running }) : (req,res)=>{if(req.url?.startsWith('/news-media/'))return media(req,res);return webhook(req,res)});
+  let closing = false;
   server.requestTimeout = 10000;
   server.headersTimeout = 10000;
   server.on('error', () => { console.error('เริ่ม webhook server ไม่สำเร็จ ตรวจ port และ host'); void stop(); process.exitCode = 1; });
   server.listen(port, host, () => {
-    console.log(`ซีบอต local webhook: http://${host}:${port}/webhook/line`);
-    console.log(`LINE dry run: ${dryRun}; allowlist configured: ${allowedUsers.size > 0}; no public deployment configured`);
+    console.log(`ซีบอต webhook: http://${host}:${port}/webhook/line`);
+    console.log(`LINE dry run: ${dryRun}; allowlist configured: ${allowedUsers.size > 0}; cloud mode: ${cloud}`);
     console.log('LINE persistent memory enabled; separate directory/lock from Terminal; retention 90 days');
     console.log('Direct LINE conversation routing: model-first; group routing unchanged');
   });
   monitorServer.on('error', () => { console.error('Monitor server unavailable'); void stop(); process.exitCode = 1; });
-  monitorServer.listen(monitorPort, '127.0.0.1', () => console.log(`ติดตามบทสนทนา: http://127.0.0.1:${monitorPort}`));
-  let closing = false;
+  if (!cloud) monitorServer.listen(monitorPort, '127.0.0.1', () => console.log(`ติดตามบทสนทนา: http://127.0.0.1:${monitorPort}`));
   const stop = async () => {
     if (closing) return;
     closing = true;
@@ -126,4 +140,4 @@ async function start() {
   process.once('SIGINT', () => { void stop(); });
   process.once('SIGTERM', () => { void stop(); });
 }
-void start().catch(()=>{console.error('Configuration ไม่ถูกต้อง ตรวจ .env บนเครื่อง');process.exitCode=1;});
+void start().catch(()=>{console.error('Configuration หรือ storage ไม่พร้อม ตรวจ environment, volume และสิทธิ์ไฟล์');process.exitCode=1;});

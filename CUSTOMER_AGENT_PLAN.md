@@ -297,3 +297,8 @@ KMเพิ่ม/แก้/เลิกใช้FAQในร่าง ค้น
 ตั้งค่าการตอบเลือกคู่provider/modelจากSDKและสถานะcredentialsโดยไม่เปิดkey แก้presentation preferences/limitsภายใต้policyและhostguardsที่คงที่ ร่าง→ลองโมเดลแบบexplicitใช้quotaในsandbox→ตรวจdiff→ยืนยันapply→version/rollback มีCAS/atomic/lock/last-good เมื่อapplyแล้วงานที่กำลังตอบคงค่าเดิม งานถัดไปทั้งTerminal/LINEใช้ใหม่โดยรักษาcanonicalmemory ไม่ต้องrestartเพื่อapplysettings
 
 Build/regression132/132/import9/9 และbrowsertempdesktop/mobileผ่าน เปิดruntimeแล้วตรวจGET/UIจริงแบบอ่าน active initial/revision0/Qwenเดิม ไม่มีการใช้ค่าร่างทดสอบกับบอตจริง ไม่มีการเรียกproviderหรือส่งLINEจากรอบทดสอบนี้ ไม่อ้างLINEE2Eหรือทุกmodelผ่านจริง รายละเอียดข้อจำกัด [KM_GUIDE.md](./KM_GUIDE.md) และ [RESPONSE_SETTINGS_GUIDE.md](./RESPONSE_SETTINGS_GUIDE.md)
+
+
+### 1 พฤศจิกายน 2026 — การแบ่งหน้าหลังบ้าน
+
+เพิ่มการแบ่งหน้า/ค้นหาทั้งชุดในรายชื่อลูกค้า บทสนทนา คำขอ ส่งข่าว และรายการตั้งค่าที่โตได้ โหลดแชตเก่าด้วย cursor และรักษาการเลือกสมาชิก/ผู้รับข้ามหน้า Build และเทสต์หลัก 238 รายการผ่าน พร้อมตรวจ browser fixture ดู [รายละเอียดและข้อจำกัด](PAGINATION_GUIDE.md) งานนี้ไม่ถือว่าปิดเกณฑ์ความทนทาน/โหลดจริงของ M5 หรือการทดสอบกลุ่มครบเกณฑ์ M7

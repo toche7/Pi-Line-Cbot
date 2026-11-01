@@ -1,12 +1,13 @@
 import { mkdirSync, chmodSync, lstatSync, readdirSync, readFileSync, openSync, writeFileSync, fsyncSync, closeSync, renameSync, unlinkSync } from 'node:fs';
 import { join } from 'node:path';
+import { staffIdentity, currentStaffActor } from './staff-context.js';
 import { randomUUID } from 'node:crypto';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 
 export type GroupObservation = { groupId: string; eventId?: string; type: string; userId?: string; text?: string; at: string };
 type GroupMessage = { eventId: string; userId?: string; text: string; at: string; direction?: 'in' | 'out'; status?: string };
 export type LineRoom = { groupId: string; account?: string; seenAt: string; firstSeenAt?: string;
-  name?: string; nameFetchedAt?: string; leftAt?: string; messages?: GroupMessage[]; status?: 'observed' | 'joined' | 'left'; replyMode?: 'mention' | 'cbot' };
+  name?: string; nameFetchedAt?: string; leftAt?: string; messages?: GroupMessage[]; status?: 'observed' | 'joined' | 'left'; replyMode?: 'mention' | 'cbot'; modeRevision?: string; modeChangedAt?: string; modeChangedBy?: string };
 const groupPattern = /^C[0-9a-f]{32}$/i;
 const userPattern = /^U[0-9a-f]{32}$/i;
 const validDate = (value: unknown): value is string => typeof value === 'string' && Number.isFinite(Date.parse(value));
@@ -32,6 +33,9 @@ export class LineGroupStore {
         || (r.account !== undefined && typeof r.account !== 'string') || (r.name !== undefined && (typeof r.name !== 'string' || r.name.length > 1000))
         || (r.nameFetchedAt !== undefined && !validDate(r.nameFetchedAt)) || (r.firstSeenAt !== undefined && !validDate(r.firstSeenAt))
         || (r.leftAt !== undefined && !validDate(r.leftAt)) || (r.status !== undefined && !['observed', 'joined', 'left'].includes(r.status))
+        || (r.modeRevision !== undefined && (typeof r.modeRevision !== 'string' || !/^[a-f0-9-]{36}$/.test(r.modeRevision)))
+        || (r.modeChangedAt !== undefined && !validDate(r.modeChangedAt))
+        || (r.modeChangedBy !== undefined && (typeof r.modeChangedBy !== 'string' || r.modeChangedBy.length > 150))
         || (r.replyMode !== undefined && !['mention', 'cbot'].includes(r.replyMode))
         || (r.messages !== undefined && (!Array.isArray(r.messages) || r.messages.length > 1000 || r.messages.some(m =>
           typeof m.eventId !== 'string' || m.eventId.length > 128 || typeof m.text !== 'string' || m.text.length > 4000
@@ -75,16 +79,21 @@ export class LineGroupStore {
     }
     this.write(room);
   }
-  enableMentions(groupId: string) {
+  setReplyMode(groupId: string, mode: 'off' | 'mention' | 'cbot', revision: string, actor = currentStaffActor('local-admin')) {
+    if (!['off', 'mention', 'cbot'].includes(mode)) throw new RoomModeError(400, 'โหมดตอบไม่ถูกต้อง');
     const room = this.list().find(r => r.groupId === groupId);
-    if (!room || room.status === 'left') throw Error('Room unavailable');
-    room.account = this.account; room.replyMode = 'mention'; this.write(room);
+    if (!room) throw new RoomModeError(404, 'ไม่พบห้องที่เลือก');
+    if (room.status === 'left') throw new RoomModeError(409, 'บอตออกจากห้องนี้แล้ว กรุณาโหลดล่าสุด');
+    if (revision !== (room.modeRevision ?? 'initial')) throw new RoomModeError(409, 'มีการเปลี่ยนโหมดแล้ว กรุณาโหลดล่าสุดก่อนบันทึก');
+    room.account = this.account;
+    if (mode === 'off') delete room.replyMode; else room.replyMode = mode;
+    room.modeRevision = randomUUID(); room.modeChangedAt = new Date(this.now()).toISOString(); room.modeChangedBy = actor;
+    this.write(room);
+    return { mode: room.replyMode ?? 'off', revision: room.modeRevision, changedAt: room.modeChangedAt };
   }
-  enableCallWord(groupId: string) {
-    const room = this.list().find(r => r.groupId === groupId);
-    if (!room || room.status === 'left') throw Error('Room unavailable');
-    room.account = this.account; room.replyMode = 'cbot'; this.write(room);
-  }
+  enableMentions(groupId: string) { return this.setReplyMode(groupId, 'mention', this.list().find(r => r.groupId === groupId)?.modeRevision ?? 'initial'); }
+  enableCallWord(groupId: string) { return this.setReplyMode(groupId, 'cbot', this.list().find(r => r.groupId === groupId)?.modeRevision ?? 'initial'); }
+  modeRevision(groupId: string) { return this.list().find(r => r.groupId === groupId)?.modeRevision ?? 'initial'; }
   replyMode(groupId: string) {
     return this.list().find(r => r.groupId === groupId && r.status !== 'left')?.replyMode;
   }
@@ -110,10 +119,12 @@ export class LineGroupStore {
   }
 }
 
+export class RoomModeError extends Error { constructor(readonly status: number, message: string) { super(message); } }
+
 export class LineGroupService {
   private attempts = new Map<string, number>();
   private inFlight = new Map<string, Promise<void>>();
-  constructor(readonly store: LineGroupStore, private token: string, private fetcher: typeof fetch = fetch, private now = () => Date.now()) {}
+  constructor(readonly store: LineGroupStore, private token: string, private fetcher: typeof fetch = fetch, private now = () => Date.now(), readonly serverIdentity = { name: 'ซีบอต', environment: 'local' }) {}
   async refreshName(groupId: string) {
     const room = this.store.list().find(r => r.groupId === groupId);
     if (!room || !this.token) throw Error('ยังไม่พบห้องหรือยังไม่ได้เชื่อมบัญชี LINE');
@@ -141,7 +152,7 @@ export class LineGroupService {
       && (!this.attempts.has(r.groupId) || this.now() - this.attempts.get(r.groupId)! > 5 * 60_000)).slice(0, 4);
     await Promise.allSettled(due.map(r => this.refreshName(r.groupId)));
     const rooms = this.store.list();
-    return { rooms, replyEnabled: rooms.some(r => !!r.replyMode && r.status !== 'left'), pushEnabled: false, retentionDays: 90, maxMessagesPerRoom: 1000 };
+    return { server: this.serverIdentity, canManageMode: staffIdentity()?.role === 'admin', rooms, replyEnabled: rooms.some(r => !!r.replyMode && r.status !== 'left'), pushEnabled: false, retentionDays: 90, maxMessagesPerRoom: 1000 };
   }
 }
 
@@ -153,12 +164,17 @@ export function lineGroupsHandler(service: LineGroupService, token: string) {
     try {
       if (req.method === 'GET') { send(200, await service.snapshot()); return; }
       if (req.method !== 'POST') { send(405, { error: 'ยังไม่รองรับคำสั่งนี้' }); return; }
-      if (req.headers.origin !== 'http://' + req.headers.host || req.headers['x-customer-token'] !== token || req.headers['content-type'] !== 'application/json') { send(403, { error: 'กรุณาเปิดเว็บเดิมเพื่ออัปเดตชื่อห้อง' }); return; }
+      if (req.headers.origin !== 'http://' + req.headers.host || req.headers['x-customer-token'] !== token || req.headers['content-type'] !== 'application/json') { send(403, { error: 'กรุณาเปิดเว็บเดิมเพื่อจัดการห้อง' }); return; }
       let raw = ''; for await (const part of req) { raw += part; if (Buffer.byteLength(raw) > 2048) { send(413, { error: 'คำขอใหญ่เกินกำหนด' }); return; } }
       let input: any; try { input = JSON.parse(raw); } catch { send(400, { error: 'รูปแบบคำขอไม่ถูกต้อง' }); return; }
-      if (input?.action !== 'refresh-name' || !groupPattern.test(input.groupId ?? '')) { send(400, { error: 'รองรับเฉพาะอัปเดตชื่อห้องที่รู้จักแล้ว' }); return; }
+      if (!['refresh-name', 'set-reply-mode'].includes(input?.action) || typeof input.groupId !== 'string' || !groupPattern.test(input.groupId)) { send(400, { error: 'คำสั่งหรือรหัสห้องไม่ถูกต้อง' }); return; }
       if (!service.store.list().some(r => r.groupId === input.groupId)) { send(404, { error: 'ไม่พบห้องที่เลือก' }); return; }
+      if (input.action === 'set-reply-mode') {
+        if (staffIdentity()?.role !== 'admin' || !staffIdentity()?.enabled) { send(403, { error: 'เฉพาะผู้ดูแลระบบที่เข้าสู่ระบบเท่านั้น' }); return; }
+        if (Object.keys(input).some(key => !['action','groupId','mode','revision'].includes(key)) || !['off','mention','cbot'].includes(input.mode) || typeof input.revision !== 'string') { send(400, { error: 'โหมดหรือเวอร์ชันไม่ถูกต้อง' }); return; }
+        send(200, { ok: true, ...service.store.setReplyMode(input.groupId, input.mode, input.revision) }); return;
+      }
       await service.refreshName(input.groupId); send(200, { ok: true });
-    } catch { send(503, { error: 'อ่านข้อมูลหรือดึงชื่อห้องไม่ได้ กรุณาตรวจว่าบอตยังอยู่ในกลุ่ม แล้วลองใหม่' }); }
+    } catch (error) { if (error instanceof RoomModeError) { send(error.status, { error: error.message }); return; } send(503, { error: 'อ่านข้อมูลหรือดึงชื่อห้องไม่ได้ กรุณาตรวจว่าบอตยังอยู่ในกลุ่ม แล้วลองใหม่' }); }
   };
 }

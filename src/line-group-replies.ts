@@ -52,10 +52,11 @@ export class LineGroupReplies {
     if (prompt === undefined || this.closed || this.dryRun || !this.store.mentionsEnabled(event.source.groupId)) return true;
     if (this.tasks.size >= 16) return false;
     if (!this.store.reserveReply(event.source.groupId, event.webhookEventId)) return true;
+    const revision = this.store.modeRevision(event.source.groupId);
     const receivedAt = Date.now(), { groupId, userId } = event.source;
     const finish = (text: string, status: 'accepted' | 'failed' | 'cancelled') => this.store.finishReply(groupId, event.webhookEventId, text, status);
     const task = this.tail.then(async () => {
-      if (this.closed || Date.now() - receivedAt > 20000 || !this.store.mentionsEnabled(groupId)) { finish('', 'cancelled'); return; }
+      if (this.closed || Date.now() - receivedAt > 20000 || !this.store.mentionsEnabled(groupId) || this.store.modeRevision(groupId) !== revision) { finish('', 'cancelled'); return; }
       let text = '';
       if (!prompt) text = mode === 'cbot' ? 'เรียกซีบอตแล้วครับ พิมพ์ CBOT หรือแท็กบัญชีบอต แล้วตามด้วยคำถามได้เลยครับ' : 'เรียกซีบอตแล้วครับ พิมพ์คำถามต่อท้ายแท็กได้เลยครับ';
       else if (prompt.startsWith('/')) text = 'คำสั่งจัดการความจำและคำขอ กรุณาใช้แชตส่วนตัวกับซีบอตครับ ในกลุ่มให้แท็กพร้อมคำถามได้เลย';
@@ -69,7 +70,7 @@ export class LineGroupReplies {
         } catch (error) { text = lineFailureReply(error); }
       }
       if (!text.trim()) text = 'ยังไม่พบคำตอบที่ยืนยันได้ครับ กรุณาดู https://cbtumu.net/faq/';
-      if (this.closed || Date.now() - receivedAt > 50000 || !this.store.mentionsEnabled(groupId)) { finish('', 'cancelled'); return; }
+      if (this.closed || Date.now() - receivedAt > 50000 || !this.store.mentionsEnabled(groupId) || this.store.modeRevision(groupId) !== revision) { finish('', 'cancelled'); return; }
       try { await this.reply(event.replyToken, text); finish(text, 'accepted'); this.log({ channel: 'line-group', outcome: 'reply_accepted' }); }
       catch { finish(text, 'failed'); this.log({ channel: 'line-group', outcome: 'reply_failed_no_retry' }); }
     });

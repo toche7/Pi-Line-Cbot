@@ -19,7 +19,7 @@ export function newsHandler(service: NewsService, token: string) {
       let input: unknown; try { input = JSON.parse(Buffer.concat(chunks).toString('utf8')); } catch { return reply(size>32768?413:400, { error: size>32768?'ข้อมูลเกินกำหนด':'JSON ไม่ถูกต้อง' }); }
       if((input as any)?.action==='image.upload')return reply(200,service.uploadImage((input as any).base64));
       if(size>32768)return reply(413,{error:'ข้อมูลเกิน 32 KiB'});
-      return reply(200, service.mutate(input));
+      const result=service.mutate(input);return reply(200,req.headers['x-paged-reply']==='1'?{id:result.id,revision:result.revision}:result);
     } catch (e) { return reply(e instanceof NewsError ? e.status : 503, { error: e instanceof NewsError ? e.message : 'อ่านหรือบันทึกไม่ได้ กรุณาลองใหม่' }); }
   };
 }
