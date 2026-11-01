@@ -1,3 +1,4 @@
+import { currentStaffActor, staffIdentity, validStoredActor } from './staff-context.js';
 import { mkdirSync, chmodSync, readFileSync, writeFileSync, renameSync, fsyncSync, openSync, closeSync, lstatSync } from 'node:fs';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
@@ -31,12 +32,12 @@ export class ConversationControl {
           || (m.waiting !== undefined && (!m.waiting || typeof m.waiting.id !== 'string' || !/^[0-9a-f-]{36}$/.test(m.waiting.id)
             || !Number.isFinite(Date.parse(m.waiting.requestedAt)) || typeof m.waiting.reason !== 'string' || m.waiting.reason.length > 200 || typeof m.waiting.stopBot !== 'boolean' || m.human))
           || (m.startedAt !== undefined && !Number.isFinite(Date.parse(m.startedAt)))
-          || !Number.isSafeInteger(m.epoch) || m.epoch < 0 || m.actor !== localActor || !Number.isFinite(Date.parse(m.at))) throw new Error();
+          || !Number.isSafeInteger(m.epoch) || m.epoch < 0 || !validStoredActor(m.actor, localActor) || !Number.isFinite(Date.parse(m.at))) throw new Error();
       }
       const ids = new Set();
       for (const d of s.deliveries as Delivery[]) {
         if (!/^[0-9a-f-]{36}$/.test(d.id) || ids.has(d.id) || !s.modes[d.key] || typeof d.text !== 'string' || d.text.length > 4500
-          || !['pending','accepted','unknown'].includes(d.status) || d.actor !== localActor || !Number.isFinite(Date.parse(d.at))) throw new Error();
+          || !['pending','accepted','unknown'].includes(d.status) || !validStoredActor(d.actor, localActor) || !Number.isFinite(Date.parse(d.at))) throw new Error();
         ids.add(d.id);
         if (d.status === 'pending') d.status = 'unknown';
       }
@@ -53,7 +54,7 @@ export class ConversationControl {
       renameSync(this.file + '.tmp', this.file); this.state = next;
     } catch { this.fault = true; fail('บันทึกสถานะไม่ได้ ระบบพักการส่งไว้', 503); }
   }
-  mode(key: string): Mode { return this.state.modes[key] ?? { human: false, epoch: 0, at: '', actor: localActor }; }
+  mode(key: string): Mode { return this.state.modes[key] ?? { human: false, epoch: 0, at: '', actor: currentStaffActor(localActor) }; }
   ticket(key: string) { return { epoch: this.mode(key).epoch, allowed: !this.fault && !this.mode(key).human && !this.mode(key).waiting?.stopBot }; }
   valid(key: string, ticket: { epoch: number; allowed: boolean }, allowWaiting = false, requestId?: string) {
     const mode = this.mode(key);
@@ -86,7 +87,7 @@ export class ConversationControl {
     if (!this.state.modes[key] && Object.keys(this.state.modes).length >= 10000) fail('จำนวนบทสนทนาเต็ม', 413);
     const next = structuredClone(this.state);
     const at = new Date().toISOString();
-    next.modes[key] = { human, epoch: epoch + 1, at, actor: localActor,
+    next.modes[key] = { human, epoch: epoch + 1, at, actor: currentStaffActor(localActor),
       ...(human ? { startedAt: this.mode(key).human ? this.mode(key).startedAt ?? this.mode(key).at : this.mode(key).waiting?.requestedAt ?? at } : {}) };
     this.commit(next); return this.mode(key);
   }
@@ -118,7 +119,7 @@ export class ConversationControl {
     if (this.fault || !this.mode(key).human || this.mode(key).epoch !== epoch) fail('ต้องรับช่วงคุยและโหลดสถานะล่าสุดก่อนส่ง');
     if (this.sending.has(key)) fail('กำลังส่งข้อความก่อนหน้า');
     if (this.state.deliveries.length >= 10000) fail('ประวัติการส่งเจ้าหน้าที่เต็ม กรุณาจัดการข้อมูลก่อน', 413);
-    const d: Delivery = { id, key, text, at: new Date().toISOString(), status: 'pending', actor: localActor };
+    const d: Delivery = { id, key, text, at: new Date().toISOString(), status: 'pending', actor: currentStaffActor(localActor) };
     const next = structuredClone(this.state); next.deliveries.push(d); this.commit(next);
     this.sending.add(key);
     try { await transport(id, text); d.status = 'accepted'; } catch { d.status = 'unknown'; }

@@ -29,6 +29,10 @@ export class ConversationMonitor {
     this.events.push({ ...event, text: event.text.slice(0, 10000) }); this.prune();
     this.persist();
   }
+  // Read without retention writes for the overview aggregation.
+  readSnapshot(now = Date.now()) {
+    return { events: this.events.filter(e => Date.parse(e.at) > now - this.retentionDays * 86400000).slice(-10000), storageError: this.storageError, retentionDays: this.retentionDays };
+  }
   snapshot() {
     const previous = this.events.length;
     this.prune();

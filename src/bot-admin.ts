@@ -10,9 +10,9 @@ export function botManagementBody(knowledgeBody: string) {
 }
 export function botSettingsScript() { return responseSettingsScript; }
 export const adminNavigationScript = String.raw`(()=>{
-const tabs=['monitor','customers','requests','news','knowledge'];
+const tabs=['overview','monitor','customers','requests','news','knowledge'].filter(t=>!document.getElementById('tab-'+t).hidden);
 function select(name){for(const t of tabs){const active=t===name,b=document.getElementById('tab-'+t);b.setAttribute('aria-selected',String(active));b.tabIndex=active?0:-1;document.getElementById(t==='knowledge'?'bot-management-panel':t+'-panel').hidden=!active}}
-function fromHash(){const name=location.hash.slice(1);select(name==='bot'||name==='bot-settings'?'knowledge':tabs.includes(name)?name:'monitor')}
+function fromHash(){const name=location.hash.slice(1);select((name==='bot'||name==='bot-settings'||name==='settings'||name.startsWith('settings-')||name==='knowledge')&&tabs.includes('knowledge')?'knowledge':tabs.includes(name)?name:'overview')}
 for(const t of tabs){const b=document.getElementById('tab-'+t);b.onclick=()=>{location.hash=t==='knowledge'?'bot':t;fromHash()};b.onkeydown=e=>{let target;const i=tabs.indexOf(t);if(e.key==='ArrowLeft')target=tabs[(i+tabs.length-1)%tabs.length];if(e.key==='ArrowRight')target=tabs[(i+1)%tabs.length];if(e.key==='Home')target=tabs[0];if(e.key==='End')target=tabs.at(-1);if(target){e.preventDefault();location.hash=target==='knowledge'?'bot':target;fromHash();document.getElementById('tab-'+target).focus()}}}
 window.addEventListener('admin-open-customer',()=>{location.hash='customers';fromHash()});window.addEventListener('admin-open-conversation',()=>{location.hash='monitor';fromHash()});window.addEventListener('hashchange',fromHash);fromHash();
 })();`;

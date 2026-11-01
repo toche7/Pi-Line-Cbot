@@ -1,0 +1,21 @@
+
+> test:catalog-import
+> node --test scripts/catalog-import.test.mjs
+
+✔ valid schema/evidence publishes an atomic independent projection with provenance (215.953625ms)
+✔ rejects unsupported schema, preserving last-good runtime bytes (220.556458ms)
+✔ rejects unknown field, preserving last-good runtime bytes (307.957291ms)
+✔ rejects wrong field type, preserving last-good runtime bytes (307.060041ms)
+✔ rejects catalog author masquerading as instructor, preserving last-good runtime bytes (302.518125ms)
+✔ rejects missing teacher evidence, preserving last-good runtime bytes (305.813584ms)
+✔ rejects unlabelled teacher excerpt, preserving last-good runtime bytes (297.825ms)
+✔ rejects invalid report fingerprint, preserving last-good runtime bytes (223.275625ms)
+✔ rejects invalid validation report, preserving last-good runtime bytes (228.397417ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2503.449959

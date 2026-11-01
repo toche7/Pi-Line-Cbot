@@ -1,3 +1,4 @@
+import { currentStaffActor, staffIdentity, validStoredActor } from './staff-context.js';
 import { mkdirSync, chmodSync, lstatSync, readFileSync, openSync, closeSync, writeFileSync, fsyncSync, renameSync, unlinkSync } from 'node:fs';
 import { join } from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
@@ -92,7 +93,7 @@ export class NewsService {
       this.verifyImage(c!);
       if (c!.review!.digest !== reviewHash(c!, this.recipients(c!.selection)) || this.now() - c!.review!.at > 600000) fail('ข้อความหรือผู้รับเปลี่ยน หรือผลตรวจหมดอายุแล้ว กรุณาตรวจใหม่', 409);
       c!.authorization = { digest, at: this.now(), expiresAt: this.now() + 30 * 60000 };
-      c!.history.push({ at: this.now(), event: 'owner-authorized', actor: localActor });
+      c!.history.push({ at: this.now(), event: 'owner-authorized', actor: currentStaffActor(localActor) });
     });
   }
   private verifyImage(c: Campaign) { if(c.image){try {if(!this.media)throw Error();this.media.verify(c.image);}catch{fail('รูปไม่พร้อมหรือเปลี่ยนแล้ว กรุณาแนบและตรวจใหม่',409)}} }
@@ -123,7 +124,7 @@ export class NewsService {
   }
   snapshot() {
     const s = this.customers.snapshot({ events: [], requests: [] });
-    return { selfServiceConfirmation: !this.gated, imageUploadEnabled: this.media?.ready ?? false, enabled: this.enabled, actor: localActor, customers: s.customers.map(c => ({ id: c.id, name: c.profile.nickname || c.displayName || c.id, consent: c.consent, groupIds: c.groupIds })), lineRooms: (this.rooms?.list() ?? []).filter(r => r.account === this.account && !r.leftAt && ['joined','observed'].includes(r.status ?? '')).map(r => ({ id: r.groupId, name: r.name || 'ห้อง LINE ' + r.groupId })), groups: s.groups.map(g => ({ id: g.id, name: g.name })), campaigns: this.store.list().map(c => ({ ...c, canConfirm: this.enabled && c.status === 'reviewed' && (!this.gated || this.authorized(c)) && !!c.review && this.now() - c.review.at <= 600000 })) };
+    return { selfServiceConfirmation: !this.gated, imageUploadEnabled: this.media?.ready ?? false, enabled: this.enabled, actor: currentStaffActor(localActor), customers: s.customers.map(c => ({ id: c.id, name: c.profile.nickname || c.displayName || c.id, consent: c.consent, groupIds: c.groupIds })), lineRooms: (this.rooms?.list() ?? []).filter(r => r.account === this.account && !r.leftAt && ['joined','observed'].includes(r.status ?? '')).map(r => ({ id: r.groupId, name: r.name || 'ห้อง LINE ' + r.groupId })), groups: s.groups.map(g => ({ id: g.id, name: g.name })), campaigns: this.store.list().map(c => ({ ...c, canConfirm: this.enabled && c.status === 'reviewed' && (!this.gated || this.authorized(c)) && !!c.review && this.now() - c.review.at <= 600000 })) };
   }
   mutate(input: any) {
     if (!input || typeof input !== 'object') fail('ข้อมูลไม่ถูกต้อง');
@@ -131,14 +132,14 @@ export class NewsService {
       let c = s.campaigns.find(c => c.id === input.id);
       if (input.action === 'create') {
         if (s.campaigns.length >= 200) fail('จำนวนข่าวเต็ม 200 รายการ');
-        c = { id: randomUUID(), revision: 0, title: '', text: '', selection: { customerIds: [], groupIds: [] }, createdAt: this.now(), updatedAt: this.now(), actor: localActor, status: 'draft', deliveries: [], history: [] }; s.campaigns.push(c);
+        c = { id: randomUUID(), revision: 0, title: '', text: '', selection: { customerIds: [], groupIds: [] }, createdAt: this.now(), updatedAt: this.now(), actor: currentStaffActor(localActor), status: 'draft', deliveries: [], history: [] }; s.campaigns.push(c);
       } else {
         if (!c) return fail('ไม่พบข่าว', 404);
         if (c.revision !== input.revision) fail('ข้อมูลเปลี่ยนแล้ว กรุณาโหลดล่าสุด ข้อความที่กรอกยังอยู่', 409);
       }
       if(input.action==='duplicate'){
         if(s.campaigns.length>=200)fail('จำนวนข่าวเต็ม 200 รายการ');
-        const source=c!;const copy:Campaign={id:randomUUID(),revision:1,title:(source.title.slice(0,110)+' (สำเนา)'),text:source.text,selection:{customerIds:[],groupIds:[],lineRoomIds:[]},...(source.image?{image:structuredClone(source.image)}:{}),createdAt:this.now(),updatedAt:this.now(),actor:localActor,status:'draft',deliveries:[],history:[{at:this.now(),event:'duplicate',actor:localActor}]};s.campaigns.push(copy);return copy;
+        const source=c!;const copy:Campaign={id:randomUUID(),revision:1,title:(source.title.slice(0,110)+' (สำเนา)'),text:source.text,selection:{customerIds:[],groupIds:[],lineRoomIds:[]},...(source.image?{image:structuredClone(source.image)}:{}),createdAt:this.now(),updatedAt:this.now(),actor:currentStaffActor(localActor),status:'draft',deliveries:[],history:[{at:this.now(),event:'duplicate',actor:currentStaffActor(localActor)}]};s.campaigns.push(copy);return copy;
       }
       const campaign = c!;
       if (input.action === 'create' || input.action === 'save') {
@@ -161,13 +162,13 @@ export class NewsService {
         if (!r.recipients.length) fail('ไม่มีผู้รับที่ยินยอมรับข่าว');
         campaign.deliveries = r.recipients.map(r => ({ ...r, key: randomUUID(), status: 'pending', attempts: 0, nextAt: this.now() }));
         campaign.deadline = this.now() + 900000; campaign.status = 'queued';
-        if(!this.gated){campaign.authorization={digest:campaign.review!.digest,at:this.now(),expiresAt:this.now()+1800000};campaign.history.push({at:this.now(),event:'web-confirmed',actor:localActor});}
+        if(!this.gated){campaign.authorization={digest:campaign.review!.digest,at:this.now(),expiresAt:this.now()+1800000};campaign.history.push({at:this.now(),event:'web-confirmed',actor:currentStaffActor(localActor)});}
       } else if (input.action === 'cancel') {
         if (['complete','cancelled'].includes(campaign.status)) fail('ข่าวสิ้นสุดแล้ว', 409);
         for (const d of campaign.deliveries) if (d.status === 'pending') { d.status = 'cancelled'; d.result = 'ยกเลิกก่อนส่ง'; }
         campaign.status = 'cancelled'; delete campaign.authorization;
       } else fail('ไม่รองรับคำสั่งนี้');
-      campaign.revision++; campaign.updatedAt = this.now(); campaign.history.push({ at: this.now(), event: input.action, actor: localActor }); return campaign;
+      campaign.revision++; campaign.updatedAt = this.now(); campaign.history.push({ at: this.now(), event: input.action, actor: currentStaffActor(localActor) }); return campaign;
     });
   }
   // Run once on process startup, before scheduling workers. Inflight can already be accepted;
@@ -175,7 +176,7 @@ export class NewsService {
   recover() {
     this.store.transaction(s => { for (const c of s.campaigns) for (const d of c.deliveries) if (d.status === 'inflight') { d.status = 'ambiguous'; d.result = 'โปรเซสหยุดระหว่างส่ง ไม่ส่งซ้ำอัตโนมัติ'; } this.finish(s); });
   }
-  private finish(s: State) { for (const c of s.campaigns) if (c.status === 'queued' && c.deliveries.every(d => !['pending','inflight'].includes(d.status))) { c.status = 'complete'; c.updatedAt = this.now(); c.revision++; c.history.push({ at: this.now(), event: 'complete', actor: localActor }); } }
+  private finish(s: State) { for (const c of s.campaigns) if (c.status === 'queued' && c.deliveries.every(d => !['pending','inflight'].includes(d.status))) { c.status = 'complete'; c.updatedAt = this.now(); c.revision++; c.history.push({ at: this.now(), event: 'complete', actor: currentStaffActor(localActor) }); } }
   async tick() {
     if (!this.transport) return;
     const job = this.store.transaction(s => {
@@ -188,7 +189,7 @@ export class NewsService {
         try { this.verifyImage(c);rosterValid = c.review?.digest === reviewHash(c, this.recipients(c.selection)); } catch { /* Fail closed on deleted/changed groups or registry failure. */ }
         if (!rosterValid) {
           for (const d of c.deliveries) if (d.status === 'pending') { d.status = 'cancelled'; d.result = 'ผู้รับหรือสถานะรับข่าวเปลี่ยนหลังตรวจ ต้องตรวจและยืนยันข่าวใหม่'; }
-          c.revision++; c.updatedAt = this.now(); c.history.push({ at: this.now(), event: 'review-invalidated', actor: localActor }); continue;
+          c.revision++; c.updatedAt = this.now(); c.history.push({ at: this.now(), event: 'review-invalidated', actor: currentStaffActor(localActor) }); continue;
         }
         for (const d of c.deliveries) {
           if (d.status !== 'pending') continue;
@@ -210,7 +211,7 @@ export class NewsService {
       else if (result?.status === 429 && d.attempts < 3 && c.status === 'queued' && this.now() + 30000 < c.deadline!) { d.status = 'pending'; d.nextAt = this.now() + 30000 * 2 ** (d.attempts - 1); d.result = 'จำกัดอัตรา รอลองด้วย key เดิม'; }
       else if (!result || result.status >= 500 || result.status === 409) { d.status = 'ambiguous'; d.result = 'ผลกำกวม ไม่ส่งซ้ำอัตโนมัติ'; }
       else { d.status = 'failed'; d.result = 'LINE ปฏิเสธคำขอ HTTP ' + result.status; }
-      c.revision++; c.updatedAt = this.now(); c.history.push({ at: this.now(), event: 'delivery:' + d.status, actor: localActor });
+      c.revision++; c.updatedAt = this.now(); c.history.push({ at: this.now(), event: 'delivery:' + d.status, actor: currentStaffActor(localActor) });
       for (const campaign of s.campaigns) for (const next of campaign.deliveries) if (next.status === 'pending') next.nextAt = Math.max(next.nextAt, this.now() + 1000);
       this.finish(s);
     });

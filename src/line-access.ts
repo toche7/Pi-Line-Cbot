@@ -1,3 +1,4 @@
+import { currentStaffActor, staffIdentity, validStoredActor } from './staff-context.js';
 import { mkdirSync, chmodSync, lstatSync, readFileSync, openSync, closeSync, writeFileSync, fsyncSync, renameSync, unlinkSync } from 'node:fs';
 import { join } from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
@@ -57,7 +58,7 @@ export class LineAccess {
       const candidate = pending.list().find(r => r.account === this.account && r.userId === userId);
       if (!candidate) throw new LineAccessError(404, 'ไม่พบผู้ทักใหม่รายนี้ หรือเกินช่วงเก็บแล้ว กรุณาให้ทักเข้ามาใหม่');
       if (s.grants.length >= 1000) throw new LineAccessError(400, 'รายชื่อสิทธิ์เพิ่มเติมเต็มแล้ว');
-      s.grants.push({ userId, at: new Date(this.now()).toISOString(), actor: localActor, lastSeenAt: candidate.lastSeenAt }); s.revision++;
+      s.grants.push({ userId, at: new Date(this.now()).toISOString(), actor: currentStaffActor(localActor), lastSeenAt: candidate.lastSeenAt }); s.revision++;
       temp = join(this.root, '.' + randomUUID() + '.tmp');
       const fd = openSync(temp, 'wx', 0o600);
       try { writeFileSync(fd, JSON.stringify(s)); fsyncSync(fd); } finally { closeSync(fd); }

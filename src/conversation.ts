@@ -1,13 +1,17 @@
 import { responseSession } from './response-session.js';
 import type { AgentSession } from '@earendil-works/pi-coding-agent';
-import { DemoFailure, describeFailure } from './diagnostics.js';
+import { recordModelConnection } from './model-connection.js';
+import { DemoFailure, describeFailure, failureCategory } from './diagnostics.js';
 
 export async function runConversation(
   session: AgentSession, prompt: string, timeoutMs: number,
   output: { text: (value: string) => void; status: (value: string) => void },
   progressMs = 5000,
 ) {
-  const limits = responseSession(session)?.binding.config.limits;
+  const binding = responseSession(session)?.binding.config;
+  const limits = binding?.limits;
+  const provider = binding?.provider ?? session.model?.provider;
+  const model = binding?.model ?? session.model?.id;
   const started = Date.now();
   let timedOut = false;
   let streamedFinalText = '';
@@ -58,6 +62,10 @@ export async function runConversation(
     if (!streamedFinalText) output.text(finalText);
     output.text('\n');
     output.status(`[completed in ${Date.now() - started} ms]`);
+    if (provider && model) recordModelConnection(provider, model, Date.now() - started, null);
+  } catch (error) {
+    if (provider && model) recordModelConnection(provider, model, Date.now() - started, failureCategory(error));
+    throw error;
   } finally {
     clearTimeout(timer);
     clearInterval(progress);

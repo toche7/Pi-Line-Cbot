@@ -1,0 +1,20 @@
+✔ Google staff login binds state/browser, uses one-time flows and revocable expiring sessions without network (2.161625ms)
+✔ Google login rejects state mismatch, expired flows, missing accounts and failed/unverified identity (0.437583ms)
+✔ logout and process restart invalidate sessions; browser cookies cannot forge Google identity (0.153583ms)
+✔ Google config fails closed on partial config and restricts callbacks to current local admin (0.648125ms)
+✔ staff invitations bind only verified exact addresses once, persist and do not elevate other Google accounts (4.575167ms)
+✔ staff changes prevent removing last admin, reject stale revisions, unauthorized mutation and unreadable state (3.198416ms)
+✔ role-aware admin page omits unauthorized data loaders and shows four settings only for admin (5.445917ms)
+✔ HTTP Google flow, API role/CSRF gates, replayed bodies, actor context, revocation and logout (fixtures only) (47.652041ms)
+✔ unknown and sending actions fail closed in permission routing (0.101333ms)
+✔ verified staff actor persists in takeover history and remains readable across restart (10.887125ms)
+✔ staff policy applies the approved role matrix and separately grants only named extra permissions (2.163416ms)
+✔ disabled, unknown and missing principals fail closed even with extra permissions (0.085917ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 873.596

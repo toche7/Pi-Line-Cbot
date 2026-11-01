@@ -1,3 +1,4 @@
+import { currentStaffActor, staffIdentity, validStoredActor } from './staff-context.js';
 import { mkdirSync, chmodSync, lstatSync, readFileSync, openSync, closeSync, writeFileSync, fsyncSync, renameSync, unlinkSync } from 'node:fs';
 import { join } from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
@@ -157,8 +158,8 @@ export class CustomerStore {
     }
     return changed;
   }
-  snapshot(sources: Sources) {
-    this.transaction(s => ({ value: undefined, changed: this.discover(s, sources) }));
+  snapshot(sources: Sources, discover = true) {
+    if (discover) this.transaction(s => ({ value: undefined, changed: this.discover(s, sources) }));
     const s = this.read();
     const customers = s.customers.map(c => {
       const events = c.identity.channel === 'line' ? sources.events.filter(e => e.account + ':direct' === c.identity.scope && e.userId === c.identity.user) : [];
@@ -166,7 +167,7 @@ export class CustomerStore {
       return { ...c, lastContactAt: events.reduce<string | null>((v, e) => !v || e.at > v ? e.at : v, null),
         requestCount: requests.length, displayName: c.lineProfile?.displayName ?? null, consent: c.consentHistory.at(-1)?.status ?? 'unknown' };
     });
-    return { revision: s.revision, customers, groups: s.groups, actor: localActor, authenticated: false, pushEnabled: false };
+    return { revision: s.revision, customers, groups: s.groups, actor: currentStaffActor(localActor), authenticated: Boolean(staffIdentity()), pushEnabled: false };
   }
   saveLineProfile(id: string, displayName: string) {
     const name = string(displayName, 1000, true);
@@ -201,11 +202,11 @@ export class CustomerStore {
         if (name && s.groups.some(g => g.id !== input.id && g.name.toLocaleLowerCase() === name.toLocaleLowerCase())) fail('มีกลุ่มชื่อนี้แล้ว');
         if (action === 'group.create') {
           if (s.groups.length >= 500) fail('จำนวนกลุ่มเต็ม');
-          s.groups.push({ id: randomUUID(), name, description, createdAt: at, updatedAt: at, actor: localActor });
+          s.groups.push({ id: randomUUID(), name, description, createdAt: at, updatedAt: at, actor: currentStaffActor(localActor) });
         } else {
           const group = s.groups.find(g => g.id === input.id);
           if (!group) fail('ไม่พบกลุ่ม', 404);
-          if (action === 'group.update') Object.assign(group!, { name, description, updatedAt: at, actor: localActor });
+          if (action === 'group.update') Object.assign(group!, { name, description, updatedAt: at, actor: currentStaffActor(localActor) });
           else if (action === 'group.delete') {
             s.groups = s.groups.filter(g => g.id !== input.id);
             for (const c of s.customers) c.groupIds = c.groupIds.filter(id => id !== input.id);
@@ -223,7 +224,7 @@ export class CustomerStore {
             if (source === 'ทีมตั้งชื่อเรียก' && field !== 'nickname' && value !== c!.profile[field]) fail('ที่มาทีมตั้งชื่อเรียกใช้เปลี่ยนได้เฉพาะชื่อที่ใช้เรียก');
             if (value !== c!.profile[field]) {
               c!.profileHistory.push({ field, value: c!.profile[field], provenance: c!.provenance[field] });
-              c!.profile[field] = value; c!.provenance[field] = { source, reference, at, actor: localActor };
+              c!.profile[field] = value; c!.provenance[field] = { source, reference, at, actor: currentStaffActor(localActor) };
             }
           }
         } else if (action === 'tags.update') c!.tags = list(data.tags, 50, 50);
@@ -236,7 +237,7 @@ export class CustomerStore {
           const fields = { text: string(data.text, 2000, true), kind: data.kind as Note['kind'], reference: string(data.reference, 500) };
           if (action === 'note.add') {
             if (c!.notes.length >= 500) fail('จำนวนโน้ตเต็ม');
-            c!.notes.push({ id: randomUUID(), ...fields, createdAt: at, actor: localActor, revisions: [] });
+            c!.notes.push({ id: randomUUID(), ...fields, createdAt: at, actor: currentStaffActor(localActor), revisions: [] });
           } else {
             const note = c!.notes.find(n => n.id === data.noteId && !n.deletedAt);
             if (!note) fail('ไม่พบโน้ตนี้', 404);
@@ -246,11 +247,11 @@ export class CustomerStore {
         } else if (action === 'note.delete') {
           const note = c!.notes.find(n => n.id === data.noteId && !n.deletedAt);
           if (!note) fail('ไม่พบโน้ตนี้', 404);
-          note!.deletedAt = at; note!.deletedBy = localActor; // Keep content and revisions for the local audit trail.
+          note!.deletedAt = at; note!.deletedBy = currentStaffActor(localActor); // Keep content and revisions for the local audit trail.
         } else if (action === 'consent.update') {
           if (!['unknown', 'subscribed', 'unsubscribed'].includes(data.status)) fail('สถานะรับข่าวสารไม่ถูกต้อง');
           const evidence = string(data.evidence, 1000, data.status !== 'unknown');
-          c!.consentHistory.push({ status: data.status, evidence, at, actor: localActor });
+          c!.consentHistory.push({ status: data.status, evidence, at, actor: currentStaffActor(localActor) });
         } else fail('ไม่รองรับคำสั่งนี้');
       }
       return { value: { ok: true, revision: s.revision + 1 }, changed: true };

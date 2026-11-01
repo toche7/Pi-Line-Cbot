@@ -152,5 +152,11 @@ export class MemoryStore {
       else if (/^[a-f0-9-]{36}\.tmp$/.test(name)) unlinkSync(join(this.root, name));
     }
   }
+  // Validate existing records without pruning, loading a customer, or writing probes.
+  readHealth() {
+    if (this.closed) return false;
+    try { for (const name of readdirSync(this.root)) if (/^[a-f0-9]{64}\.json$/.test(name)) this.read(join(this.root, name)); return true; }
+    catch { return false; }
+  }
   close() { if (!this.closed) { this.closed = true; unlinkSync(this.lock); } }
 }

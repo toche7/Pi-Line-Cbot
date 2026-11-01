@@ -26,6 +26,7 @@ export class NewsWorker {
       this.stopped = true; if (this.timer) clearInterval(this.timer); this.onError();
     }).finally(() => { this.pending = undefined; });
   }
+  status() { return { running: this.fd !== undefined && !this.stopped, suspended: this.stopped && this.fd !== undefined, busy: !!this.pending }; }
   private release() { if (this.fd !== undefined) { closeSync(this.fd); this.fd = undefined; unlinkSync(this.lock); } }
   async close() { this.stopped = true; if (this.timer) clearInterval(this.timer); await this.pending; this.release(); }
 }

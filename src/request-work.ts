@@ -1,3 +1,4 @@
+import { currentStaffActor, staffIdentity, validStoredActor } from './staff-context.js';
 import { mkdirSync, chmodSync, lstatSync, readFileSync, readdirSync, openSync, closeSync, writeFileSync, fsyncSync, renameSync, unlinkSync } from 'node:fs';
 import { join } from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
@@ -35,7 +36,7 @@ export class RequestWorkStore {
       const ids = new Set();
       for (const e of s.timeline) {
         if (!uuid.test(e.operationId) || ids.has(e.operationId) || !/^[a-f0-9]{64}$/.test(e.fingerprint) || !['claim', 'assign', 'status', 'note'].includes(e.action)
-          || !Number.isFinite(Date.parse(e.at)) || e.actor !== localActor) throw Error();
+          || !Number.isFinite(Date.parse(e.at)) || !validStoredActor(e.actor, localActor)) throw Error();
         text(e.text, 2000, true); ids.add(e.operationId);
       }
       return s;
@@ -54,10 +55,15 @@ export class RequestWorkStore {
     const active = new Set(rows.map(r => r.id));
     for (const name of readdirSync(this.root)) if (name.endsWith('.json') && uuid.test(name.slice(0, -5)) && !active.has(name.slice(0, -5))) unlinkSync(join(this.root, name));
   }
+  // Atomic per-file reads; no lock, pruning, or source deletion on overview GET.
+  readSnapshot(now = this.now()) {
+    const rows = this.requests.list(undefined, true).filter(r => now - Date.parse(r.createdAt) <= 90 * 86400000);
+    return rows.map(r => ({ ...r, customerId: customerId(r.owner), work: this.read(r) }));
+  }
   snapshot() {
     return this.locked(() => {
       const rows = this.requests.list(); this.prune(rows);
-      return { requests: rows.map(r => ({ ...r, customerId: customerId(r.owner), work: this.read(r) })), actor: localActor, authenticated: false, deliveryEnabled: false };
+      return { requests: rows.map(r => ({ ...r, customerId: customerId(r.owner), work: this.read(r) })), actor: currentStaffActor(localActor), authenticated: Boolean(staffIdentity()), deliveryEnabled: false };
     });
   }
   mutate(raw: unknown) {
@@ -87,7 +93,7 @@ export class RequestWorkStore {
         if (!allowed[s.status].includes(value)) return fail(409, 'เปลี่ยนสถานะนี้ไม่ได้ ให้เริ่มดูแลก่อนปิดงาน หรือเปิดงานเสร็จแล้วกลับมาดูแล');
         description = s.status + ' → ' + value; s.status = value as WorkStatus;
       }
-      s.timeline.push({ operationId: String(d.operationId), fingerprint, action, at: new Date(this.now()).toISOString(), actor: localActor, text: description }); s.revision++;
+      s.timeline.push({ operationId: String(d.operationId), fingerprint, action, at: new Date(this.now()).toISOString(), actor: currentStaffActor(localActor), text: description }); s.revision++;
       const temp = join(this.root, '.' + randomUUID() + '.tmp');
       try {
         const fd = openSync(temp, 'wx', 0o600);

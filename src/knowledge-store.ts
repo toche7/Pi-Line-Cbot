@@ -1,3 +1,4 @@
+import { currentStaffActor, staffIdentity, validStoredActor } from './staff-context.js';
 import { mkdirSync, chmodSync, lstatSync, readFileSync, openSync, closeSync, writeFileSync, fsyncSync, renameSync, unlinkSync } from 'node:fs';
 import { join } from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
@@ -71,7 +72,7 @@ export class KnowledgeStore {
       return structuredClone(this.lastGood);
     }
   }
-  snapshot() { const s = this.read(); return { ...structuredClone(s), healthy: !this.unhealthy, actor: knowledgeActor, warning: this.unhealthy ? 'ที่เก็บความรู้เสียหรือหาย ใช้ last-good แบบอ่านอย่างเดียว กรุณากู้ไฟล์ก่อนแก้หรือเผยแพร่' : '' }; }
+  snapshot() { const s = this.read(); return { ...structuredClone(s), healthy: !this.unhealthy, actor: currentStaffActor(knowledgeActor), warning: this.unhealthy ? 'ที่เก็บความรู้เสียหรือหาย ใช้ last-good แบบอ่านอย่างเดียว กรุณากู้ไฟล์ก่อนแก้หรือเผยแพร่' : '' }; }
   activeEntries() { const s = this.read(); return structuredClone(s.versions.find(v => v.id === s.active)!.entries.filter(e => !e.retired)); }
   private atomic(file: string, json: string) {
     const tmp = join(this.root,'.'+randomUUID()+'.tmp'); let fd: number | undefined;
@@ -100,15 +101,15 @@ export class KnowledgeStore {
         const v = s.versions.find(v => v.id === input.version); if (!v) fail('ไม่พบเวอร์ชัน',404);
         s.draft = structuredClone(v!.entries); delete s.review; event = 'restore:'+v!.id;
       } else if (input.action === 'review') {
-        entries(s.draft); s.review = { revision: s.revision+1, digest: knowledgeDigest(s.draft), at, actor: knowledgeActor };
+        entries(s.draft); s.review = { revision: s.revision+1, digest: knowledgeDigest(s.draft), at, actor: currentStaffActor(knowledgeActor) };
       } else if (input.action === 'publish') {
         if (input.confirm !== true || !s.review || input.digest !== s.review.digest || s.review.digest !== knowledgeDigest(s.draft) || s.review.revision !== s.revision) fail('ต้องตรวจร่างล่าสุดและยืนยันเผยแพร่อย่างชัดเจน',409);
-        const version: KnowledgeVersion = { id: randomUUID(), entries: structuredClone(s.draft), at, actor: knowledgeActor, event: 'publish', digest: s.review!.digest };
+        const version: KnowledgeVersion = { id: randomUUID(), entries: structuredClone(s.draft), at, actor: currentStaffActor(knowledgeActor), event: 'publish', digest: s.review!.digest };
         s.versions.push(version); s.active = version.id; delete s.review;
         // Retain the active snapshot and the newest 39 previous versions.
         s.versions = s.versions.slice(-40);
       } else fail('ไม่รองรับคำสั่ง');
-      s.revision++; s.history.push({ at, actor: knowledgeActor, event }); s.history = s.history.slice(-200); validateState(s);
+      s.revision++; s.history.push({ at, actor: currentStaffActor(knowledgeActor), event }); s.history = s.history.slice(-200); validateState(s);
       const json = JSON.stringify(s); if (Buffer.byteLength(json) > 20_000_000) fail('ที่เก็บความรู้เต็ม',413);
       this.beforeCommit?.(); this.atomic(this.file,json); this.lastGood = structuredClone(s);
       // Primary rename is the commit point. Backup failure must not misreport a committed publish.

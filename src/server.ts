@@ -1,3 +1,9 @@
+import { existsSync } from 'node:fs';
+import { StaffAuth } from './staff-auth.js';
+import { StaffStore } from './staff-store.js';
+import { googleLoginConfig } from './google-login.js';
+import { SystemStatusService } from './system-status.js';
+import { RequestWorkStore } from './request-work.js';
 import { NewsMediaStore } from './news-media.js';
 import { newsPublicMedia, newsImageBase } from './news-public-media.js';
 import type { HandoverTranscript } from './handover-context.js';
@@ -68,7 +74,25 @@ async function start() {
   const groupCore = new CustomerCore(undefined, timeout, log, undefined, groupMemory);
   const groupReplies = new LineGroupReplies(groupStore, groupCore, process.env.LINE_CHANNEL_ID || '', dryRun, lineReply(token), log);
   const pendingLineUsers = new PendingLineUsers(resolve('runtime/line-pending-users'));
-  const monitorServer = createServer(adminHandler(monitor, requestStore, customerStore, profiles, conversationService, news, knowledge, responseSettings, lineGroups, { store: pendingLineUsers, account: process.env.LINE_CHANNEL_ID || '', allowedUsers, access: lineAccess }));
+  const statusWork = new RequestWorkStore(resolve('runtime/request-work'), requestStore);
+  const systemStatus = new SystemStatusService({
+    startedAt: Date.now() - Math.floor(process.uptime() * 1000), webhookPort: port, adminPort: monitorPort,
+    listeners: () => ({ webhook: server.listening, admin: monitorServer.listening }),
+    token, channelConfigured: !!process.env.LINE_CHANNEL_ID, secretConfigured: !!secret, dryRun, publicBase: process.env.PUBLIC_BASE_URL || '', settings: responseSettings,
+    stores: [
+      { name: 'ความจำ LINE', check: () => store.readHealth() && groupMemory.readHealth() },
+      { name: 'บทสนทนา', check: () => !monitor.readSnapshot().storageError && !control.snapshot().storageError },
+      { name: 'ลูกค้า', check: () => { customerStore.snapshot({ events: [], requests: [] }, false); return true; } },
+      { name: 'งานคำขอ', check: () => { statusWork.readSnapshot(); return true; } },
+      { name: 'ข่าว', check: () => { news.store.list(); return true; } },
+      { name: 'ตั้งค่าบอตและความรู้', check: () => responseSettingsStore.snapshot().healthy && knowledge.snapshot().healthy },
+    ], worker: () => newsWorker.status(),
+  });
+  const loginConfig = googleLoginConfig(process.env);
+  if (loginConfig && new URL(loginConfig.redirectUri).port !== String(monitorPort)) throw new Error('Google callback port must match admin port');
+  if (!loginConfig && existsSync(resolve('runtime/staff/accounts.json'))) throw new Error('Google login config missing for existing staff registry');
+  const staffAuth = loginConfig ? new StaffAuth(new StaffStore(resolve('runtime/staff'), process.env.ADMIN_BOOTSTRAP_EMAIL || ''), loginConfig) : undefined;
+  const monitorServer = createServer(adminHandler(monitor, requestStore, customerStore, profiles, conversationService, news, knowledge, responseSettings, lineGroups, { store: pendingLineUsers, account: process.env.LINE_CHANNEL_ID || '', allowedUsers, access: lineAccess }, systemStatus, staffAuth));
   monitorServer.requestTimeout = 10000;
   monitorServer.headersTimeout = 10000;
   const adapter = new LineAdapter({ secret, account: process.env.LINE_CHANNEL_ID || 'test-oa', allowedUsers, dryRun, core, control,
