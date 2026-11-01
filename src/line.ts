@@ -27,6 +27,7 @@ export function lineReply(accessToken: string, fetcher: typeof fetch = fetch) {
 }
 
 type LineOptions = {
+  versionText?: string;
   secret: string; account: string; allowedUsers: Set<string>; dryRun: boolean;
   reply: (token: string, text: string) => Promise<void>;
   control?: ConversationControl;
@@ -115,7 +116,7 @@ export class LineAdapter {
             routing = { allowWaiting: true, text: control.mode(key).waiting
               ? 'คำขอของคุณยังรอเจ้าหน้าที่ครับ ยังไม่มีผู้รับช่วงและยังยืนยันเวลาตอบไม่ได้'
               : 'เจ้าหน้าที่รับช่วงคุยในแชต LINE นี้ได้ครับ หากต้องการ พิมพ์ ขอคุยกับเจ้าหน้าที่ ยังยืนยันเวลาตอบไม่ได้ครับ' };
-          } else if (/^\/(?:help|memory|reset|forget|confirm-forget|cancel)$/.test(prompt)) routing = { allowWaiting: true };
+          } else if (/^\/(?:help|version|memory|reset|forget|confirm-forget|cancel)$/.test(prompt)) routing = { allowWaiting: true };
         } catch { this.options.log?.({ channel: 'line', outcome: 'handover_request_storage_failed' }); return 503; }
       }
       this.seen.set(event.webhookEventId, Date.now() + 24 * 60 * 60_000);
@@ -139,7 +140,8 @@ export class LineAdapter {
         let text = routing?.text ?? '';
         let fallback = false;
         try {
-          if (!routing?.text) await this.conversations.send(identity, event.message.text, { text: value => { text += value; }, status: () => {} });
+          if (event.message.text.trim() === '/version') text = this.options.versionText || 'ยังไม่มีข้อมูลเวอร์ชันของเซิร์ฟเวอร์นี้ครับ';
+          else if (!routing?.text) await this.conversations.send(identity, event.message.text, { text: value => { text += value; }, status: () => {} });
           // Successful /reset and /confirm-forget also clear the waiting request.
           if (routing?.allowWaiting && !routing.requestId && /^\/(?:reset|confirm-forget)$/.test(event.message.text.trim())
             && ticket && control && control.mode(key).epoch === ticket.epoch + 1 && !control.mode(key).waiting && !control.mode(key).human) ticket = control.ticket(key);

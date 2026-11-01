@@ -5,6 +5,7 @@ export function commandHelp(channel: 'terminal' | 'line', client?: ChatClient) {
   return [
     `คำสั่งซีบอตใน ${channel === 'line' ? 'LINE OA นี้ (เฉพาะความจำของคุณ)' : 'Terminal'}`,
     '/help — ดูคำสั่งที่ใช้ได้',
+    ...(channel === 'line' ? ['/version — ดูรุ่นโปรแกรมและเซิร์ฟเวอร์ของแชตส่วนตัวนี้'] : []),
     ...(client?.requestsEnabled ? [
       '/book ชื่อคอร์ส — เตรียมคำขอจอง ให้ตรวจและยืนยันก่อนบันทึก',
       '/contact เรื่องที่ต้องการฝาก — เตรียมเรื่องให้ทีมงาน',

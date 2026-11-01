@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && node dist/write-build-info.js",
     "start": "node --env-file-if-exists=.env dist/main.js",
     "chat": "node --env-file-if-exists=.env dist/main.js --chat",
     "chat:natural": "node --env-file-if-exists=.env dist/natural-main.js",

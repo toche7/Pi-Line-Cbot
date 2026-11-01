@@ -1,3 +1,4 @@
+import { currentBuildInfo } from './program-version.js';
 import { systemStatusHandler, type SystemStatusService } from './system-status.js';
 import { systemStatusScript, systemStatusBody } from './system-status-admin.js';
 import { hasPermission, visibleSettings, type StaffPrincipal } from './staff-policy.js';
@@ -37,14 +38,17 @@ import { pendingUsersHandler, pendingUsersStyle, pendingUsersBody, pendingUsersS
 // Reuse the existing panels and their same-origin APIs without frames or extra ports.
 export function adminPage(token = '', staff?: { principal: StaffPrincipal; csrf: string }, serverIdentity?: {name:string;environment:string}) {
   const escapeServer = (text:string) => text.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));
-  const serverBadge = serverIdentity ? '<p id="server-identity">เซิร์ฟเวอร์: '+escapeServer(serverIdentity.name)+' · สภาพแวดล้อม: '+escapeServer(serverIdentity.environment)+'</p>' : '';
+  const build = currentBuildInfo();
+  const buildLabel = build ? build.code.slice(0,12) : 'ไม่ระบุ';
+  const versionDetails = '<section id="program-version-details"><h3>เวอร์ชันโปรแกรมที่กำลังรัน</h3><p>รุ่นโค้ด: '+escapeServer(build?.code || 'ไม่ระบุ (ยังไม่มีข้อมูล build)')+'</p>'+(build ? '<p>สร้างเมื่อ: '+escapeServer(new Date(build.builtAt).toLocaleString('th-TH',{timeZone:'Asia/Bangkok'}))+' (เวลาไทย)</p>' : '')+'</section>';
+  const serverBadge = serverIdentity ? '<p id="server-identity">เซิร์ฟเวอร์: '+escapeServer(serverIdentity.name)+' · สภาพแวดล้อม: '+escapeServer(serverIdentity.environment)+' · รุ่นโค้ด: '+buildLabel+'</p>' : '<p id="server-identity">รุ่นโค้ด: '+buildLabel+'</p>';
   const can = (permission: Parameters<typeof hasPermission>[1]) => !staff || hasPermission(staff.principal, permission);
   const showNews = can('news.draft') || can('news.send');
   const showSettings = !staff || visibleSettings(staff.principal).length > 0;
   const showSystem = can('system.inspect');
   const showPending = can('line.approve');
   const roleNewsScript = !staff ? newsScript : newsScript.replace("n.onclick=fn;return n", "n.onclick=fn;" + (!can('news.send') ? "if(/^ยืนยันส่ง|^ยกเลิก/.test(text))n.hidden=true;" : "") + (!can('news.draft') ? "if(/ทำสำเนา|บันทึก|ตรวจ|อัปโหลด|ลบรูป|แนบรูป/.test(text))n.hidden=true;" : "") + "return n").replace("const editable=['draft','reviewed'].includes(c.status)", "const editable=" + String(can('news.draft')) + "&&['draft','reviewed'].includes(c.status)");
-  const management = staff ? settingsWorkspace(staff.principal, responseSettingsBody, knowledgeBody, systemStatusBody) : botManagementBody(knowledgeBody);
+  const management = staff ? settingsWorkspace(staff.principal, responseSettingsBody, knowledgeBody, systemStatusBody + versionDetails) : botManagementBody(knowledgeBody);
   const statusScript = !showSystem ? '' : staff ? systemStatusScript.replace("document.getElementById('overview-panel').hidden", "document.getElementById('bot-management-panel').hidden||document.getElementById('settings-system').hidden") : systemStatusScript;
   const parts = (html: string) => ({
     style: html.match(/<style>([\s\S]*?)<\/style>/)![1],

@@ -1,3 +1,4 @@
+import { runningVersion } from './program-version.js';
 import { existsSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { createHash } from 'node:crypto';
@@ -109,7 +110,7 @@ async function start() {
   const monitorServer = createServer(admin);
   monitorServer.requestTimeout = 10000;
   monitorServer.headersTimeout = 10000;
-  const adapter = new LineAdapter({ secret, account: process.env.LINE_CHANNEL_ID || 'test-oa', allowedUsers, dryRun, core, control,
+  const adapter = new LineAdapter({ versionText: runningVersion(lineGroups.serverIdentity), secret, account: process.env.LINE_CHANNEL_ID || 'test-oa', allowedUsers, dryRun, core, control,
     observePendingUser: (account, userId) => pendingLineUsers.record(account, userId),
     groupReplies, observeGroup: event => groupStore.observe(event), observe: event => monitor.record(event), reply: lineReply(token), log });
   const webhook = webhookHandler(adapter), media = newsPublicMedia(news);
