@@ -1,5 +1,37 @@
 # Railway cloud trial
 
+## อัปเวอร์ชันโปรแกรมและข้อความเจ้าหน้าที่ — 1 พฤศจิกายน 2026
+
+- ผู้ใช้สั่งอัปโค้ดล่าสุด Railway เดิม; รอบนี้เพิ่ม build metadata, แสดงรุ่นในหน้าเว็บ/คำสั่ง LINE direct `/version`, prefix เจ้าหน้าที่ `Staff: ` และซ่อน audit event พักบอตที่ไม่มีข้อความจากหน้าแชต
+- แก้ write-build-info ให้ hash เฉพาะ production TypeScript และ course-catalog-data.json ตาม allowlist staging เพราะ local มี test sources ที่ไม่ได้ส่งขึ้น Docker; ตรวจ hash จาก staging ตรง local build แล้ว
+- Build และ application tests 300/300 ผ่าน; snapshot `a71ac83e-fb40-4beb-b9f1-72627c1122a6`, `Before program version update 2026-11-01` ตรวจพบใน native backup list
+- ก่อนอัป deployment `ece8dd32-1cb8-465b-be56-652551e2a7da`; ใหม่ `b038a187-56dd-4990-87ea-861818e31a33` SUCCESS รุ่นโค้ด `1476874266de` ตรง local/cloud
+- เทียบ SHA-256 production files ที่เปลี่ยน 8 ไฟล์ตรง local build; ตรวจฟังก์ชัน version reply ใน container มีรุ่นที่ถูกต้อง ไม่ได้ส่ง `/version` จริงผ่าน LINE
+- ตรวจ health/auth/Origin/signature/Google start และ LINE Platform Verify ผ่าน webhook เดิม active=true; ไม่เปลี่ยน Variables/volume/webhook ไม่ส่งข้อความจากเครื่องมือ ไม่ commit/push GitHub
+- ไม่ได้รัน Playwright UI script รอบนี้เพราะ project ไม่มี Playwright; application tests ครอบคลุม admin version visibility, LINE version command gates และบทสนทนา ผู้ใช้ควร refresh/login ใหม่แล้วลอง UI จริง
+
+## แก้ข้อความลูกค้าไม่แสดงระหว่างเจ้าหน้าที่รับช่วง — 1 พฤศจิกายน 2026
+
+- ผู้ใช้อนุญาตแก้และอัป Railway เดิมหลังรายงานข้อความธรรมดาหายจากหน้าบทสนทนา พบ browser cache รวมรายการด้วย webhook ID อย่างเดียว ทำให้รายการขาออก `bot_paused` ทับข้อความขาเข้า ID เดียวกัน
+- แก้ cache identity ให้รวม account/user/ID/direction และ cursor ฝั่ง browse ให้แยก source/ID/direction ป้องกันข้ามข้อความเมื่อ timestamp และ webhook ID ตรงกันตรงขอบหน้า ไม่มีการแก้รูปแบบข้อมูลบน volume
+- Build ผ่านและ targeted tests 18/18 ผ่าน รวม regression ทดสอบ merge ที่ใช้จริงใน browser script, polling ไม่เพิ่มรายการซ้ำ, และ API paging size=1 ที่คืน inbound/paused ครบทั้งคู่
+- ตรวจ metadata cloud โดยไม่แสดงข้อความหรือ ID ลูกค้า พบ active human conversations=0 ณ ตอนตรวจ จึงยังยืนยันข้อความที่ผู้ใช้แจ้งเป็นรายรายการไม่ได้ ไม่อ้างว่าตรวจข้อมูลจริงครบ
+- Snapshot ก่อนอัป `fafa6786-bb2e-4eb0-b797-06c91dd6f1de` ชื่อ `Before handover inbox display fix 2026-11-01` ตรวจพบใน backup list แล้ว
+- ก่อนอัป `43bff015-059b-4dea-a6a2-8c7918315e54`; deployment ตัวแก้ `ece8dd32-1cb8-465b-be56-652551e2a7da` SUCCESS ใช้ source staging แบบ allowlist 94 ไฟล์ ตรง working tree ขณะอัป ไม่เปลี่ยน Variables/webhook/volume data
+- หลังอัป SHA-256 `conversations-admin.js` และ `browse.js` ตรง build ที่ทดสอบแล้ว; health/auth/Origin/signature/Google start และ LINE Platform Verify ผ่าน endpoint เดิม active=true ไม่ส่งข้อความ LINE จากเครื่องมือ
+- ผู้ใช้ต้อง refresh/login ใหม่เพื่อรับ browser script ใหม่ แล้วลองให้เจ้าหน้าที่รับช่วงและลูกค้าตอบกลับ ยังไม่ได้ตรวจด้วย session UI จริงของผู้ใช้หรือส่งข้อความแทนลูกค้า
+
+## อัป grounded runtime และข้อมูลหลักสูตร — 1 พฤศจิกายน 2026 เวลาไทย
+
+- ผู้ใช้สั่งอัปโค้ดล่าสุดไปปลายทางเดิม `MaiLinePvd / cbot-trial`, production; ก่อนอัป deployment `698c66e7-fe43-4fec-9f01-fe3278307bd3` SUCCESS
+- Build ผ่าน, application tests 295/295 และ catalog import tests 11/11 ผ่าน เทสต์ HTTP ต้องรันนอก sandbox; importer ใช้ jsonschema ใน temp Python environment ไม่เปลี่ยน Python ระบบ
+- Native snapshot ก่อนอัป `a1a324c3-923e-4e17-9a7c-b506c11a5bae`, `Before grounded runtime update 2026-11-01` ตรวจพบใน backup list แล้ว ไม่ได้ทดสอบ restore รอบนี้
+- Staging allowlist 94 ไฟล์ตรง working tree รวม `src/course-catalog-data.json`; credential pattern scan ไม่พบ ไม่มี local runtime/.env; digest `6ebbc5c504ac6541fd7e474ab25c0901ed644c7e00e5144f6adf91e40c773d3b`
+- Deployment ใหม่ `43bff015-059b-4dea-a6a2-8c7918315e54` SUCCESS, start `node dist/server.js`, healthcheck `/healthz`, หนึ่ง replica และ volume `/data` เดิม ไม่เปลี่ยน Variables หรือ webhook
+- หลัง deploy cloud health/auth/Origin/signature/Google start และ LINE Platform Verify ผ่าน, endpoint ตรง cloud และ active=true; UI modes/server badge อยู่ครบ live=true
+- เทียบ SHA-256 ไฟล์ build บน cloud กับ local 16 ไฟล์ตรงทั้งหมด รวม grounded runtime, core, customer-runtime และข้อมูลหลักสูตร JSON ไม่ได้ส่งข้อความ LINE หรือทดสอบคำตอบโมเดลจริงรอบนี้
+- Source ปัจจุบันเลือก grounded ทั้ง LINE direct และกลุ่มตามโค้ดที่ผู้ใช้ปรับ; ข้อมูลและโหมดห้องใช้ volume เดิม ไม่ได้คัดลอกข้อมูล local หรือ commit/push GitHub
+
 ## อัปตัวแก้ชื่อ LINE รอบล่าสุด — 1 พฤศจิกายน 2026
 
 ผู้ใช้ขออัป source ล่าสุดอีกครั้ง เปรียบเทียบกับ staging รอบก่อนพบ production change ที่ `admin.ts` และ `browse.ts`: ส่ง LineProfiles เข้าหน้ารายการแบบแบ่งหน้า คืน capability ของปุ่ม refresh และ refreshDue เฉพาะรายการที่เห็นกับลูกค้าที่เลือกโดยใช้ cache/backoff เดิม หน้าตั้งโหมดห้องยังอยู่ครบ

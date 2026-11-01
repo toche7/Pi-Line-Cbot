@@ -1,0 +1,98 @@
+{
+  "status": "completed",
+  "calls": 6,
+  "requestCap": 8,
+  "environment": "temporary LINE adapters, synthetic events, in-process reply sink, no real LINE transport",
+  "records": [
+    {
+      "mode": "line-direct",
+      "version": "next",
+      "prompt": "Could you walk me through signing up for a course?",
+      "answer": "You can choose a course from the Home page and register there. If you don’t already have a membership, create one by following the registration steps on the website. I can’t complete membership, registration, payment, or seat confirmation for you.\n\nSources:\nhttps://cbtumu.net/faq/ (2026-10-23T06:17:59Z)",
+      "calls": 2,
+      "elapsedMs": 1544,
+      "statuses": []
+    },
+    {
+      "mode": "line-direct",
+      "version": "next",
+      "prompt": "เยอะเลยนะ",
+      "answer": "ใช่ครับ ขั้นตอนมีหลายอย่างหน่อย แต่หลัก ๆ ก็แค่เลือกคอร์สแล้วสมัครตามหน้าเว็บ ถ้ายังไม่มีสมาชิกก็สร้างก่อน แล้วค่อยลงทะเบียนเรียนครับ",
+      "calls": 1,
+      "elapsedMs": 501,
+      "statuses": [],
+      "trace": [
+        {
+          "intent": "lookup",
+          "query": "ขั้นตอนการสมัครและลงทะเบียนเรียน course enrollment registration steps",
+          "stopReason": "stop"
+        },
+        {
+          "intent": "answer",
+          "reply": "You can choose a course from the Home page and register there. If you don’t already have a membership, create one by following the registration steps on the website. I can’t complete membership, registration, payment, or seat confirmation for you.",
+          "evidence": [
+            {
+              "id": "faq:enroll",
+              "quote": "เลือกคอร์สจากหน้า Home แล้วลงทะเบียน หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนบนเว็บไซต์"
+            },
+            {
+              "id": "host:capabilities",
+              "quote": "ยังสมัครสมาชิก ลงทะเบียน ชำระเงิน หรือยืนยันที่นั่งแทนไม่ได้ครับ"
+            }
+          ],
+          "stopReason": "stop"
+        },
+        {
+          "intent": "chat",
+          "reply": "ใช่ครับ ขั้นตอนมีหลายอย่างหน่อย แต่หลัก ๆ ก็แค่เลือกคอร์สแล้วสมัครตามหน้าเว็บ ถ้ายังไม่มีสมาชิกก็สร้างก่อน แล้วค่อยลงทะเบียนเรียนครับ",
+          "stopReason": "stop"
+        }
+      ]
+    },
+    {
+      "mode": "line-group",
+      "version": "next",
+      "prompt": "Could you walk me through signing up for a course?",
+      "answer": "You can choose a course from the CBTU home page and register. If you don’t already have an account, create one by following the sign-up steps on the website. I can’t complete the registration for you.\n\nSources:\nhttps://cbtumu.net/faq/ (2026-10-23T06:17:59Z)",
+      "calls": 2,
+      "elapsedMs": 1638,
+      "statuses": []
+    },
+    {
+      "mode": "line-group",
+      "version": "next",
+      "prompt": "เยอะเลยนะ",
+      "answer": "ใช่ครับ ขั้นตอนมีหลายอย่างหน่อย แต่ทำทีละขั้นก็ไม่น่าจะยากเกินไปครับ",
+      "calls": 1,
+      "elapsedMs": 489,
+      "statuses": [],
+      "trace": [
+        {
+          "intent": "lookup",
+          "query": "ขั้นตอนการสมัครและลงทะเบียนเรียนหลักสูตร",
+          "stopReason": "stop"
+        },
+        {
+          "intent": "answer",
+          "reply": "You can choose a course from the CBTU home page and register. If you don’t already have an account, create one by following the sign-up steps on the website. I can’t complete the registration for you.",
+          "evidence": [
+            {
+              "id": "faq:enroll",
+              "quote": "เลือกคอร์สจากหน้า Home แล้วลงทะเบียน หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนบนเว็บไซต์"
+            },
+            {
+              "id": "host:capabilities",
+              "quote": "ยังสมัครสมาชิก ลงทะเบียน ชำระเงิน หรือยืนยันที่นั่งแทนไม่ได้ครับ"
+            }
+          ],
+          "stopReason": "stop"
+        },
+        {
+          "intent": "chat",
+          "reply": "ใช่ครับ ขั้นตอนมีหลายอย่างหน่อย แต่ทำทีละขั้นก็ไม่น่าจะยากเกินไปครับ",
+          "stopReason": "stop"
+        }
+      ]
+    }
+  ]
+}

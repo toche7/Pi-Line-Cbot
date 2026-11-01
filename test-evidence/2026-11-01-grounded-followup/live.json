@@ -1,0 +1,224 @@
+{
+  "status": "completed",
+  "calls": 3,
+  "turns": [
+    {
+      "prompt": "research",
+      "answer": "หลักสูตรที่ตรงกับ “research” มากที่สุดคือ CBTU AI Day : AI for Research ครับ\n\n• ฝึกใช้ Prism AI ช่วยค้นและสรุปข้อมูล\n• วางโครงร่างบทความวิชาการโดยคำนึงถึงจริยธรรม AI\n• กลุ่มเป้าหมาย: นักวิจัย นักศึกษา อาจารย์ และผู้สนใจ AI เพื่องานวิจัย\n• พื้นฐาน: ใช้คอมพิวเตอร์และอินเทอร์เน็ตได้ มีพื้นฐานการเขียนวิชาการ (แนะนำมีบัญชี Prism AI)\n• รูปแบบ: วิดีโอบรรยายย้อนหลังและเอกสารประกอบ\n• ระยะเวลา: 1 ชั่วโมง 30 นาที\n• วิทยากร: ผศ. ดร.ทวีศักดิ์ สมานชื่น\n• ราคาในหน้าเดิม: Free (เป็นข้อมูล snapshot ไม่ใช่ข้อเสนอสด)\n\nหมายเหตุ: วัน/รอบเรียนไม่ระบุในหน้าเดิม และสถานะ “Enroll Now” เป็นข้อมูลจากหน้าเดิม ไม่ยืนยันการเปิดรับปัจจุบันครับ\n\nหลักสูตร CBTU AI Day : AI for Research:\nhttps://cbtumu.net/coursenew/cbtu-ai-day-ai-for-research/ (2026-10-23)",
+      "calls": 2,
+      "elapsedMs": 3583
+    },
+    {
+      "prompt": "ใครสอน",
+      "answer": "วิทยากรของหลักสูตร CBTU AI Day : AI for Research คือ ผศ. ดร.ทวีศักดิ์ สมานชื่น ครับ\n\nหลักสูตร CBTU AI Day : AI for Research:\nhttps://cbtumu.net/coursenew/cbtu-ai-day-ai-for-research/ (2026-10-23)",
+      "calls": 1,
+      "elapsedMs": 689
+    }
+  ],
+  "trace": [
+    {
+      "plan": {
+        "intent": "lookup",
+        "query": "research AI for Research CBTU AI Day"
+      },
+      "stopReason": "stop",
+      "usage": {
+        "input": 3091,
+        "output": 18,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "reasoning": 0,
+        "totalTokens": 3109,
+        "cost": {
+          "input": 0.0024728000000000003,
+          "output": 0.000072,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0.0025448000000000003
+        }
+      },
+      "evidenceIds": [
+        "host:identity",
+        "host:capabilities",
+        "host:private-chat",
+        "host:requests",
+        "host:support"
+      ]
+    },
+    {
+      "plan": {
+        "intent": "answer",
+        "reply": "หลักสูตรที่ตรงกับ “research” มากที่สุดคือ CBTU AI Day : AI for Research ครับ\n\n• ฝึกใช้ Prism AI ช่วยค้นและสรุปข้อมูล\n• วางโครงร่างบทความวิชาการโดยคำนึงถึงจริยธรรม AI\n• กลุ่มเป้าหมาย: นักวิจัย นักศึกษา อาจารย์ และผู้สนใจ AI เพื่องานวิจัย\n• พื้นฐาน: ใช้คอมพิวเตอร์และอินเทอร์เน็ตได้ มีพื้นฐานการเขียนวิชาการ (แนะนำมีบัญชี Prism AI)\n• รูปแบบ: วิดีโอบรรยายย้อนหลังและเอกสารประกอบ\n• ระยะเวลา: 1 ชั่วโมง 30 นาที\n• วิทยากร: ผศ. ดร.ทวีศักดิ์ สมานชื่น\n• ราคาในหน้าเดิม: Free (เป็นข้อมูล snapshot ไม่ใช่ข้อเสนอสด)\n\nหมายเหตุ: วัน/รอบเรียนไม่ระบุในหน้าเดิม และสถานะ “Enroll Now” เป็นข้อมูลจากหน้าเดิม ไม่ยืนยันการเปิดรับปัจจุบันครับ",
+        "evidence": [
+          {
+            "id": "course:cbtu-02",
+            "quote": "outcomes: ใช้ Prism AI ช่วยค้นและสรุปข้อมูล; วางโครงงานเขียนโดยคำนึงถึงจริยธรรม AI"
+          },
+          {
+            "id": "course:cbtu-02",
+            "quote": "audience: นักวิจัย นักศึกษา อาจารย์ และผู้สนใจ AI เพื่องานวิจัย"
+          },
+          {
+            "id": "course:cbtu-02",
+            "quote": "prerequisites: ใช้คอมพิวเตอร์และอินเทอร์เน็ตได้ มีพื้นฐานการเขียนวิชาการ; แนะนำบัญชี Prism AI"
+          },
+          {
+            "id": "course:cbtu-02",
+            "quote": "format: มีวิดีโอบรรยายย้อนหลังและเอกสารประกอบ"
+          },
+          {
+            "id": "course:cbtu-02",
+            "quote": "duration: 1 ชั่วโมง 30 นาที"
+          },
+          {
+            "id": "course:cbtu-02",
+            "quote": "instructors: ผศ. ดร.ทวีศักดิ์ สมานชื่น"
+          },
+          {
+            "id": "course:cbtu-02",
+            "quote": "price: หน้าเดิมแสดง Free"
+          },
+          {
+            "id": "course:cbtu-02",
+            "quote": "sessions: not recorded"
+          },
+          {
+            "id": "course:cbtu-02",
+            "quote": "availability: Enroll Now"
+          }
+        ],
+        "sourceLabel": "หลักสูตร CBTU AI Day : AI for Research"
+      },
+      "stopReason": "stop",
+      "usage": {
+        "input": 7426,
+        "output": 430,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "reasoning": 0,
+        "totalTokens": 7856,
+        "cost": {
+          "input": 0.0059408,
+          "output": 0.00172,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0.007660800000000001
+        }
+      },
+      "refs": [
+        {
+          "id": "course:cbtu-02",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 82
+        },
+        {
+          "id": "course:cbtu-02",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 63
+        },
+        {
+          "id": "course:cbtu-02",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 93
+        },
+        {
+          "id": "course:cbtu-02",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 45
+        },
+        {
+          "id": "course:cbtu-02",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 27
+        },
+        {
+          "id": "course:cbtu-02",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 38
+        },
+        {
+          "id": "course:cbtu-02",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 24
+        },
+        {
+          "id": "course:cbtu-02",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 22
+        },
+        {
+          "id": "course:cbtu-02",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 24
+        }
+      ],
+      "evidenceIds": [
+        "host:identity",
+        "host:capabilities",
+        "host:private-chat",
+        "host:requests",
+        "host:support",
+        "course:cbtu-02",
+        "course:cbtu-03",
+        "course:cbtu-12",
+        "course:cbtu-14",
+        "course:cbtu-04",
+        "course:cbtu-01"
+      ]
+    },
+    {
+      "plan": {
+        "intent": "answer",
+        "reply": "วิทยากรของหลักสูตร CBTU AI Day : AI for Research คือ ผศ. ดร.ทวีศักดิ์ สมานชื่น ครับ",
+        "evidence": [
+          {
+            "id": "course:cbtu-02",
+            "quote": "instructors: ผศ. ดร.ทวีศักดิ์ สมานชื่น"
+          }
+        ],
+        "sourceLabel": "หลักสูตร CBTU AI Day : AI for Research"
+      },
+      "stopReason": "stop",
+      "usage": {
+        "input": 4144,
+        "output": 78,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "reasoning": 0,
+        "totalTokens": 4222,
+        "cost": {
+          "input": 0.0033152000000000004,
+          "output": 0.000312,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0.0036272000000000006
+        }
+      },
+      "refs": [
+        {
+          "id": "course:cbtu-02",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 38
+        }
+      ],
+      "evidenceIds": [
+        "host:identity",
+        "host:capabilities",
+        "host:private-chat",
+        "host:requests",
+        "host:support",
+        "course:cbtu-02"
+      ]
+    }
+  ]
+}

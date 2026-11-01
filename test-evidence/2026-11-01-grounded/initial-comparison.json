@@ -1,0 +1,148 @@
+{
+  "status": "completed",
+  "calls": 10,
+  "requestCap": 14,
+  "environment": "temporary LINE adapters, synthetic events, in-process reply sink, no real LINE transport",
+  "records": [
+    {
+      "mode": "line-direct",
+      "version": "before",
+      "prompt": "What is the exact number of people in my kitchen right now?",
+      "answer": "ยังไม่พบข้อมูลยืนยันเรื่องนี้จากแหล่ง CBTU ที่กำหนดครับ ต้องการอธิบายคำถามเพิ่ม หรือดู https://cbtumu.net/faq/ ได้ ซีบอตยังไม่ได้ส่งเรื่องให้เจ้าหน้าที่",
+      "calls": 1,
+      "elapsedMs": 780,
+      "statuses": [],
+      "trace": [
+        {
+          "intent": "unknown",
+          "reply": "ผมเป็น AI จึงไม่สามารถมองเห็นหรือทราบจำนวนคนในห้องครัวของคุณได้ครับ",
+          "stopReason": "stop"
+        }
+      ]
+    },
+    {
+      "mode": "line-direct",
+      "version": "next",
+      "prompt": "What is the exact number of people in my kitchen right now?",
+      "answer": "I don't have access to your kitchen or real-time physical surroundings, so I can't tell you how many people are there right now.",
+      "calls": 1,
+      "elapsedMs": 487,
+      "statuses": []
+    },
+    {
+      "mode": "line-direct",
+      "version": "next",
+      "prompt": "Could you walk me through signing up for a course?",
+      "answer": "I can’t complete membership, registration, payment, or seat confirmation for you. In this chat, you can submit a booking request by using /book followed by the course name, or send a message with /contact. The system will ask you to review and confirm the summary before it records the request for the team; it does not send it automatically or confirm a seat. For the full official enrollment steps, please check the CBTU website or contact staff.",
+      "calls": 2,
+      "elapsedMs": 1864,
+      "statuses": []
+    },
+    {
+      "mode": "line-direct",
+      "version": "next",
+      "prompt": "เยอะเลยนะ",
+      "answer": "ใช่ครับ มีหลายหลักสูตรเลย ถ้าอยากดูเฉพาะด้านไหน เช่น AI, Data, หรือเครื่องมือเฉพาะทาง บอกได้เลย เดี๋ยวช่วยคัดให้",
+      "calls": 1,
+      "elapsedMs": 501,
+      "statuses": [],
+      "trace": [
+        {
+          "intent": "unknown",
+          "reply": "I don't have access to your kitchen or real-time physical surroundings, so I can't tell you how many people are there right now.",
+          "stopReason": "stop"
+        },
+        {
+          "intent": "lookup",
+          "query": "sign up enroll register course process steps",
+          "stopReason": "stop"
+        },
+        {
+          "intent": "answer",
+          "reply": "I can’t complete membership, registration, payment, or seat confirmation for you. In this chat, you can submit a booking request by using /book followed by the course name, or send a message with /contact. The system will ask you to review and confirm the summary before it records the request for the team; it does not send it automatically or confirm a seat. For the full official enrollment steps, please check the CBTU website or contact staff.",
+          "evidence": [
+            {
+              "id": "host:capabilities",
+              "quote": "ยังสมัครสมาชิก ลงทะเบียน ชำระเงิน หรือยืนยันที่นั่งแทนไม่ได้ครับ"
+            },
+            {
+              "id": "host:requests",
+              "quote": "รับคำขอจองได้ครับ ใช้ /book ชื่อคอร์ส หรือฝากเรื่องด้วย /contact ข้อความ ระบบจะให้ตรวจสรุปและยืนยันก่อนบันทึกคำขอให้ทีมงาน ยังไม่ส่งต่ออัตโนมัติ ไม่ใช่การยืนยันที่นั่ง และยังสมัครสมาชิก ลงทะเบียนเรียน หรือชำระเงินแทนไม่ได้ครับ"
+            }
+          ],
+          "stopReason": "stop"
+        },
+        {
+          "intent": "chat",
+          "reply": "ใช่ครับ มีหลายหลักสูตรเลย ถ้าอยากดูเฉพาะด้านไหน เช่น AI, Data, หรือเครื่องมือเฉพาะทาง บอกได้เลย เดี๋ยวช่วยคัดให้",
+          "stopReason": "stop"
+        }
+      ]
+    },
+    {
+      "mode": "line-group",
+      "version": "before",
+      "prompt": "What is the exact number of people in my kitchen right now?",
+      "answer": "ยังไม่พบข้อมูลยืนยันเรื่องนี้จากแหล่ง CBTU ที่กำหนดครับ ต้องการอธิบายคำถามเพิ่ม หรือดู https://cbtumu.net/faq/ ได้ ซีบอตยังไม่ได้ส่งเรื่องให้เจ้าหน้าที่",
+      "calls": 1,
+      "elapsedMs": 559,
+      "statuses": [],
+      "trace": [
+        {
+          "intent": "unknown",
+          "reply": "ผมเป็น AI จึงไม่สามารถมองเห็นหรือทราบจำนวนคนในครัวของคุณได้ครับ",
+          "stopReason": "stop"
+        }
+      ]
+    },
+    {
+      "mode": "line-group",
+      "version": "next",
+      "prompt": "What is the exact number of people in my kitchen right now?",
+      "answer": "I can’t see your kitchen or know how many people are there right now.",
+      "calls": 1,
+      "elapsedMs": 532,
+      "statuses": []
+    },
+    {
+      "mode": "line-group",
+      "version": "next",
+      "prompt": "Could you walk me through signing up for a course?",
+      "answer": "I don’t have the exact step-by-step enrollment instructions in the available evidence. I can also not sign up or register for you.",
+      "calls": 2,
+      "elapsedMs": 2223,
+      "statuses": []
+    },
+    {
+      "mode": "line-group",
+      "version": "next",
+      "prompt": "เยอะเลยนะ",
+      "answer": "ใช่ครับ มีหลายหลักสูตรเลย ถ้าอยากดูเฉพาะด้านไหน เช่น AI, Data, Excel หรือ Canva บอกได้เลยครับ",
+      "calls": 1,
+      "elapsedMs": 481,
+      "statuses": [],
+      "trace": [
+        {
+          "intent": "unknown",
+          "reply": "I can’t see your kitchen or know how many people are there right now.",
+          "stopReason": "stop"
+        },
+        {
+          "intent": "lookup",
+          "query": "sign up enroll register course CBTU steps",
+          "stopReason": "stop"
+        },
+        {
+          "intent": "unknown",
+          "reply": "I don’t have the exact step-by-step enrollment instructions in the available evidence. I can also not sign up or register for you.",
+          "stopReason": "stop"
+        },
+        {
+          "intent": "chat",
+          "reply": "ใช่ครับ มีหลายหลักสูตรเลย ถ้าอยากดูเฉพาะด้านไหน เช่น AI, Data, Excel หรือ Canva บอกได้เลยครับ",
+          "stopReason": "stop"
+        }
+      ]
+    }
+  ]
+}

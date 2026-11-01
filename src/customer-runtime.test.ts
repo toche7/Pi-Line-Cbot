@@ -8,14 +8,20 @@ import { createHmac } from 'node:crypto';
 import { createAssistantMessageEventStream, type AssistantMessage } from '@earendil-works/pi-ai';
 import type { SessionManager } from '@earendil-works/pi-coding-agent';
 import { createDemo } from './agent.js';
-import { createCustomerCore } from './customer-runtime.js';
+import { createCustomerCore as createRuntimeCore } from './customer-runtime.js';
 import { CourseRequests, CourseRequestStore, requestCapabilityAnswer, requestCapabilityTopic } from './course-requests.js';
 import { ConversationControl, conversationKey } from './conversation-control.js';
 import { DemoFailure } from './diagnostics.js';
 import { LineAdapter } from './line.js';
+import { LineGroupStore } from './line-groups.js';
+import { LineGroupReplies } from './line-group-replies.js';
 import { MemoryStore } from './memory.js';
 import type { SettingsBinding } from './response-settings.js';
 import { capabilitiesTopic, renderCapabilities } from './capabilities.js';
+
+// Retain coverage of the previous routing path explicitly while production defaults to grounded.
+const createCustomerCore = (options: Parameters<typeof createRuntimeCore>[0] = {}) =>
+  createRuntimeCore({ experimentalGrounding: false, ...options });
 
 function factory(plans: object[], contexts: string[]) {
   return async (manager?: SessionManager, settings?: SettingsBinding) => {
@@ -37,7 +43,7 @@ function factory(plans: object[], contexts: string[]) {
   };
 }
 
-test('ordinary runtime uses accepted model-first routing while preserving persistent memory, request confirmation and identity isolation', async () => {
+test('retained previous runtime uses model-first routing while preserving persistent memory, request confirmation and identity isolation', async () => {
   const root = mkdtempSync(join(tmpdir(), 'customer-runtime-'));
   const contexts: string[] = [], logs: object[] = [];
   const requestsStore = new CourseRequestStore(join(root, 'requests'));
@@ -81,7 +87,7 @@ test('ordinary runtime uses accepted model-first routing while preserving persis
   } finally { await core.dispose(); store.close(); rmSync(root, { recursive: true, force: true }); }
 });
 
-test('signed direct LINE uses ordinary model-first runtime and retains host help, requests, waiting, pause/release and memory reset', async () => {
+test('signed direct LINE retains previous model-first coverage and retains host help, requests, waiting, pause/release and memory reset', async () => {
   const root = mkdtempSync(join(tmpdir(), 'line-customer-runtime-'));
   const store = new MemoryStore(join(root, 'memory'));
   const requestStore = new CourseRequestStore(join(root, 'requests'));
@@ -191,7 +197,7 @@ test('ordinary Terminal entrypoint opens help/memory/exit in an isolated cwd wit
       cwd: root, encoding: 'utf8', input: '/help\n/memory\n/exit\n', timeout: 15000,
     });
     assert.equal(child.status, 0, child.stderr);
-    assert.match(child.stdout, /Conversation routing: model-first/);
+    assert.match(child.stdout, /Conversation routing: grounded/);
     assert.match(child.stdout, /คำสั่งซีบอตใน Terminal/);
     assert.match(child.stdout, /จบแชตแล้ว/);
     assert.doesNotMatch(child.stderr, /กำลังส่งข้อความและรอคำตอบ/);
@@ -261,4 +267,63 @@ test('capability summary cannot advertise request support that is not wired in t
     assert.match(reply, /\/help/);
     assert.doesNotMatch(reply, /รับคำขอจอง|เจ้าหน้าที่เพื่อรอรับช่วง/);
   } finally { await core.dispose(); }
+});
+
+
+test('group runtime shares semantic capability routing, refers private services, and retains isolated memory and slash blocking', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'group-capabilities-'));
+  const contexts: string[] = [], replies: string[] = [];
+  const groupId = 'C' + 'a'.repeat(32), userId = 'U' + 'b'.repeat(32);
+  const directMemory = new MemoryStore(join(root, 'direct-memory'));
+  const groupMemory = new MemoryStore(join(root, 'group-memory'));
+  const requestStore = new CourseRequestStore(join(root, 'requests'));
+  const requests = new CourseRequests(requestStore);
+  const direct = createCustomerCore({ store: directMemory, requests, factory: factory([], []) });
+  const group = createCustomerCore({ store: groupMemory, factory: factory([
+    { intent: 'knowledge', topic: capabilitiesTopic.id, reply: 'จองสำเร็จในกลุ่มแล้ว' },
+    { intent: 'memory', action: 'recall' },
+    { intent: 'catalog_query', operation: 'list', scope: 'search', query: 'AI', limit: 3 },
+  ], contexts), privateChatCapabilities: { requests: true, commands: true, humanSupport: true } });
+  const rooms = new LineGroupStore(join(root, 'rooms'), 'oa');
+  rooms.observe({ groupId, type: 'join', at: new Date().toISOString() }); rooms.enableCallWord(groupId);
+  const adapter = new LineGroupReplies(rooms, group, 'oa', false, async (_token, reply) => { replies.push(reply); });
+  let sequence = 0;
+  const send = async (text: string) => {
+    adapter.accept({ type: 'message', webhookEventId: 'cap-' + sequence++, replyToken: 'fake-only',
+      source: { type: 'group', groupId, userId }, message: { type: 'text', text: 'CBOT ' + text } }, undefined);
+    await adapter.drain(); return replies.at(-1)!;
+  };
+  try {
+    await direct.client({ channel: 'line', scope: 'oa:direct', user: userId }).send('ฉันชื่อ Private-Fixture', { text() {}, status() {} });
+    const summary = await send('เธอทำอะไรได้บ้าง');
+    assert.match(summary, /ค้น.*เปรียบเทียบ/);
+    const [here, privateOnly] = summary.split('ส่วนบริการต่อไปนี้ ให้ทัก LINE ส่วนตัวกับซีบอตครับ');
+    assert.ok(privateOnly); assert.doesNotMatch(here, /คำขอจอง|ดูความจำ|ขอคุยกับเจ้าหน้าที่|\/help/);
+    for (const feature of ['คำขอจอง', 'ดูความจำ', '/help', 'เจ้าหน้าที่', 'ยืนยันที่นั่งแทนไม่ได้']) assert.ok(privateOnly.includes(feature), feature);
+    assert.doesNotMatch(summary, /จองสำเร็จในกลุ่มแล้ว|Private-Fixture/);
+    assert.equal(group.faqWithoutModel, false);
+    const callCount = contexts.length;
+    assert.match(await send('/book Excel'), /กรุณาใช้แชตส่วนตัว/);
+    assert.equal(contexts.length, callCount);
+    assert.match(await send('จำอะไรได้บ้าง'), /ยังไม่มีข้อมูล/);
+    assert.match(await send('มีคอร์ส AI อะไรบ้าง'), /AI for Research/);
+    assert.doesNotMatch(contexts.join(''), /Private-Fixture/);
+    assert.match(contexts[0], /Experimental conversation routing/);
+    assert.match(contexts[0], /privateChat/);
+    assert.equal(requestStore.list().length, 0);
+  } finally {
+    adapter.close(); await group.dispose(); await direct.dispose(); directMemory.close(); groupMemory.close();
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('private-chat referral only advertises supplied direct services and never appears in Terminal/direct summaries', () => {
+  const group = renderCapabilities({ channel: 'line', commands: false, requests: false, humanSupport: false,
+    privateChat: { requests: false, commands: true, humanSupport: false } });
+  assert.match(group, /LINE ส่วนตัว/); assert.match(group, /\/help/);
+  assert.doesNotMatch(group, /คำขอจอง|เจ้าหน้าที่/);
+  for (const channel of ['terminal', 'line'] as const) {
+    assert.doesNotMatch(renderCapabilities({ channel, commands: true, requests: false, humanSupport: false,
+      privateChat: { requests: true, commands: true, humanSupport: true } }), /ส่วนบริการต่อไปนี้|คำขอจอง|เจ้าหน้าที่/);
+  }
 });

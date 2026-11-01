@@ -1,0 +1,142 @@
+{
+  "status": "completed",
+  "calls": 4,
+  "turns": [
+    {
+      "prompt": "AI Agent Workshop with n8n ใครสอน",
+      "answer": "ตอนนี้ยังไม่มีข้อมูลผู้สอนของหลักสูตร AI Agent Workshop with n8n ที่ยืนยันได้ในชุดข้อมูล CBTU ครับ",
+      "calls": 2,
+      "elapsedMs": 1640
+    },
+    {
+      "prompt": "แล้ว AI Agent with n8n ล่ะ",
+      "answer": "ตอนนี้ยังไม่มีข้อมูลผู้สอนของหลักสูตร AI Agent with n8n ที่ยืนยันได้ในชุดข้อมูล CBTU ครับ",
+      "calls": 2,
+      "elapsedMs": 1334
+    }
+  ],
+  "trace": [
+    {
+      "plan": {
+        "intent": "catalog_query",
+        "operation": "instructor",
+        "scope": "search",
+        "query": "AI Agent Workshop with n8n"
+      },
+      "stopReason": "stop",
+      "usage": {
+        "input": 3270,
+        "output": 26,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "reasoning": 0,
+        "totalTokens": 3296,
+        "cost": {
+          "input": 0.0026160000000000003,
+          "output": 0.000104,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0.00272
+        }
+      },
+      "evidenceIds": [
+        "host:identity",
+        "host:capabilities",
+        "host:private-chat",
+        "host:requests",
+        "host:support"
+      ]
+    },
+    {
+      "plan": {
+        "intent": "unknown",
+        "reply": "ตอนนี้ยังไม่มีข้อมูลผู้สอนของหลักสูตร AI Agent Workshop with n8n ที่ยืนยันได้ในชุดข้อมูล CBTU ครับ"
+      },
+      "stopReason": "stop",
+      "usage": {
+        "input": 6113,
+        "output": 33,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "reasoning": 0,
+        "totalTokens": 6146,
+        "cost": {
+          "input": 0.0048904000000000005,
+          "output": 0.00013199999999999998,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0.005022400000000001
+        }
+      },
+      "evidenceIds": [
+        "host:identity",
+        "host:capabilities",
+        "host:private-chat",
+        "host:requests",
+        "host:support",
+        "turn:catalog"
+      ]
+    },
+    {
+      "plan": {
+        "intent": "catalog_query",
+        "operation": "instructor",
+        "scope": "search",
+        "query": "AI Agent with n8n"
+      },
+      "stopReason": "stop",
+      "usage": {
+        "input": 3446,
+        "output": 25,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "reasoning": 0,
+        "totalTokens": 3471,
+        "cost": {
+          "input": 0.0027568000000000002,
+          "output": 0.00009999999999999999,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0.0028568
+        }
+      },
+      "evidenceIds": [
+        "host:identity",
+        "host:capabilities",
+        "host:private-chat",
+        "host:requests",
+        "host:support"
+      ]
+    },
+    {
+      "plan": {
+        "intent": "unknown",
+        "reply": "ตอนนี้ยังไม่มีข้อมูลผู้สอนของหลักสูตร AI Agent with n8n ที่ยืนยันได้ในชุดข้อมูล CBTU ครับ"
+      },
+      "stopReason": "stop",
+      "usage": {
+        "input": 6345,
+        "output": 32,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "reasoning": 0,
+        "totalTokens": 6377,
+        "cost": {
+          "input": 0.005076000000000001,
+          "output": 0.000128,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0.005204
+        }
+      },
+      "evidenceIds": [
+        "host:identity",
+        "host:capabilities",
+        "host:private-chat",
+        "host:requests",
+        "host:support",
+        "turn:catalog"
+      ]
+    }
+  ]
+}

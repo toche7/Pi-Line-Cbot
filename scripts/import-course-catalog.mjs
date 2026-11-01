@@ -4,10 +4,11 @@ import { createHash, randomUUID } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { resolve, join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { groupCatalog, flattenCatalog } from './course-catalog-layout.mjs';
 const sha = text => createHash('sha256').update(text).digest('hex');
 // Optional paths support isolated import regression fixtures; neither path is a network source.
 const inputDir = resolve(process.argv[2] ?? 'research/cbtu-website');
-const output = resolve(process.argv[3] ?? 'src/course-catalog.ts');
+const output = resolve(process.argv[3] ?? 'src/course-catalog-data.json');
 const raw = await readFile(join(inputDir, 'courses.json'), 'utf8');
 const report = await readFile(join(inputDir, 'SOURCE_REPORT.md'), 'utf8');
 const validationRaw = await readFile(join(inputDir, 'validation_report.json'), 'utf8');
@@ -17,12 +18,18 @@ if (source.schema_version !== '1.1.0' || source.status !== 'research_for_owner_r
   || validation.published_catalog_sha256 !== sha(raw)) throw new Error('Unsupported schema, invalid report or catalog fingerprint');
 const archived = await readFile(join(inputDir, 'versions', sha(raw), 'courses.json'), 'utf8');
 if (archived !== raw) throw new Error('Published catalog differs from archived last-good version');
-let previous;
+let previous, previousGrouped;
 try {
   const existing = await readFile(output, 'utf8');
-  const serialized = existing.match(/ = (\{[\s\S]*\});\s*$/)?.[1];
-  if (!serialized) throw new Error('Cannot parse existing last-good catalog');
-  previous = JSON.parse(serialized);
+  if (existing.trimStart().startsWith('{')) {
+    previousGrouped = JSON.parse(existing);
+    previous = flattenCatalog(previousGrouped);
+  } else {
+    // One-time compatibility with the former generated TypeScript snapshot.
+    const serialized = existing.match(/ = (\{[\s\S]*\});\s*$/)?.[1];
+    if (!serialized) throw new Error('Cannot parse existing last-good catalog');
+    previous = JSON.parse(serialized);
+  }
 } catch (error) { if (error.code !== 'ENOENT') throw error; }
 const scripts = dirname(fileURLToPath(import.meta.url));
 // Revalidate exact candidate bytes rather than trusting a past "valid" flag.
@@ -51,13 +58,11 @@ const snapshot = { schemaVersion: source.schema_version, collectionDate: source.
   ingestion: 'Owner-authorized public metadata only; unresolved conflicts/protected fields remain unverified',
   sourceSha256: sha(raw), reportSha256: sha(report), validationSha256: sha(validationRaw),
   validationWarnings: validation.warnings, courses };
-const header = `// Generated read-only projection; run scripts/import-course-catalog.mjs only for an authorized refresh.\nexport interface Course {\n  id: string; record_type: string; name: string; canonical_url: string; detail_access: string;\n  description_th: string | null; topics: string[] | null; learning_outcomes_th: string[] | null;\n  audience_th: string | null; prerequisites_th: string | null; format_th: string | null; duration_text: string | null;\n  session_dates_text: string | null; instructors_text: string | null;\n  price: { displayed_amount: number | null; currency: string | null; reference_amount: number | null; label: string | null; is_current_offer_verified: boolean };\n  enrollment: { observed_text: string | null; is_live_availability_verified: boolean; catalog_observed_text?: string };\n  certificate: { observed_text: string | null; course_specific_pass_criteria: string | null; general_faq_rule: string; faq_url: string };\n  flags: string[]; missing_fields: string[];\n  provenance: { requested_url: string; resolved_url: string; retrieved_at: string; html_sha256: string };\n  field_sources: Record<string, string>; source_refs: { url: string; role: string }[];\n}\nexport const courseCatalog: { collectionDate: string; sourceStatus: string; ingestion: string; sourceSha256: string; reportSha256: string; validationSha256: string; courses: Course[] } = `;
-const typedHeader = header.replace('  price: {', `  instructors: { name: string; source_url: string; source_type: 'course_detail' | 'explicit_bundle_teacher' }[] | null;\n  instructor_evidence: { name: string; source_url: string; source_type: 'course_detail' | 'explicit_bundle_teacher'; excerpt: string; provenance: Course['provenance'] }[];\n  evidence: Record<string, string | null>; dates: { raw: string | null; parsed: { start_date: string; end_date: string | null }[] | null }; included_course_ids: string[];\n  price: {`)
-  .replace('collectionDate: string;', 'schemaVersion: string; validationWarnings: { code: string; path: string; message: string }[]; collectionDate: string;')
-  .replace('catalog_observed_text?: string', 'catalog_observed_text?: string | null');
+// Preserve existing instructor names when the matching ID/URL has no new website teacher data.
+const grouped = groupCatalog(snapshot, previousGrouped);
 const temporary = output + '.' + randomUUID() + '.tmp';
 try {
-  await writeFile(temporary, typedHeader + JSON.stringify(snapshot, null, 2) + ';\n', { flag: 'wx' });
+  await writeFile(temporary, JSON.stringify(grouped, null, 2) + '\n', { flag: 'wx' });
   await rename(temporary, output);
 } finally { await unlink(temporary).catch(error => { if (error.code !== 'ENOENT') throw error; }); }
 console.log(`Validated schema 1.1.0 and projected ${courses.length} public records; warnings=${validation.warnings.length}; source SHA256 ${sha(raw)}. Research files unchanged.`);

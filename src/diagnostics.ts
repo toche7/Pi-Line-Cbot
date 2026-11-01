@@ -25,6 +25,22 @@ export function lineFailureReply(error: unknown, faqWithoutModel = true): string
   if (failureCategory(error) === 'model_format') return 'โมเดลจัดรูปแบบคำตอบไม่สำเร็จ กรุณาส่งข้อความใหม่อีกครั้ง ' + help;
   return 'ขณะนี้ซีบอตยังตอบไม่ได้ กรุณาลองใหม่ภายหลัง หรือติดต่อเจ้าหน้าที่ผ่าน https://cbtumu.net/faq/';
 }
+// Experimental route: distinguish operational failure from genuinely missing
+// knowledge without echoing raw model text or redirecting every failure to FAQ.
+export function neutralFailureReply(error: unknown): string {
+  if (error instanceof DemoFailure) {
+    if (/ตรวจรูปแบบหรือหลักฐาน/.test(error.message)) return 'โมเดลส่งคำตอบมาแล้ว แต่ยังตรวจรูปแบบหรือหลักฐานไม่ผ่านครับ กรุณาลองถามใหม่';
+    if (/จำนวนครั้งเรียกโมเดล|call budget/i.test(error.message)) return 'รอบนี้ใช้จำนวนครั้งเรียกโมเดลครบแล้วครับ ยังตอบให้สำเร็จไม่ได้ กรุณาลองใหม่';
+    if (/หมดเวลา|timed out|timeout/i.test(error.message)) return 'รอบนี้โมเดลใช้เวลาตอบเกินกำหนดครับ กรุณาลองใหม่';
+    const category = failureCategory(error);
+    if (category === 'model_rate_limit') return 'โมเดลถูกจำกัดโควตาชั่วคราวครับ กรุณารอสักครู่แล้วลองใหม่';
+    if (category === 'model_auth') return 'ขณะนี้เชื่อมต่อโมเดลไม่ได้เนื่องจากสิทธิ์การใช้งานครับ กรุณาให้ผู้ดูแลตรวจการตั้งค่า';
+    if (category === 'model_network') return 'ขณะนี้เชื่อมต่อโมเดลไม่ได้ครับ กรุณาลองใหม่ภายหลัง';
+    if (category === 'model_format') return 'โมเดลส่งรูปแบบคำตอบไม่สมบูรณ์ครับ กรุณาลองใหม่';
+    if (category === 'memory_write') return 'ยังบันทึกข้อมูลเพิ่มไม่สำเร็จครับ ข้อมูลเดิมยังอยู่ กรุณาลองใหม่';
+  }
+  return 'ขณะนี้ตอบไม่ได้ กรุณาลองใหม่อีกครั้งครับ';
+}
 export function rateLimitWaitMs(raw: string): number {
   const wait = raw.match(/try again in\s*(?:(\d+)m)?\s*(\d+(?:\.\d+)?)s/i);
   return wait ? Math.max(1000, Math.min(120000, Math.ceil((Number(wait[1] || 0) * 60 + Number(wait[2])) * 1000))) : 10000;

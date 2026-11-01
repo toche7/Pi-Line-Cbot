@@ -94,7 +94,7 @@ export function browseSnapshot(resource:string,q:PageQuery,s:Sources):any {
     const list=pageOf(all,q),selected=registry.customers.find(c=>conversationKey(c)===q.selected),key=selected&&conversationKey(selected);
     const relevant=events.filter(e=>JSON.stringify([e.account,e.userId])===key).map(e=>({...e,source:'monitor'}));
     const deliveries=(control?.deliveries||[]).filter(d=>d.key===key).map(d=>({...d,source:'staff'}));
-    const combined=olderMessages<any>([...relevant,...deliveries],q,r=>r.source+':'+r.id);
+    const combined=olderMessages<any>([...relevant,...deliveries],q,r=>JSON.stringify([r.source,r.id,r.direction]));
     const relevantKeys=new Set([...list.items,...(selected?[selected]:[])].map(conversationKey));
     const recent=!!selected&&relevant.some(e=>e.direction==='in'&&Date.now()-Date.parse(e.at)>=0&&Date.now()-Date.parse(e.at)<7*86400000);
     return {...registry,customers:list.items.map(customerSummary),selectedCustomer:selected||null,events:combined.items.filter(e=>e.source==='monitor'),

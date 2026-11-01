@@ -1,0 +1,212 @@
+{
+  "status": "completed",
+  "calls": 4,
+  "turns": [
+    {
+      "prompt": "มีคอร์สอะไรบ้าง",
+      "answer": "ตอนนี้มีข้อมูลหลักสูตรทั้งหมด 20 รายการครับ ตัวอย่าง 3 รายการแรกคือ\n\n1. Data Analysis with AI — Online workshop ผ่าน Zoom ระยะเวลา 4 สัปดาห์ / 4 วัน / 12 ชั่วโมง\n2. CBTU AI Day : AI for Research — มีวิดีโอบรรยายย้อนหลังและเอกสารประกอบ ระยะเวลา 1 ชั่วโมง 30 นาที\n3. CBTU AI Day : AI for Work — มีวิดีโอบรรยายย้อนหลังและเอกสารประกอบ ระยะเวลา 2 ชั่วโมง\n\nหากต้องการดูรายการที่เหลือ พิมพ์ “ดูต่อ” ได้ครับ\n\nข้อมูลหลักสูตร CBTU:\nhttps://cbtumu.net/coursenew/dataanalysiswithai/\nhttps://cbtumu.net/coursenew/cbtu-ai-day-ai-for-research/\nhttps://cbtumu.net/coursenew/cbtu-ai-day-ai-for-work/",
+      "calls": 2,
+      "elapsedMs": 1954
+    },
+    {
+      "prompt": "canva",
+      "answer": "พบคอร์สที่เกี่ยวกับ Canva 1 รายการครับ\n\n1. สร้างสื่อสวยด้วย Canva — เรียนผ่านวิดีโอ เรียนด้วยตนเองและทบทวนซ้ำได้ เหมาะกับงานทำโปสเตอร์และสไลด์นำเสนอ\n\nต้องการดูรายละเอียดเพิ่มเติมของคอร์สนี้ไหมครับ\n\nข้อมูลหลักสูตร CBTU:\nhttps://cbtumu.net/coursenew/creativemediadesignwithcanva/",
+      "calls": 2,
+      "elapsedMs": 2101
+    }
+  ],
+  "trace": [
+    {
+      "plan": {
+        "intent": "catalog_query",
+        "operation": "list",
+        "scope": "all"
+      },
+      "stopReason": "stop",
+      "usage": {
+        "input": 3052,
+        "output": 15,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "reasoning": 0,
+        "totalTokens": 3067,
+        "cost": {
+          "input": 0.0024416000000000004,
+          "output": 0.000059999999999999995,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0.0025016000000000005
+        }
+      },
+      "evidenceIds": [
+        "host:identity",
+        "host:capabilities",
+        "host:private-chat",
+        "host:requests",
+        "host:support"
+      ]
+    },
+    {
+      "plan": {
+        "intent": "answer",
+        "reply": "ตอนนี้มีข้อมูลหลักสูตรทั้งหมด 20 รายการครับ ตัวอย่าง 3 รายการแรกคือ\n\n1. Data Analysis with AI — Online workshop ผ่าน Zoom ระยะเวลา 4 สัปดาห์ / 4 วัน / 12 ชั่วโมง\n2. CBTU AI Day : AI for Research — มีวิดีโอบรรยายย้อนหลังและเอกสารประกอบ ระยะเวลา 1 ชั่วโมง 30 นาที\n3. CBTU AI Day : AI for Work — มีวิดีโอบรรยายย้อนหลังและเอกสารประกอบ ระยะเวลา 2 ชั่วโมง\n\nหากต้องการดูรายการที่เหลือ พิมพ์ “ดูต่อ” ได้ครับ",
+        "evidence": [
+          {
+            "id": "turn:catalog",
+            "quote": "พบ 20 รายการ แสดง 1–3"
+          },
+          {
+            "id": "turn:catalog",
+            "quote": "1. Data Analysis with AI\nใช้กับงาน: เตรียมและสำรวจข้อมูลโดยใช้ AI ช่วย\nการเรียน: Online workshop ผ่าน Zoom · 4 สัปดาห์ / 4 วัน / 12 ชั่วโมง"
+          },
+          {
+            "id": "turn:catalog",
+            "quote": "2. CBTU AI Day : AI for Research\nใช้กับงาน: ค้นคว้าและวางโครงบทความวิชาการ\nการเรียน: มีวิดีโอบรรยายย้อนหลังและเอกสารประกอบ · 1 ชั่วโมง 30 นาที"
+          },
+          {
+            "id": "turn:catalog",
+            "quote": "3. CBTU AI Day : AI for Work\nใช้กับงาน: ช่วยร่างงานและทำสื่อสำหรับงานประจำ\nการเรียน: มีวิดีโอบรรยายย้อนหลังและเอกสารประกอบ · 2 ชั่วโมง"
+          },
+          {
+            "id": "turn:catalog",
+            "quote": "ยังมีรายการต่อ พิมพ์ “ดูต่อ” ได้"
+          }
+        ],
+        "sourceLabel": "ข้อมูลหลักสูตร CBTU"
+      },
+      "stopReason": "stop",
+      "usage": {
+        "input": 6008,
+        "output": 333,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "reasoning": 0,
+        "totalTokens": 6341,
+        "cost": {
+          "input": 0.004806400000000001,
+          "output": 0.0013319999999999999,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0.0061384000000000005
+        }
+      },
+      "refs": [
+        {
+          "id": "turn:catalog",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 21
+        },
+        {
+          "id": "turn:catalog",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 139
+        },
+        {
+          "id": "turn:catalog",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 142
+        },
+        {
+          "id": "turn:catalog",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 134
+        },
+        {
+          "id": "turn:catalog",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 32
+        }
+      ],
+      "evidenceIds": [
+        "host:identity",
+        "host:capabilities",
+        "host:private-chat",
+        "host:requests",
+        "host:support",
+        "turn:catalog"
+      ]
+    },
+    {
+      "plan": {
+        "intent": "catalog_query",
+        "operation": "list",
+        "scope": "search",
+        "query": "Canva",
+        "limit": 10
+      },
+      "stopReason": "stop",
+      "usage": {
+        "input": 3869,
+        "output": 25,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "reasoning": 0,
+        "totalTokens": 3894,
+        "cost": {
+          "input": 0.0030952,
+          "output": 0.00009999999999999999,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0.0031952
+        }
+      },
+      "evidenceIds": [
+        "host:identity",
+        "host:capabilities",
+        "host:private-chat",
+        "host:requests",
+        "host:support"
+      ]
+    },
+    {
+      "plan": {
+        "intent": "answer",
+        "reply": "พบคอร์สที่เกี่ยวกับ Canva 1 รายการครับ\n\n1. สร้างสื่อสวยด้วย Canva — เรียนผ่านวิดีโอ เรียนด้วยตนเองและทบทวนซ้ำได้ เหมาะกับงานทำโปสเตอร์และสไลด์นำเสนอ\n\nต้องการดูรายละเอียดเพิ่มเติมของคอร์สนี้ไหมครับ",
+        "evidence": [
+          {
+            "id": "turn:catalog",
+            "quote": "1. สร้างสื่อสวยด้วย Canva\nใช้กับงาน: ทำโปสเตอร์และสไลด์นำเสนอ\nการเรียน: วิดีโอ เรียนด้วยตนเองและทบทวนซ้ำได้"
+          }
+        ],
+        "sourceLabel": "ข้อมูลหลักสูตร CBTU"
+      },
+      "stopReason": "stop",
+      "usage": {
+        "input": 7180,
+        "output": 124,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "reasoning": 0,
+        "totalTokens": 7304,
+        "cost": {
+          "input": 0.005744000000000001,
+          "output": 0.000496,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0.006240000000000001
+        }
+      },
+      "refs": [
+        {
+          "id": "turn:catalog",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 107
+        }
+      ],
+      "evidenceIds": [
+        "host:identity",
+        "host:capabilities",
+        "host:private-chat",
+        "host:requests",
+        "host:support",
+        "turn:catalog"
+      ]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 import type { CustomerCore } from './core.js';
 import type { LineGroupStore } from './line-groups.js';
-import { lineFailureReply } from './diagnostics.js';
+import { lineFailureReply, neutralFailureReply } from './diagnostics.js';
 
 export function groupCallWordPrompt(event: any): string | undefined {
   if (event?.type !== 'message' || event.mode === 'standby' || event.source?.type !== 'group'
@@ -41,7 +41,7 @@ export class LineGroupReplies {
   private tasks = new Set<Promise<void>>();
   private tail: Promise<void> = Promise.resolve();
   private closed = false;
-  constructor(private store: LineGroupStore, private core: Pick<CustomerCore, 'client'>, private account: string,
+  constructor(private store: LineGroupStore, private core: Pick<CustomerCore, 'client'> & Partial<Pick<CustomerCore, 'faqWithoutModel' | 'neutralFallback'>>, private account: string,
     private dryRun: boolean, private reply: (replyToken: string, text: string) => Promise<void>, private log: (record: object) => void = () => {}) {}
   accept(event: any, destination: unknown): boolean {
     const mode = event?.source?.groupId ? this.store.replyMode(event.source.groupId) : undefined;
@@ -67,9 +67,9 @@ export class LineGroupReplies {
           await this.core.client({ channel: 'line', scope: this.account + ':group:' + groupId, user: userId }).send(prompt, {
             text: value => { text += value; }, status: () => {},
           });
-        } catch (error) { text = lineFailureReply(error); }
+        } catch (error) { text = this.core.neutralFallback ? neutralFailureReply(error) : lineFailureReply(error, this.core.faqWithoutModel ?? true); }
       }
-      if (!text.trim()) text = 'ยังไม่พบคำตอบที่ยืนยันได้ครับ กรุณาดู https://cbtumu.net/faq/';
+      if (!text.trim()) text = this.core.neutralFallback ? 'ยังไม่มีข้อมูลเรื่องนี้ครับ' : 'ยังไม่พบคำตอบที่ยืนยันได้ครับ กรุณาดู https://cbtumu.net/faq/';
       if (this.closed || Date.now() - receivedAt > 50000 || !this.store.mentionsEnabled(groupId) || this.store.modeRevision(groupId) !== revision) { finish('', 'cancelled'); return; }
       try { await this.reply(event.replyToken, text); finish(text, 'accepted'); this.log({ channel: 'line-group', outcome: 'reply_accepted' }); }
       catch { finish(text, 'failed'); this.log({ channel: 'line-group', outcome: 'reply_failed_no_retry' }); }

@@ -1,0 +1,179 @@
+{
+  "status": "completed",
+  "calls": 4,
+  "turns": [
+    {
+      "prompt": "AI Agent Workshop with n8n ใครสอน",
+      "answer": "คอร์ส AI Agent Workshop with n8n ระบุวิทยากรว่า ผศ.ดร. ทวีศักดิ์ สมานชื่น ครับ\n\nข้อมูลหลักสูตร:\nhttps://cbtumu.net/coursenew/n8n-workshop/\nที่มาชื่อผู้สอนของ AI Agent Workshop with n8n: คำยืนยันจากผู้ใช้ในแชตโครงการ 2026-11-01 ไม่ใช่ข้อความชื่อผู้สอนจากหน้าเว็บ",
+      "calls": 2,
+      "elapsedMs": 2758
+    },
+    {
+      "prompt": "แล้ว AI Agent with n8n ล่ะ",
+      "answer": "คอร์ส AI Agent with n8n ระบุวิทยากรว่า ผศ.ดร. ทวีศักดิ์ สมานชื่น เช่นกันครับ\n\nข้อมูลหลักสูตร AI Agent with n8n:\nhttps://cbtumu.net/coursenew/aiagentwithn8n/",
+      "calls": 2,
+      "elapsedMs": 1447
+    }
+  ],
+  "trace": [
+    {
+      "plan": {
+        "intent": "catalog_query",
+        "operation": "read",
+        "scope": "search",
+        "query": "AI Agent Workshop with n8n",
+        "fields": [
+          "instructors"
+        ]
+      },
+      "stopReason": "stop",
+      "usage": {
+        "input": 3293,
+        "output": 30,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "reasoning": 0,
+        "totalTokens": 3323,
+        "cost": {
+          "input": 0.0026344000000000003,
+          "output": 0.00011999999999999999,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0.0027544
+        }
+      },
+      "evidenceIds": [
+        "host:identity",
+        "host:capabilities",
+        "host:private-chat",
+        "host:requests",
+        "host:support"
+      ]
+    },
+    {
+      "plan": {
+        "intent": "answer",
+        "reply": "คอร์ส AI Agent Workshop with n8n ระบุวิทยากรว่า ผศ.ดร. ทวีศักดิ์ สมานชื่น ครับ",
+        "evidence": [
+          {
+            "id": "turn:catalog",
+            "quote": "AI Agent Workshop with n8n\nวิทยากร: ผศ.ดร. ทวีศักดิ์ สมานชื่น"
+          }
+        ],
+        "sourceLabel": "ข้อมูลหลักสูตร"
+      },
+      "stopReason": "stop",
+      "usage": {
+        "input": 6310,
+        "output": 76,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "reasoning": 0,
+        "totalTokens": 6386,
+        "cost": {
+          "input": 0.005048,
+          "output": 0.00030399999999999996,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0.005352
+        }
+      },
+      "refs": [
+        {
+          "id": "turn:catalog",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 61
+        }
+      ],
+      "evidenceIds": [
+        "host:identity",
+        "host:capabilities",
+        "host:private-chat",
+        "host:requests",
+        "host:support",
+        "turn:catalog"
+      ]
+    },
+    {
+      "plan": {
+        "intent": "catalog_query",
+        "operation": "read",
+        "scope": "search",
+        "query": "AI Agent with n8n",
+        "fields": [
+          "instructors"
+        ]
+      },
+      "stopReason": "stop",
+      "usage": {
+        "input": 4090,
+        "output": 29,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "reasoning": 0,
+        "totalTokens": 4119,
+        "cost": {
+          "input": 0.003272,
+          "output": 0.000116,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0.0033880000000000004
+        }
+      },
+      "evidenceIds": [
+        "host:identity",
+        "host:capabilities",
+        "host:private-chat",
+        "host:requests",
+        "host:support",
+        "course:cbtu-10"
+      ]
+    },
+    {
+      "plan": {
+        "intent": "answer",
+        "reply": "คอร์ส AI Agent with n8n ระบุวิทยากรว่า ผศ.ดร. ทวีศักดิ์ สมานชื่น เช่นกันครับ",
+        "evidence": [
+          {
+            "id": "turn:catalog",
+            "quote": "AI Agent with n8n\nวิทยากร: ผศ.ดร. ทวีศักดิ์ สมานชื่น"
+          }
+        ],
+        "sourceLabel": "ข้อมูลหลักสูตร AI Agent with n8n"
+      },
+      "stopReason": "stop",
+      "usage": {
+        "input": 7276,
+        "output": 82,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "reasoning": 0,
+        "totalTokens": 7358,
+        "cost": {
+          "input": 0.0058208,
+          "output": 0.000328,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0.0061488
+        }
+      },
+      "refs": [
+        {
+          "id": "turn:catalog",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 52
+        }
+      ],
+      "evidenceIds": [
+        "host:identity",
+        "host:capabilities",
+        "host:private-chat",
+        "host:requests",
+        "host:support",
+        "turn:catalog"
+      ]
+    }
+  ]
+}

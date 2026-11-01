@@ -202,7 +202,7 @@ test('natural check runs SDK initialization in temp and preserves source files/c
     assert.equal(process.cwd(), realpathSync(project));
     assert.equal(readFileSync(sentinel, 'utf8'), 'PRIVATE_SENTINEL_NOT_FOR_EXPERIMENT');
     assert.doesNotMatch(text, /PRIVATE_SENTINEL/);
-    assert.match(text, /model-first/);
+    assert.match(text, /grounded/);
     assert.match(text, /ไม่เรียกโมเดล/);
     assert.match(text, /ไม่มี LINE transport/);
   } finally { process.chdir(original); rmSync(project, { recursive: true, force: true }); }
@@ -226,5 +226,65 @@ test('a model cannot enable request capabilities by choosing a host topic when r
     assert.equal(await f.send('จองได้เหรอ'), unknownAnswer);
     assert.doesNotMatch(f.contexts[0], /prepareBookingRequest/);
     assert.equal(f.client.requestsEnabled, false);
+  } finally { await f.core.dispose(); }
+});
+
+
+test('browsing asks one area question then lists immediately; explicit all/filtered requests bypass advice', async () => {
+  const f = fixture([
+    { intent: 'chat', reply: 'สนใจด้านไหนครับ เช่น AI วิเคราะห์ข้อมูล หรือออกแบบสื่อ?' },
+    { intent: 'catalog_query', operation: 'list', scope: 'search', query: 'AI', limit: 3 },
+    { intent: 'catalog_query', operation: 'list', scope: 'all', limit: 3 },
+    { intent: 'catalog_query', operation: 'list', scope: 'search', query: 'Canva', limit: 3 },
+  ], 'model-first');
+  try {
+    const question = await f.send('มีหลักสูตรอะไรไหม');
+    assert.match(question, /สนใจด้านไหน/);
+    assert.doesNotMatch(question, /พื้นฐาน|เวลาเรียน|ช่วยงานอะไร|ยังไม่พบข้อมูล/);
+    assert.equal(JSON.parse(await f.client.memory!()).catalog, undefined);
+    const ai = await f.send('AI');
+    assert.match(ai, /AI for Research/); assert.doesNotMatch(ai, /พื้นฐาน|มีเวลาเรียน|ช่วยงานอะไร/);
+    const all = await f.send('ขอดูรายการทั้งหมดเลย');
+    assert.match(all, /พบ 20 รายการ/);
+    const filtered = await f.send('มีคอร์ส Canva อะไรบ้าง');
+    assert.match(filtered, /Canva/); assert.doesNotMatch(filtered, /สนใจด้านไหน/);
+    assert.equal(f.contexts.length, 4);
+    const memory = JSON.parse(await f.client.memory!());
+    assert.equal(memory.catalog.advice, undefined);
+    assert.deepEqual(memory.profile, {}); assert.deepEqual(memory.longTerm, []);
+    // Ensures this behavioral contract is supplied even on follow-up turns.
+    assert.ok(f.contexts.every(c => c.includes('Course browsing versus personal advice:')));
+  } finally { await f.core.dispose(); }
+});
+
+test('person biography, courses taught and course instructor are separate semantic operations', async () => {
+  const f = fixture([
+    { intent: 'catalog_query', operation: 'instructor', scope: 'search', query: 'ทวีศักดิ์ สมานชื่น' },
+    { intent: 'catalog_query', operation: 'list', scope: 'all', filters: [{ field: 'instructors', value: 'ทวีศักดิ์ สมานชื่น' }], limit: 3 },
+    { intent: 'catalog_query', operation: 'read', scope: 'search', query: 'Data Analysis with AI', fields: ['instructors'] },
+  ], 'model-first');
+  try {
+    const bio = await f.send('ทวีศักดิ์ สมานชื่นเป็นใคร');
+    assert.match(bio, /มีชื่อเป็นผู้สอน/); assert.match(bio, /ยังไม่มีประวัติการศึกษา/);
+    assert.doesNotMatch(bio, /พบ \d+ รายการ/);
+    assert.match(await f.send('เขาสอนคอร์สอะไรบ้าง'), /พบ \d+ รายการ/);
+    assert.match(await f.send('ใครสอน Data Analysis with AI'), /วิทยากร:.*ทวีศักดิ์/);
+    assert.match(f.contexts[1], /Host answer after commit/);
+    assert.match(f.contexts[1], /ยังไม่มีประวัติการศึกษา/);
+  } finally { await f.core.dispose(); }
+});
+
+test('opening the bot private LINE chat uses a dedicated host topic and preserves staff contact FAQ', async () => {
+  const f = fixture([
+    { intent: 'knowledge', topic: 'host:line-private-chat', reply: 'แอดไอดี @invented และเปิดเคสแล้ว' },
+    { intent: 'knowledge', topic: 'contact' },
+  ], 'model-first');
+  try {
+    const help = await f.send('add line ส่วนตัวอย่างไร');
+    assert.match(help, /เพิ่มเพื่อน/); assert.match(help, /กดแชต/);
+    assert.doesNotMatch(help, /@invented|เปิดเคสแล้ว|อีเมล|faq\//);
+    assert.equal(await f.send('ติดต่อเจ้าหน้าที่ทางไหน'), renderKnowledge('contact'));
+    assert.match(f.contexts[1], /Host answer after commit/);
+    assert.match(f.contexts[1], /QR code/);
   } finally { await f.core.dispose(); }
 });

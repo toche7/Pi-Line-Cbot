@@ -1,0 +1,334 @@
+
+> test
+> node --test dist/*.test.js
+
+✔ unified admin serves both panels and APIs on one origin with existing access restrictions (9.647875ms)
+✔ SDK runs allowed tool, rejects unregistered tool, and preserves conversation (140.077583ms)
+✔ server paging searches the whole registry, bounds list payloads and preserves selected detail outside the page (3716.731625ms)
+✔ conversation and room histories load one bounded window with stable older-message cursors and global search (5828.305208ms)
+✔ work, news, recipients, staff, pending and knowledge collections page without truncating global totals or mutation selections (2680.608916ms)
+✔ real failed LINE question sequence: list, prices, shorter, paging, price ranking and total count retain correct scope (58.514083ms)
+✔ catalog aggregate operations distinguish missing prices, all/previous/search and finite pagination (1.198084ms)
+✔ legacy bounded history recovers course context; no private data or unrelated records are needed (5.292541ms)
+✔ signed LINE failed-question replay returns prices/counts and keeps dedupe (66.439333ms)
+✔ semantic plans execute host queries; catalog state survives mixed chat/compaction/restart and resets per identity (370.072583ms)
+✔ catalog snapshot retains provenance, protected/null fields and unverified offers (6.750208ms)
+✔ retrieval supports aliases, ambiguity, Thai/English, comparison and contextual follow-ups without intercepting chat (55.328541ms)
+✔ five acceptance cases use only selected catalog facts; memory and dialogue remain available (85.670375ms)
+✔ host rejects IDs outside retrieval, retains cohort warnings and answers grounded catalog during 429 (27.938209ms)
+✔ signed LINE events use the same catalog retrieval and host comparison (14.783041ms)
+✔ chat processes queued turns in one session and exits on /exit or EOF (56.415042ms)
+✔ Ctrl-C aborts an active SDK request and closes chat cleanly (16.302916ms)
+✔ single cloud listener keeps public routes separate and protects real panel reads/writes with HTTPS staff auth (84.404917ms)
+✔ Terminal help is a host command, lists supported commands and cancels pending forget without deleting memory (24.163834ms)
+✔ signed allowlisted LINE help has no Terminal exits, does not call model and safely cancels forget (9.036208ms)
+✔ help omits memory commands when the supplied client does not implement them (0.215459ms)
+✔ handover persists per OA/user, rejects stale state and invalidates old bot tickets even after release (15.5135ms)
+✔ handover during generation suppresses active and queued bot replies; other customers continue and only fresh messages resume (28.12075ms)
+✔ handover cannot race a bot transport already sending (13.07725ms)
+✔ manual send reserves durable id before transport, suppresses concurrent/different/restarted duplicates and blocks release in flight (21.800375ms)
+✔ uncertain manual send is never auto retried; bot mode, malformed text/id and stale epochs reject (22.040541ms)
+✔ corrupt persistence fails startup; failed state writes suspend bot authority (3.832791ms)
+✔ manual LINE transport uses push with stable retry key, never old reply tokens; only API acceptance counts (3.606666ms)
+✔ conversation HTTP gates host/origin/token, account/allowlist, confirmation, seven-day eligibility, dry run and idempotency (164.809208ms)
+✔ public FAQ routing has provenance, conflicts, unknown and no transfer claims (3.707542ms)
+✔ core isolates customers/channels, serializes turns, retains grounded turns and enforces limits (313.288583ms)
+✔ dialogue routing handles open conversation and host renders institutional facts (3.208333ms)
+✔ dialogue errors and provider cooldown do not kill session or block FAQ; next chat recovers (33.399916ms)
+✔ reviewed briefs cover every course, keep real topics/provenance and distinguish inferred work from taught outcomes (1.786417ms)
+✔ job-first advice asks one stage at a time and does not pad weakly related choices (25.412208ms)
+✔ advice state persists through restart and remains isolated; reset/forget clear answers (120.291959ms)
+✔ public reader restricts fields and renders stored instructors and missing values faithfully (1.689875ms)
+✔ public reads follow displayed scope and paginate without losing the requested fields (1.2805ms)
+✔ teacher search uses verified structured names, preserves the result set for prices/count/paging and excludes unknown authors (19.779708ms)
+✔ semantic field reads work with candidate retrieval and follow-up context; host ignores invented model facts (59.896125ms)
+✔ booking requires a reviewed fresh confirmation and persists one immutable central request with no dispatch (21.218ms)
+✔ ambiguous courses and contact notes are explicit; edits invalidate old consent; secrets are refused (19.807125ms)
+✔ confirmation is bound to user/OA/channel and expires; a restart discards unsigned drafts (7.276042ms)
+✔ booking mentions and capability questions do not start requests; pending course selection does not trap ordinary dialogue (11.707375ms)
+✔ unrelated dialogue preserves pending numbered course choices without treating a question as a selection (10.77575ms)
+✔ failed and ambiguous writes never falsely confirm; retry is idempotent and cannot overwrite another owner (10.356458ms)
+✔ shared store retains separate writers and prunes only expired records; forget also removes expired own data (15.740709ms)
+✔ signed LINE intake uses no model, preserves memory/context, resets drafts and confirmed forget removes only own requests (17.114333ms)
+✔ central admin is read-only, loopback/same-origin only and renders request text as data (12.327125ms)
+✔ ordinary runtime uses accepted model-first routing while preserving persistent memory, request confirmation and identity isolation (182.140834ms)
+✔ signed direct LINE uses ordinary model-first runtime and retains host help, requests, waiting, pause/release and memory reset (75.240125ms)
+✔ direct LINE failure message no longer promises model-free FAQ for ordinary model-first runtime (0.592875ms)
+✔ signed LINE booking draft yields to capability questions and reactions without losing selection or creating a record (57.533917ms)
+✔ ordinary Terminal entrypoint opens help/memory/exit in an isolated cwd without invoking a model turn (1009.734833ms)
+✔ booking capability facts use the same host answer across typo/repeated questions and cannot be overridden by a model denial (40.796416ms)
+✔ what-can-you-do renders enabled customer capabilities and help rather than the identity paragraph, per channel (17.19375ms)
+✔ capability summary cannot advertise request support that is not wired in the current runtime (10.038292ms)
+✔ group runtime shares semantic capability routing, refers private services, and retains isolated memory and slash blocking (112.07825ms)
+✔ private-chat referral only advertises supplied direct services and never appears in Terminal/direct summaries (0.26275ms)
+✔ registry discovers only actual monitor/request identities, isolates OA/channel, and persists after history expires (27.860583ms)
+✔ profile edits track field provenance, preserve unknowns and reject invalid email/stale whole-form overwrite (25.591167ms)
+✔ notes keep customer statements separate from observations with server actor/time, edit revisions and deletion trail (37.824625ms)
+✔ manual groups support many memberships, atomic bulk add/remove, tags, duplicate validation and safe group deletion (72.400333ms)
+✔ subscription requires evidence and retains every confirmed state without creating consent through groups/tags (26.363916ms)
+✔ corrupted/symlink stores and competing writes fail closed without replacing existing records (11.886292ms)
+✔ integrated admin JavaScript parses and keeps five main tabs, same-origin endpoints and safe text rendering (2.904958ms)
+✔ customer HTTP writes require exact host, same origin, token and JSON; malformed input and persistence errors are explicit (136.599333ms)
+✔ cloud entrypoint verifies signed webhooks and keeps volume data across a graceful process restart (2444.594291ms)
+✔ cloud requires explicit mode, mounted data root and exact HTTPS Google origin; local paths remain unchanged (1.18475ms)
+✔ cloud volume starts fresh and persists a channel binding across restart (5.718084ms)
+✔ provider errors are distinct from actual deadline and never echo raw secrets (2.55125ms)
+✔ Groq Qwen uses system instructions rather than unsupported developer role (23.708875ms)
+✔ dialogue repairs malformed or truncated output once, hides plans, and restores tools/hooks (101.319291ms)
+✔ format repair shares original deadline and cancels the second request on timeout (135.728875ms)
+✔ Google staff login binds state/browser, uses one-time flows and revocable expiring sessions without network (5.337209ms)
+✔ Google login rejects state mismatch, expired flows, missing accounts and failed/unverified identity (0.609959ms)
+✔ logout and process restart invalidate sessions; browser cookies cannot forge Google identity (0.15625ms)
+✔ Google config fails closed on partial config and restricts callbacks to current local admin (0.711583ms)
+✔ handover collector isolates OA/user/window and only accepted operator messages; privacy, ordering and size are bounded (227.5655ms)
+✔ core model transport receives role-labelled handover after stale bot history; restart/compaction preserve it, reset/forget remove without replay or cross-owner leakage (576.787125ms)
+✔ release keeps human control until context sync succeeds, blocks competing sends, and fails closed on persistence errors (32.19425ms)
+✔ context import waits behind active core work and does not learn operator memory instructions (39.597958ms)
+✔ HTTP take -> manual accepted send -> inbound while paused -> release -> next bot payload includes actual conversation and no internal notes (177.10425ms)
+✔ LINE model payload and host identity know actual staff capability/waiting state; Terminal does not inherit it (26.097458ms)
+✔ explicit Thai/English requests, stop, resume and capability questions are distinct; complaints/quotes/negation do not create requests (7.374ms)
+✔ request is durable before reply, dedupes across messages/restart, does not pause ordinary bot turns or affect other identities (23.12825ms)
+✔ stop during active generation suppresses active/queued answers; one acknowledgement, inbox retained, help available, explicit resume cancels waiting (25.97175ms)
+✔ take clears waiting without automatic transition messages and starts handover context at the original request (24.262666ms)
+✔ capability question creates no waiting item; normal request upgrades to stop without changing request id/time (22.119875ms)
+✔ reset/confirmed forget clear waiting after success; human requests invalidate destructive challenges even when queued together (45.305709ms)
+✔ request persistence failure returns 503 without deduping away a retry or falsely confirming (17.552084ms)
+✔ KM API enforces loopback/Host/Origin/CSRF/JSON/size and rejects authority/prototype writes (28.463542ms)
+✔ KM API previews bound draft versus actual published answers with no network/model; review/publish/restore flow (173.0615ms)
+✔ KM browser script parses, uses safe text rendering and separate navigation preserving the five work tabs (1.39675ms)
+✔ KM draft isolation, new entry, updates, tombstones and required public evidence (115.946417ms)
+✔ KM review binds exact revision and content; stale edits, no explicit confirm and old digest cannot publish (54.778625ms)
+✔ KM committed publish drives host, semantic renderer, tool, compatibility export and existing core; survives restart (67.910625ms)
+✔ KM custom topics are live to semantic context, unknown and conflict stay explicit; retire removes active answers (123.008709ms)
+✔ KM rollback is a new reviewed publication; restart keeps history actor and timestamps (103.090625ms)
+✔ KM failed atomic commit keeps last-good bytes and answers; lock and multi-tab stale writes fail closed (53.207875ms)
+✔ KM corrupt primary recovers last-good read-only across restart, preserves corrupt bytes and refuses mutation (57.306459ms)
+✔ KM validates persisted checksum and malicious shapes; HTML stays plain data; policy/secrets/unsafe URLs rejected (79.074291ms)
+✔ KM bounded versions retain active knowledge and latest history after repeated publications (5051.776791ms)
+✔ KM existing semantic session gets new published topic context per turn and host renders active content only (126.650083ms)
+✔ owner admission changes running adapter immediately, persists across restart and preserves baseline users without replaying old messages (36.451834ms)
+✔ unknown/expired/foreign users and stale revisions cannot grant access; unreadable files and lock preserve current rights (10.209458ms)
+✔ admission HTTP requires same origin, CSRF, exact confirmation and current revision; GET cannot grant and forged actor is ignored (77.324333ms)
+✔ group discovery requires signed events and cannot call core or send replies (3.870667ms)
+✔ native self mention is required; name text, other users, all, forged target, malformed offsets and missing sender remain silent (2.112417ms)
+✔ CBOT prefix accepts case-insensitive deliberate calls only, without LINE native mention metadata (116.381542ms)
+✔ CBOT rooms accept native self mentions as a second trigger and reject plain @names, all, other users and disabled rooms (67.5985ms)
+✔ only enabled rooms reply to native tags; signed adapter keeps direct monitor/control separate and reply redelivery is durable (73.095583ms)
+✔ different senders and rooms receive isolated identities; quiet messages do not reach group core (84.313209ms)
+✔ dry run, closed service, left room and failed/ambiguous transport never produce automatic repeated messages (48.56475ms)
+✔ group slash commands and bare tags reply locally without touching core or private memory commands (74.86225ms)
+✔ real core group identity uses dedicated persistent memory and cannot load private or other group/sender facts (90.721875ms)
+✔ changing mode off then on while generating cancels the old reply, without sending to LINE (63.550166ms)
+✔ existing captured room loads without fabricated history; group records persist separate messages, dedupe and lifecycle (67.139042ms)
+✔ only signed group events reach read-only group storage, never direct monitor, model, customer or reply (19.131875ms)
+✔ room summary uses fixed GET, verifies group identity, caches names and retains last good name on errors (24.356041ms)
+✔ room API enforces local access, CSRF and refresh-only operations; integrated script parses (83.244875ms)
+✔ room mode revisions persist independently of incoming messages, reject stale changes and departed rooms (49.458042ms)
+✔ LINE signed events persist profile/recent/summary across restart; OA/user/channel stores are isolated (1493.330625ms)
+✔ LINE forget confirmation expires; memory reads enforce retention without touching another channel (39.269167ms)
+✔ pending-user view is read-only, filters current OA/allowed users and enforces local host/origin (85.016333ms)
+✔ pending admission records only metadata for signed unknown direct senders, never replies or authorizes (14.980583ms)
+✔ pending identities stay isolated per OA, persist latest observation and expire after seven days (15.949708ms)
+✔ LINE names use fixed authenticated GET, persist cache, preserve manually edited fields and never imply consent (58.231042ms)
+✔ unavailable/malformed/mismatched LINE profiles preserve cached names, keep errors safe and back off automatic retries (36.688333ms)
+✔ profile enrichment deduplicates concurrent calls and bounds work per registry snapshot (85.102875ms)
+✔ profile API refresh resolves the existing identity server-side, ignores spoofed names, and uses same CSRF checks (114.94775ms)
+✔ paged registry refreshes only visible profiles plus off-page selection and preserves manual refresh capability (156.13ms)
+✔ paged profile controls stay disabled when no LINE profile service is configured (21.136083ms)
+✔ LINE distinguishes rate-limited fallback from successful FAQ without exposing errors (5.296542ms)
+✔ LINE hides unknown exception details and identifies timeout fallback (0.455083ms)
+✔ LINE verifies raw bytes before parsing; mock reply, dedupe and user isolation (2.415875ms)
+✔ LINE dry-run sends nothing and failed replies are not retried automatically (0.326083ms)
+✔ reply client uses fixed LINE endpoint with bounded plain text and mocked fetch only (32.176041ms)
+✔ Thai paraphrases persist normalized preferences; temporary requests remain pending; profile updates are host-confirmed (151.851042ms)
+✔ references use only a single immediately previous personal fact; ambiguity clarifies and reset/new topics cancel context (273.852416ms)
+✔ store failure never confirms or changes canonical memory; retry succeeds once the write succeeds (44.9065ms)
+✔ provider/malformed extraction cannot save or promise success; secrets and policy instructions are not retained (116.94425ms)
+✔ clarification permission expires and does not survive a new core; capacity cannot evict existing preferences (114.465125ms)
+✔ host guards reject foreign ownership, assistant facts, unrequested writes, fabricated evidence and identity overrides (0.39675ms)
+✔ signed LINE and Terminal adapters confirm actual stored facts and retain user/OA/channel isolation (79.054666ms)
+✔ semantic recall reads actual owner facts without changing them; later explicit saves still work (68.138041ms)
+✔ memory keyword does not override a semantic chat answer or permit an unsolicited save (66.692375ms)
+✔ recall cannot select another owner or carry write payloads; identities stay isolated (77.189791ms)
+✔ recall cancels pending write clarification instead of granting the next message write permission (63.566459ms)
+✔ persistent memory: >20 turns, Pi compaction, next-day restart, isolation, reset and confirmed deletion (820.056625ms)
+✖ sensitive data never reaches persisted memory; questions cannot overwrite profile; failed summary/429 preserve facts (430.300833ms)
+✔ Terminal forget needs explicit confirm and cancel leaves data; reset keeps profile (28.613042ms)
+✔ separate Node processes reopen store; retention, locking and corruption fail safely (1653.789125ms)
+✔ monitor persists bounded history with restrictive permissions and removes expired history (22.017417ms)
+✔ monitor rejects foreign hosts, origins, mutations and webhook paths (7.5585ms)
+✔ monitor observes only verified fresh allowlisted messages and distinguishes delivery outcomes (1.918625ms)
+✔ natural experiment sends negation/correction/greeting to model instead of keyword FAQ; keeps actual host facts in context (67.362083ms)
+✔ natural experiment lets model interpret ambiguous follow-up and laughter without automatically repeating FAQ or paging courses (39.23575ms)
+✔ natural experiment does not preempt a correction mentioning a course with catalog keyword routing (9.404833ms)
+✔ legacy low-level core retains rule-based FAQ and greetings without model requests (17.032375ms)
+✔ natural catalog reaction repairs guarded chat in the same budget instead of silently rendering not-found (41.522042ms)
+✔ natural chat repair remains bounded and keeps factual guards intact (7.440792ms)
+✔ conversational repair cannot change intent and execute a catalog action instead (6.747458ms)
+✔ exact live catalog plan with empty filters executes once in experiment; default parser remains strict (7.093209ms)
+✔ model catalog parser preserves real filters and still rejects invalid fields/limits; repair gets catalog-specific instructions (13.728875ms)
+✔ repeated invalid catalog plans report a command error instead of blaming JSON or suggesting reset (18.13875ms)
+✔ natural check runs SDK initialization in temp and preserves source files/cwd without inference or importing private stores (22.186833ms)
+✔ temporary CLI help and exit label requests/memory as temporary without sending any model turn (1.566875ms)
+✔ a model cannot enable request capabilities by choosing a host topic when request support is absent (5.791ms)
+✔ browsing asks one area question then lists immediately; explicit all/filtered requests bypass advice (14.212291ms)
+✔ news HTTP guards loopback, host, origin, CSRF, JSON and payload; does not accept enable/grant commands (38.492959ms)
+✔ news browser script parses independently (0.533083ms)
+✔ image upload validates type, size, traversal, bytes and bounded frame dimensions (60.640333ms)
+✔ image draft stays private; approval binds exact image; confirmed mock sends image once and preserves payload after restart (302.761708ms)
+✔ replacing/removing image revokes review/grant and tampering blocks review and dispatch (205.479083ms)
+✔ public media handler serves only confirmed immutable image paths and no admin or traversal (164.939917ms)
+✔ LINE mock transport has image then text in one retry-key request (75.976875ms)
+✔ image base discovery uses only existing matching HTTPS tunnel and fails closed (1.938625ms)
+✔ room selection dedupes, counts rooms, binds approval and sends once to each room through mock (349.715ms)
+✔ room leave after review blocks confirmation and leave after queue cancels unsent work (338.674083ms)
+✔ unknown rooms and rooms belonging to another OA cannot be selected (77.632583ms)
+✔ self-service sends only after exact reviewed confirmation, without host grant; repeated confirms cannot duplicate (234.248208ms)
+✔ duplicate keeps original history intact, copies content with no recipients, clears queue/review/authorization and needs fresh review (187.425959ms)
+✔ confirmation remains readable when the clock advances between every timestamp read (149.010417ms)
+✔ news selects people/groups, dedupes and excludes unknown/opt-out; never copies notes (250.718625ms)
+✔ news exact review approval invalidates edits, changed consent and stale review (212.189875ms)
+✔ news double confirmation, concurrent tick and restart do not duplicate accepted sends (172.424ms)
+✔ news crash recovery marks inflight ambiguous and never resends (149.760625ms)
+✔ news rechecks consent immediately before dispatch and deadline expires safely (130.384959ms)
+✔ news 429 backs off with stable retry key; 5xx and timeouts stay ambiguous (472.054542ms)
+✔ news 409 accepted requires provider accepted-request-id; other 4xx fails (485.3995ms)
+✔ news cancellation and partial failures persist counts (163.127084ms)
+✔ news lock/concurrency and unreadable storage fail without overwrite (65.567125ms)
+✔ news transport matches LINE push API with stable key and no reply token (mock fetch) (45.254167ms)
+✔ news two independent processes cannot save the same campaign revision twice (276.235708ms)
+✔ news group membership changes after confirmation invalidate remaining recipients (179.648458ms)
+✔ news owner grant persists exact campaign across restart, expires, preserves identical re-review and revokes changed drafts (164.907625ms)
+✔ news worker owns singleton recovery, dispatches only queued authorized work, and drains on close (mock) (158.433042ms)
+✔ overview counts Bangkok midnight, distinct OA identities, inbound only, and omits private content (23.467833ms)
+✔ overview reads persisted work statuses and waiting separately; pending excludes allowed/other OA/expired (91.179ms)
+✔ overview GET never discovers customers, prunes expired requests/work, writes files or changes rights (26.464833ms)
+✔ overview keeps healthy sections when a source is corrupt or absent; unavailable is null not zero (23.212125ms)
+✔ overview news aggregates delivery states and ignores newer unsent drafts without sending (113.70675ms)
+✔ overview API rejects foreign origins, cross-site and writes; overview navigation defaults correctly (16.629375ms)
+✔ list client cancels superseded requests and rejects late results even if the transport ignores cancellation (4.334292ms)
+✔ page parser bounds size, rejects duplicate/unknown/malformed parameters and clamps deleted last pages (3.28025ms)
+✔ message cursor orders tied timestamps, returns every retained message exactly once and resists newer arrivals (10.488ms)
+✔ work persists across restart; original request unchanged; retries are idempotent even with stale revision (53.551542ms)
+✔ revision conflicts, invalid transitions, forged actor/foreign owner and duplicate payload conflicts preserve data (112.864542ms)
+✔ missing, forgotten and expired requests never expose or recreate orphan work (47.537ms)
+✔ corrupt store and lock do not overwrite work; atomic failure keeps existing data (45.809416ms)
+✔ two independent processes cannot lose updates with the same revision (1041.990666ms)
+✔ failure before atomic rename preserves prior file and removes temporary write (917.710458ms)
+✔ request API rejects cross-site writes, bounds payload and protects actor and identity (61.808041ms)
+✔ response settings HTTP enforces loopback/Host/Origin/CSRF/JSON/size and never runs models on GET/save/review/apply without approval (138.251083ms)
+✔ response settings UI uses safe rendering and one management page with settings above intact KM and exactly five customer tabs (4.899208ms)
+✔ response settings draft isolation, strict bounds, secret/authority/prototype denial and SDK pair readiness (32.570458ms)
+✔ response settings trial quota consent, exact draft/context review, explicit confirmation and restart (143.774458ms)
+✔ response settings edit, knowledge/policy change, expiration and rollback invalidate review until new successful trial (398.066459ms)
+✔ response settings failed model trial clears old approval; failed session preparation and atomic write keep active unchanged (137.374583ms)
+✔ response settings busy/concurrent preview and stale save are rejected without approving stale model results (29.549208ms)
+✔ response settings corrupt primary/backup/checksum never overwrite files; last-good remains usable after restart (77.27375ms)
+✔ response settings abort, unsupported/unconfigured providers and failed active comparison never change active config (75.472542ms)
+✔ response settings affect real SDK system prompt/token cap while fixed policy and tool allowlist remain immutable (26.909875ms)
+✔ response settings active SDK model call budget blocks additional requests (29.462292ms)
+✔ response settings next-turn replacement affects Terminal and LINE and preserves canonical memory across model versions (186.83225ms)
+✔ response settings inflight and queued turns bind separate versions without interrupting or losing prior conversation (104.487625ms)
+✔ response settings configured deadline aborts real SDK mock stream on both channels (2018.743167ms)
+✔ response settings keeps bounded versions/active across restart and detects tampered checksums (1247.528333ms)
+✔ response settings provider/model cooldown isolates old 429 from newly selected model on another identity (65.426458ms)
+✔ mode API requires authenticated admin, origin and token; stale update is conflict and identity escapes HTML (87.298375ms)
+✔ staff invitations bind only verified exact addresses once, persist and do not elevate other Google accounts (11.361083ms)
+✔ staff changes prevent removing last admin, reject stale revisions, unauthorized mutation and unreadable state (12.264875ms)
+✔ role-aware admin page omits unauthorized data loaders and shows four settings only for admin (9.426792ms)
+✔ HTTP Google flow, API role/CSRF gates, replayed bodies, actor context, revocation and logout (fixtures only) (134.55825ms)
+✔ unknown and sending actions fail closed in permission routing (0.140083ms)
+✔ verified staff actor persists in takeover history and remains readable across restart (11.860333ms)
+✔ staff policy applies the approved role matrix and separately grants only named extra permissions (1.57475ms)
+✔ disabled, unknown and missing principals fail closed even with extra permissions (0.097917ms)
+✔ status GET reads internal state only, never calls LINE/public/model and never exposes keys (6.144333ms)
+✔ explicit external check reads only fixed LINE endpoints and configured public health; cache and stale states (2.715292ms)
+✔ external checks distinguish failed API, closed webhook, mismatch and inaccessible HTTPS without raw errors (1.719292ms)
+✔ missing tunnel is unknown, fixed configured HTTPS works without ngrok and untrusted origins are not probed (0.7775ms)
+✔ concurrent explicit checks share one probe; dry-run and source failures remain visible (0.400875ms)
+✔ AI uses evidence for active provider/model only; old or absent results do not claim connectivity (0.409ms)
+✔ status API protects external check with same-origin/CSRF and rejects write methods without side effects (2.711917ms)
+✔ model evidence is recorded only by actual conversation attempts and excludes prompts/raw errors (1.601667ms)
+✔ memory health validates read-only and preserves expired/corrupt files (8.13225ms)
+✔ failed status checks distinguish expired page permission, unavailable checker and timeout from LINE failure (0.642042ms)
+✔ overview automatically checks absent/stale evidence, but leaves fresh external evidence alone (0.136458ms)
+✔ read-only diagnostic recovers rotated page token once after server restart; never reloads or probes arbitrary destinations (1.253041ms)
+ℹ tests 251
+ℹ suites 0
+ℹ pass 250
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 14802.343333
+
+✖ failing tests:
+
+test at dist/memory.test.js:131:1
+✖ sensitive data never reaches persisted memory; questions cannot overwrite profile; failed summary/429 preserve facts (430.300833ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    [
+      {
+        assistant: 'เลือกคอร์สจากหน้า Home แล้วลงทะเบียน หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนบนเว็บไซต์\n' +
+          'แหล่งข้อมูล: https://cbtumu.net/faq/\n' +
+          'เก็บข้อมูล: 2026-10-23T06:17:59Z (ข้อมูลสำเนา ไม่ใช่การตรวจสด)',
+  -     at: 1793525177291,
+  -     user: 'สมัครเรียนอย่างไร'
+  -   },
+  -   {
+  -     assistant: 'เลือกคอร์สจากหน้า Home แล้วลงทะเบียน หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนบนเว็บไซต์\n' +
+  -       'แหล่งข้อมูล: https://cbtumu.net/faq/\n' +
+  -       'เก็บข้อมูล: 2026-10-23T06:17:59Z (ข้อมูลสำเนา ไม่ใช่การตรวจสด)',
+  -     at: 1793525177304,
+  -     user: 'สมัครเรียนอย่างไร'
+  -   },
+  -   {
+  -     assistant: 'เลือกคอร์สจากหน้า Home แล้วลงทะเบียน หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนบนเว็บไซต์\n' +
+  -       'แหล่งข้อมูล: https://cbtumu.net/faq/\n' +
+  -       'เก็บข้อมูล: 2026-10-23T06:17:59Z (ข้อมูลสำเนา ไม่ใช่การตรวจสด)',
+  -     at: 1793525177315,
+  -     user: 'สมัครเรียนอย่างไร'
+  -   },
+  -   {
+  -     assistant: 'เลือกคอร์สจากหน้า Home แล้วลงทะเบียน หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนบนเว็บไซต์\n' +
+  -       'แหล่งข้อมูล: https://cbtumu.net/faq/\n' +
+  -       'เก็บข้อมูล: 2026-10-23T06:17:59Z (ข้อมูลสำเนา ไม่ใช่การตรวจสด)',
+  -     at: 1793525177331,
+  -     user: 'สมัครเรียนอย่างไร'
+  -   },
+  -   {
+  -     assistant: 'เลือกคอร์สจากหน้า Home แล้วลงทะเบียน หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนบนเว็บไซต์\n' +
+  -       'แหล่งข้อมูล: https://cbtumu.net/faq/\n' +
+  -       'เก็บข้อมูล: 2026-10-23T06:17:59Z (ข้อมูลสำเนา ไม่ใช่การตรวจสด)',
+  -     at: 1793525177346,
+  -     user: 'สมัครเรียนอย่างไร'
+  -   },
+  -   {
+  -     assistant: 'เลือกคอร์สจากหน้า Home แล้วลงทะเบียน หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนบนเว็บไซต์\n' +
+  -       'แหล่งข้อมูล: https://cbtumu.net/faq/\n' +
+  -       'เก็บข้อมูล: 2026-10-23T06:17:59Z (ข้อมูลสำเนา ไม่ใช่การตรวจสด)',
+  -     at: 1793525177359,
+  -     user: 'สมัครเรียนอย่างไร'
+  -   },
+  -   {
+  -     assistant: 'เลือกคอร์สจากหน้า Home แล้วลงทะเบียน หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนบนเว็บไซต์\n' +
+  -       'แหล่งข้อมูล: https://cbtumu.net/faq/\n' +
+  -       'เก็บข้อมูล: 2026-10-23T06:17:59Z (ข้อมูลสำเนา ไม่ใช่การตรวจสด)',
+        at: 1793525177379,
+        user: 'สมัครเรียนอย่างไร'
+      },
+      {
+        assistant: 'เลือกคอร์สจากหน้า Home แล้วลงทะเบียน หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนบนเว็บไซต์\n' +
+  
+      at TestContext.<anonymous> (file:///Users/taweesaksamanchuen/Dev/codexOnPC/pi-sdk-demo/dist/memory.test.js:150:16)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ { user: 'สมัครเรียนอย่างไร', assistant: 'เลือกคอร์สจากหน้า Home แล้วลงทะเบียน หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนบนเว็บไซต์\nแหล่งข้อมูล: https://cbtumu.net/faq/\nเก็บข้อมูล: 2026-10-23T06:17:59Z (ข้อมูลสำเนา ไม่ใช่การตรวจสด)', at: 1793525177379 }, { user: 'สมัครเรียนอย่างไร', assistant: 'เลือกคอร์สจากหน้า Home แล้วลงทะเบียน หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนบนเว็บไซต์\nแหล่งข้อมูล: https://cbtumu.net/faq/\nเก็บข้อมูล: 2026-10-23T06:17:59Z (ข้อมูลสำเนา ไม่ใช่การตรวจสด)', at: 1793525177393 }, { user: 'สมัครเรียนอย่างไร', assistant: 'เลือกคอร์สจากหน้า Home แล้วลงทะเบียน หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนบนเว็บไซต์\nแหล่งข้อมูล: https://cbtumu.net/faq/\nเก็บข้อมูล: 2026-10-23T06:17:59Z (ข้อมูลสำเนา ไม่ใช่การตรวจสด)', at: 1793525177405 }, { user: 'สมัครเรียนอย่างไร', assistant: 'เลือกคอร์สจากหน้า Home แล้วลงทะเบียน หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนบนเว็บไซต์\nแหล่งข้อมูล: https://cbtumu.net/faq/\nเก็บข้อมูล: 2026-10-23T06:17:59Z (ข้อมูลสำเนา ไม่ใช่การตรวจสด)', at: 1793525177410 }, { user: 'สมัครเรียนอย่างไร', assistant: 'เลือกคอร์สจากหน้า Home แล้วลงทะเบียน หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนบนเว็บไซต์\nแหล่งข้อมูล: https://cbtumu.net/faq/\nเก็บข้อมูล: 2026-10-23T06:17:59Z (ข้อมูลสำเนา ไม่ใช่การตรวจสด)', at: 1793525177417 }, { user: 'สมัครเรียนอย่างไร', assistant: 'เลือกคอร์สจากหน้า Home แล้วลงทะเบียน หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนบนเว็บไซต์\nแหล่งข้อมูล: https://cbtumu.net/faq/\nเก็บข้อมูล: 2026-10-23T06:17:59Z (ข้อมูลสำเนา ไม่ใช่การตรวจสด)', at: 1793525177429 } ],
+    expected: [ { user: 'สมัครเรียนอย่างไร', assistant: 'เลือกคอร์สจากหน้า Home แล้วลงทะเบียน หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนบนเว็บไซต์\nแหล่งข้อมูล: https://cbtumu.net/faq/\nเก็บข้อมูล: 2026-10-23T06:17:59Z (ข้อมูลสำเนา ไม่ใช่การตรวจสด)', at: 1793525177291 }, { user: 'สมัครเรียนอย่างไร', assistant: 'เลือกคอร์สจากหน้า Home แล้วลงทะเบียน หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนบนเว็บไซต์\nแหล่งข้อมูล: https://cbtumu.net/faq/\nเก็บข้อมูล: 2026-10-23T06:17:59Z (ข้อมูลสำเนา ไม่ใช่การตรวจสด)', at: 1793525177304 }, { user: 'สมัครเรียนอย่างไร', assistant: 'เลือกคอร์สจากหน้า Home แล้วลงทะเบียน หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนบนเว็บไซต์\nแหล่งข้อมูล: https://cbtumu.net/faq/\nเก็บข้อมูล: 2026-10-23T06:17:59Z (ข้อมูลสำเนา ไม่ใช่การตรวจสด)', at: 1793525177315 }, { user: 'สมัครเรียนอย่างไร', assistant: 'เลือกคอร์สจากหน้า Home แล้วลงทะเบียน หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนบนเว็บไซต์\nแหล่งข้อมูล: https://cbtumu.net/faq/\nเก็บข้อมูล: 2026-10-23T06:17:59Z (ข้อมูลสำเนา ไม่ใช่การตรวจสด)', at: 1793525177331 }, { user: 'สมัครเรียนอย่างไร', assistant: 'เลือกคอร์สจากหน้า Home แล้วลงทะเบียน หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนบนเว็บไซต์\nแหล่งข้อมูล: https://cbtumu.net/faq/\nเก็บข้อมูล: 2026-10-23T06:17:59Z (ข้อมูลสำเนา ไม่ใช่การตรวจสด)', at: 1793525177346 }, { user: 'สมัครเรียนอย่างไร', assistant: 'เลือกคอร์สจากหน้า Home แล้วลงทะเบียน หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนบนเว็บไซต์\nแหล่งข้อมูล: https://cbtumu.net/faq/\nเก็บข้อมูล: 2026-10-23T06:17:59Z (ข้อมูลสำเนา ไม่ใช่การตรวจสด)', at: 1793525177359 }, { user: 'สมัครเรียนอย่างไร', assistant: 'เลือกคอร์สจากหน้า Home แล้วลงทะเบียน หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนบนเว็บไซต์\nแหล่งข้อมูล: https://cbtumu.net/faq/\nเก็บข้อมูล: 2026-10-23T06:17:59Z (ข้อมูลสำเนา ไม่ใช่การตรวจสด)', at: 1793525177379 }, { user: 'สมัครเรียนอย่างไร', assistant: 'เลือกคอร์สจากหน้า Home แล้วลงทะเบียน หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนบนเว็บไซต์\nแหล่งข้อมูล: https://cbtumu.net/faq/\nเก็บข้อมูล: 2026-10-23T06:17:59Z (ข้อมูลสำเนา ไม่ใช่การตรวจสด)', at: 1793525177393 }, { user: 'สมัครเรียนอย่างไร', assistant: 'เลือกคอร์สจากหน้า Home แล้วลงทะเบียน หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนบนเว็บไซต์\nแหล่งข้อมูล: https://cbtumu.net/faq/\nเก็บข้อมูล: 2026-10-23T06:17:59Z (ข้อมูลสำเนา ไม่ใช่การตรวจสด)', at: 1793525177405 }, { user: 'สมัครเรียนอย่างไร', assistant: 'เลือกคอร์สจากหน้า Home แล้วลงทะเบียน หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนบนเว็บไซต์\nแหล่งข้อมูล: https://cbtumu.net/faq/\nเก็บข้อมูล: 2026-10-23T06:17:59Z (ข้อมูลสำเนา ไม่ใช่การตรวจสด)', at: 1793525177410 }, { user: 'สมัครเรียนอย่างไร', assistant: 'เลือกคอร์สจากหน้า Home แล้วลงทะเบียน หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนบนเว็บไซต์\nแหล่งข้อมูล: https://cbtumu.net/faq/\nเก็บข้อมูล: 2026-10-23T06:17:59Z (ข้อมูลสำเนา ไม่ใช่การตรวจสด)', at: 1793525177417 }, { user: 'สมัครเรียนอย่างไร', assistant: 'เลือกคอร์สจากหน้า Home แล้วลงทะเบียน หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนบนเว็บไซต์\nแหล่งข้อมูล: https://cbtumu.net/faq/\nเก็บข้อมูล: 2026-10-23T06:17:59Z (ข้อมูลสำเนา ไม่ใช่การตรวจสด)', at: 1793525177429 } ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

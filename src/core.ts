@@ -13,7 +13,8 @@ import { renderCatalog, catalogTopicForAnswer } from './catalog.js';
 import { routeCatalog, recoverCatalogState, executeCatalogQuery, parseCatalogQuery } from './catalog-query.js';
 import { safeMemoryInput, mayRequestMemory, canLearnDirectly, canResumeMemory, decideMemory, applyMemoryChanges, memoryConfirmation, MemoryCapacityError } from './memory-request.js';
 import { requestCapabilityAnswer, type CourseRequests } from './course-requests.js';
-import { renderCapabilities } from './capabilities.js';
+import { renderPrivateChatHelp } from './private-chat-help.js';
+import { renderCapabilities, type PrivateChatCapabilities } from './capabilities.js';
 
 export type Output = { text: (value: string) => void; status: (value: string) => void };
 export type Identity = { channel: 'terminal' | 'line'; scope: string; user: string };
@@ -25,7 +26,7 @@ export class CustomerCore {
   private closed = false;
   private modelCooldowns = new Map<string, number>();
   constructor(
-    private factory: (manager?: SessionManager, settings?: SettingsBinding) => Promise<AgentSession> = async (manager, settings) => (await createDemo({ sessionManager: manager, settings })).session,
+    private factory: (manager?: SessionManager, settings?: SettingsBinding) => Promise<AgentSession> = async (manager, settings) => (await createDemo({ sessionManager: manager, settings, conversationMode: this.dialogueMode === 'grounded' ? 'grounded' : undefined })).session,
     private timeoutMs = 30000,
     private log: (record: object) => void = () => {},
     private now = () => Date.now(),
@@ -34,9 +35,12 @@ export class CustomerCore {
     private courseRequests?: CourseRequests,
     private responseSettings: () => SettingsBinding | undefined = captureResponseSettings,
     private humanSupport?: (identity: Identity) => HumanSupportStatus | undefined,
-    // Application entrypoints select model-first; low-level callers retain legacy compatibility.
-    private dialogueMode: 'rules-first' | 'model-first' = 'rules-first',
+    // Application entrypoints select grounded; low-level callers retain legacy compatibility.
+    private dialogueMode: 'rules-first' | 'model-first' | 'grounded' = 'rules-first',
+    private privateChatCapabilities?: PrivateChatCapabilities,
   ) {}
+
+  get neutralFallback() { return this.dialogueMode === 'grounded'; }
 
   get faqWithoutModel() { return this.dialogueMode === 'rules-first'; }
 
@@ -95,17 +99,18 @@ export class CustomerCore {
               session.dispose(); current.session = Promise.resolve(replacement); session = replacement;
               output.status('[ใช้การตั้งค่าบอตเวอร์ชันใหม่ คงความจำและประวัติเดิม]');
             }
+            let turnMemory = current.memory;
             if (current.memory.recent.length >= 12 || JSON.stringify(session.messages).length > 24000) {
               const compacted = compactMemory(current.memory, this.summarizer);
-              this.store?.save(key, compacted); // Commit bounded canonical data before releasing the old Pi session.
+              // Stage compaction with this turn: a failed model request must not commit it.
               const replacement = await this.factory(memoryManager(compacted), turnSettings);
               session.dispose();
               current.session = Promise.resolve(replacement);
-              current.memory = compacted;
+              turnMemory = compacted;
               session = replacement;
               output.status('[ย่อบริบทเก่าอัตโนมัติ คงโปรไฟล์ สาระ และเรื่องค้างไว้]');
             }
-            const before = current.memory;
+            const before = turnMemory;
             let staged = structuredClone(before);
             let directLearned = canLearnDirectly(prompt) && learnProfile(staged, prompt);
             // Capacity never silently evicts an existing explicit preference.
@@ -117,7 +122,7 @@ export class CustomerCore {
             let memoryClarified = false;
             const orderId = memoryHint || directLearned ? undefined : prompt.match(/\bDEMO-[0-9]+\b/i)?.[0].toUpperCase();
             const previousCatalog = current.memory.catalog ?? recoverCatalogState(current.memory.recent.filter(t => !current.memory.handover || t.at > current.memory.handover.at));
-            let routed = this.dialogueMode === 'model-first' || orderId || memoryHint || directLearned ? undefined : routeCatalog(prompt, previousCatalog,
+            let routed = this.dialogueMode !== 'rules-first' || orderId || memoryHint || directLearned ? undefined : routeCatalog(prompt, previousCatalog,
               current.lastTopic ?? (previousCatalog?.shownIds.length ? 'catalog:' + previousCatalog.shownIds.join(',') : undefined), current.memory.profile.interests);
             const catalog = routed?.selection;
             let nextCatalog = routed?.state ?? previousCatalog;
@@ -135,7 +140,7 @@ export class CustomerCore {
             } else {
               // A personal preference containing "video", for example, is not a
               // playback-support question. Keep it available as user context.
-              answer = this.dialogueMode === 'model-first' || memoryHint || (!routed && canResumeMemory(prompt)) ? undefined : routed ? routed.answer : publicAnswer(prompt);
+              answer = this.dialogueMode !== 'rules-first' || memoryHint || (!routed && canResumeMemory(prompt)) ? undefined : routed ? routed.answer : publicAnswer(prompt);
               // General course/certificate FAQ must not mask a factual follow-up
               // about the displayed course. The planner can still choose knowledge
               // for a general FAQ or read for course-specific public fields.
@@ -149,7 +154,9 @@ export class CustomerCore {
             const support = this.humanSupport?.(identity);
             const capabilities = { channel: identity.channel,
               commands: !(identity.channel === 'line' && identity.scope.includes(':group:')),
-              requests: !!this.courseRequests, humanSupport: !!support };
+              requests: !!this.courseRequests, humanSupport: !!support,
+              ...(identity.channel === 'line' && identity.scope.includes(':group:') && this.privateChatCapabilities
+                ? { privateChat: this.privateChatCapabilities } : {}) };
             if (support && answer && (answer.startsWith('ผมชื่อซีบอต') || topicForAnswer(answer) === 'contact')) {
               answer = answer.replace('หรือส่งเรื่องให้เจ้าหน้าที่ไม่ได้', 'ไม่ได้');
               answer += '\n' + humanSupportText(support);
@@ -168,11 +175,11 @@ export class CustomerCore {
               try {
                 reply = catalog && this.now() < cooldownUntil() ? renderCatalog(catalog)
                   : await runDialogue(session, prompt, turnTimeout, output, catalog, memoryHint && this.dialogueMode === 'rules-first' ? undefined : { state: nextCatalog, resolve: plan => {
-                    routed = executeCatalogQuery(parseCatalogQuery(plan, this.dialogueMode === 'model-first' ? 'model' : 'strict'), nextCatalog);
+                    routed = executeCatalogQuery(parseCatalogQuery(plan, this.dialogueMode !== 'rules-first' ? 'model' : 'strict'), nextCatalog);
                     semanticRead = true;
                     nextCatalog = routed.state ?? previousCatalog;
                     return routed.answer!;
-                  } }, { previousUser: before.recent.filter(t => !before.handover || t.at > before.handover.at).at(-1)?.user, clarificationPending: resumeMemory, resolve: plan => {
+                  } }, { evidenceIds: before.evidenceIds, rememberEvidence: ids => { staged.evidenceIds = ids; }, previousAssistant: before.recent.filter(t => !before.handover || t.at > before.handover.at).at(-1)?.assistant, previousUser: before.recent.filter(t => !before.handover || t.at > before.handover.at).at(-1)?.user, clarificationPending: resumeMemory, resolve: plan => {
                     const decision = decideMemory(plan, prompt, before, resumeMemory);
                     const candidate = structuredClone(staged);
                     try { applyMemoryChanges(candidate, decision.changes); }
@@ -201,7 +208,7 @@ export class CustomerCore {
               }
               renderedAnswer = reply;
               // The model sees the grounded answer on the next turn, not just its own topic ID.
-              if (this.dialogueMode === 'model-first' && (semanticRead || topicForAnswer(reply) || reply === requestCapabilityAnswer || reply === renderCapabilities(capabilities))) hostTurn = true;
+              if (this.dialogueMode === 'grounded' || this.dialogueMode !== 'rules-first' && (semanticRead || topicForAnswer(reply) || reply === requestCapabilityAnswer || reply === renderCapabilities(capabilities) || reply === renderPrivateChatHelp(capabilities))) hostTurn = true;
               if (!memoryHandled) nextTopic = semanticRead ? routed?.topic : catalog ? catalogTopicForAnswer(reply, catalog) : routed?.topic ?? topicForAnswer(reply);
               if (!semanticRead && catalog && nextCatalog && nextTopic?.startsWith('catalog:')) nextCatalog = { ...nextCatalog, shownIds: nextTopic.slice(8).split(',') };
             }
@@ -256,7 +263,7 @@ export class CustomerCore {
           const messages = new Map([...(next.handover?.messages ?? []), ...transcript.messages].map(m => [m.id, m]));
           next.handover = { ...transcript, messages: [...messages.values()].filter(m => m.at >= this.now()-90*86400000)
             .sort((a,b) => a.at-b.at).slice(-handoverLimit) };
-          next.catalog = undefined; next.lastTopic = undefined; next.updatedAt = this.now();
+          next.catalog = undefined; next.evidenceIds = undefined; next.lastTopic = undefined; next.updatedAt = this.now();
           try { this.store?.save(key, next); }
           catch { throw new DemoFailure('บันทึกบริบทไม่สำเร็จ ยังคงผู้ดูแลรับช่วงไว้'); }
           current.memory = next; current.lastTopic = undefined; current.memoryClarificationExpires = undefined;

@@ -1,0 +1,109 @@
+{
+  "basis": "Same recorded run rescored offline after owner made language non-blocking; no additional inference.",
+  "languageBlocking": false,
+  "corePassed": true,
+  "records": [
+    {
+      "channel": "line-direct",
+      "version": "next",
+      "prompt": "What is the exact number of people in my kitchen right now?",
+      "answer": "ผมไม่มีทางรู้จำนวนคนในครัวของคุณตอนนี้ครับ",
+      "calls": 1,
+      "elapsedMs": 524,
+      "automatedCheck": false,
+      "coreCheck": true,
+      "languageAdvisory": false
+    },
+    {
+      "channel": "line-direct",
+      "version": "next",
+      "prompt": "Could you walk me through signing up for a course?",
+      "answer": "เลือกคอร์สจากหน้า Home แล้วลงทะเบียนได้เลยครับ หากยังไม่มีสมาชิก ให้สมัครสมาชิกตามขั้นตอนบนเว็บไซต์ก่อน\n\nแหล่งอ้างอิง:\nhttps://cbtumu.net/faq/ (2026-10-23T06:17:59Z)",
+      "calls": 2,
+      "elapsedMs": 2037,
+      "automatedCheck": false,
+      "coreCheck": true,
+      "languageAdvisory": false
+    },
+    {
+      "channel": "line-direct",
+      "version": "next",
+      "prompt": "เยอะเลยนะ",
+      "answer": "ใช่ครับ ขั้นตอนมีหลายอย่างหน่อย แต่พอทำจริงก็ไม่ได้ยากมากครับ ถ้าติดตรงไหนบอกได้เลย เดี๋ยวช่วยดูให้",
+      "calls": 1,
+      "elapsedMs": 619,
+      "automatedCheck": true,
+      "plans": [
+        {
+          "intent": "unknown",
+          "stopReason": "stop"
+        },
+        {
+          "intent": "lookup",
+          "stopReason": "stop"
+        },
+        {
+          "intent": "answer",
+          "stopReason": "stop"
+        },
+        {
+          "intent": "chat",
+          "stopReason": "stop"
+        }
+      ],
+      "coreCheck": true,
+      "languageAdvisory": true
+    },
+    {
+      "channel": "line-group",
+      "version": "next",
+      "prompt": "What is the exact number of people in my kitchen right now?",
+      "answer": "ผมไม่มีข้อมูลจำนวนคนในครัวของคุณตอนนี้ครับ",
+      "calls": 1,
+      "elapsedMs": 428,
+      "automatedCheck": false,
+      "coreCheck": true,
+      "languageAdvisory": false
+    },
+    {
+      "channel": "line-group",
+      "version": "next",
+      "prompt": "Could you walk me through signing up for a course?",
+      "answer": "เลือกคอร์สจากหน้า Home แล้วลงทะเบียนได้เลยครับ หากยังไม่มีสมาชิก ให้สมัครสมาชิกตามขั้นตอนบนเว็บไซต์ก่อนครับ\n\nแหล่งอ้างอิง:\nhttps://cbtumu.net/faq/ (2026-10-23T06:17:59Z)",
+      "calls": 2,
+      "elapsedMs": 1584,
+      "automatedCheck": false,
+      "coreCheck": true,
+      "languageAdvisory": false
+    },
+    {
+      "channel": "line-group",
+      "version": "next",
+      "prompt": "เยอะเลยนะ",
+      "answer": "ใช่ครับ ขั้นตอนมีหลายอย่างหน่อย แต่พอทำจริงก็ไม่ยากนักครับ ถ้าติดตรงไหนบอกได้เลย เดี๋ยวช่วยชี้ทางให้ครับ",
+      "calls": 1,
+      "elapsedMs": 558,
+      "automatedCheck": true,
+      "plans": [
+        {
+          "intent": "unknown",
+          "stopReason": "stop"
+        },
+        {
+          "intent": "lookup",
+          "stopReason": "stop"
+        },
+        {
+          "intent": "answer",
+          "stopReason": "stop"
+        },
+        {
+          "intent": "chat",
+          "stopReason": "stop"
+        }
+      ],
+      "coreCheck": true,
+      "languageAdvisory": true
+    }
+  ]
+}

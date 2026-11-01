@@ -1,0 +1,32 @@
+✔ retrieves evidence with a contextual query and composes an English answer instead of selecting a FAQ reply (50.755917ms)
+✔ unknown and reactions preserve the user language without CBTU links, identity boilerplate or keyword overrides (38.960417ms)
+✔ renderer rejects unseen IDs, invented quotes, reply URLs, false completed actions and references on unknown (0.202959ms)
+✔ bad evidence gets at most one repair; a retrieved source cannot grant a memory write (20.599167ms)
+✔ catalog operations remain host-executed but the reply can be composed in another language (18.103167ms)
+✔ explicit memory writes/recall retain consent guards in the experimental conversation (24.940042ms)
+✔ lexical retrieval only returns bounded published documents and leaves a no-match query empty (4.400542ms)
+✔ experimental direct/group adapters preserve channel gates and never attach FAQ on unknown or service failure (73.578834ms)
+✔ ten-course listing can cite twelve exact passages from one source without being rejected (1.314334ms)
+✔ repair explains the precise violated bound instead of asking for the same invalid output again (9.395917ms)
+✔ short target reply retains the pending instructor field and actual previous clarification in context (15.006042ms)
+✔ experimental operational errors distinguish validation, timeout, quota and network without leaking private errors or FAQ links (0.245959ms)
+✔ unused field projections do not invalidate a listing; read still enforces its public projection schema (0.957375ms)
+✔ an exact long quote is accepted without truncation while any invented suffix still fails verification (0.113125ms)
+✔ broad browsing followed by a subject reply executes despite an unused full field projection (12.625167ms)
+✔ research followed by who-teaches reuses still-published evidence without a second lookup (23.087083ms)
+✔ evidence pointers survive compaction and reopening while reset and identity boundaries clear their use (134.067583ms)
+✔ conversation evidence uses current published records, never resurrects retired IDs, and rejects unsafe pointer metadata (0.543042ms)
+✔ new retrieval replaces previous public evidence rather than mixing an obsolete result into the answer (20.361041ms)
+✔ truncated composition returns the current validated catalog result without leaking partial JSON or repeating the read (9.971375ms)
+✔ invalid composed evidence also falls back only to the current validated read result (14.785875ms)
+✔ empty/truncated/JSON-generation failures before retrieval get at most one short repair (28.437833ms)
+✔ format repair after public lookup keeps its evidence and never retries quota or network errors (23.153959ms)
+✔ a later failed turn cannot fall back to an earlier course result or commit a partial new selection (22.5075ms)
+ℹ tests 24
+ℹ suites 0
+ℹ pass 24
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1293.017042

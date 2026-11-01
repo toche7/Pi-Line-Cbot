@@ -17,5 +17,6 @@ const copy = path => {
 };
 for (const path of ['Dockerfile', '.dockerignore', 'railway.json', 'package.json', 'package-lock.json', 'tsconfig.json']) copy(path);
 mkdirSync(join(destination, 'src'), { mode: 0o700 });
+copy('src/course-catalog-data.json');
 for (const name of readdirSync(join(project, 'src')).sort()) if (/^[\w-]+\.ts$/.test(name)) copy('src/' + name);
 console.log(destination);

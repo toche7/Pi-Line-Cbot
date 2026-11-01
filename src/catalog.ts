@@ -1,3 +1,4 @@
+import { courseInstructors } from './course-instructors.js';
 import { courseCatalog, type Course } from './course-catalog.js';
 import { briefCard, briefSourceNote, courseBrief } from './course-briefs.js';
 
@@ -60,7 +61,7 @@ export function retrieveCourses(query: string) {
   const queryTerms = terms(query);
   // Index only structured, evidence-backed names. Match significant name tokens,
   // retaining marks and allowing title/spacing variants without merging people.
-  const instructorMatches = courseCatalog.courses.filter(c => c.instructors?.some(t => {
+  const instructorMatches = courseCatalog.courses.filter(c => courseInstructors(c).some(t => {
     const name = normalize(t.name);
     const nameTerms = [...new Intl.Segmenter('th', { granularity: 'word' }).segment(name)]
       .filter(s => s.isWordLike && s.segment.length >= 4).map(s => s.segment);
@@ -125,7 +126,7 @@ export function selectCatalog(query: string, lastTopic?: string, interests?: str
 const clip = (s: string | null, length = 180) => s ? (s.length > length ? s.slice(0, length) + '…' : s) : 'ไม่พบข้อมูลใน snapshot';
 function price(c: Course) {
   if (c.price.displayed_amount === null) return 'ไม่พบราคาใน snapshot ไม่ถือว่าฟรี กรุณาตรวจหน้าหลักสูตร/เจ้าหน้าที่';
-  if (c.price.label === 'Free') return 'หน้าเว็บแสดง Free ใน snapshot ต้องยืนยันสิทธิ์และเงื่อนไขปัจจุบัน';
+  if (c.price.label === 'Free') return 'เรียนฟรี ไม่มีค่าใช้จ่าย';
   return `ราคาแสดงใน snapshot ${c.price.displayed_amount.toLocaleString('en-US')} ${c.price.currency ?? '(ไม่ระบุสกุลเงิน)'}${c.price.reference_amount === null ? '' : `; ราคาอ้างอิงที่หน้าเว็บแสดง ${c.price.reference_amount.toLocaleString('en-US')}`}`;
 }
 function caveats(c: Course) {

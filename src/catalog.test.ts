@@ -91,7 +91,7 @@ test('five acceptance cases use only selected catalog facts; memory and dialogue
     assert.match(comparison, /Microsoft Excel/); assert.match(comparison, /สร้างสื่อสวยด้วย Canva/);
     assert.match(comparison, /เว็บยังไม่ระบุ/); assert.doesNotMatch(comparison, /999999|เปิดรับสมัครทันที/);
     assert.deepEqual(requests.at(-1)!.candidates, ['cbtu-06', 'cbtu-07']);
-    const missing = await send('AI Agent for ALL ราคาเท่าไร');
+    const missing = await send('Basic Prompt Engineering (Update) ราคาเท่าไร');
     assert.match(missing, /ไม่พบราคา.*ไม่ถือว่าฟรี/); assert.match(missing, /https:\/\/cbtumu.net\/faq\//);
     const before = requests.length;
     assert.match(await send('มีคอร์ส Quantum Computing ไหม'), /ไม่พบ.*ในชุดข้อมูล.*ไม่ได้หมายความว่าไม่มี/);

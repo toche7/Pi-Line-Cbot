@@ -1,0 +1,38 @@
+✔ retrieves evidence with a contextual query and composes an English answer instead of selecting a FAQ reply (40.874833ms)
+✔ unknown and reactions preserve the user language without CBTU links, identity boilerplate or keyword overrides (30.760667ms)
+✔ renderer rejects unseen IDs, invented quotes, reply URLs, false completed actions and references on unknown (0.226ms)
+✔ bad evidence gets at most one repair; a retrieved source cannot grant a memory write (29.292125ms)
+✔ catalog operations remain host-executed but the reply can be composed in another language (17.959833ms)
+✔ explicit memory writes/recall retain consent guards in the experimental conversation (34.8595ms)
+✔ lexical retrieval only returns bounded published documents and leaves a no-match query empty (4.705584ms)
+✔ experimental direct/group adapters preserve channel gates and never attach FAQ on unknown or service failure (113.620917ms)
+✔ ten-course listing can cite twelve exact passages from one source without being rejected (1.387708ms)
+✔ repair explains the precise violated bound instead of asking for the same invalid output again (12.994584ms)
+✔ short target reply retains the pending instructor field and actual previous clarification in context (25.131042ms)
+✔ experimental operational errors distinguish validation, timeout, quota and network without leaking private errors or FAQ links (0.287875ms)
+✔ unused field projections do not invalidate a listing; read still enforces its public projection schema (1.016417ms)
+✔ an exact long quote is accepted without truncation while any invented suffix still fails verification (0.131666ms)
+✔ broad browsing followed by a subject reply executes despite an unused full field projection (16.467416ms)
+✔ research followed by who-teaches reuses still-published evidence without a second lookup (28.391ms)
+✔ evidence pointers survive compaction and reopening while reset and identity boundaries clear their use (191.14825ms)
+✔ conversation evidence uses current published records, never resurrects retired IDs, and rejects unsafe pointer metadata (0.805292ms)
+✔ new retrieval replaces previous public evidence rather than mixing an obsolete result into the answer (29.053ms)
+✔ handover collector isolates OA/user/window and only accepted operator messages; privacy, ordering and size are bounded (150.698667ms)
+✔ core model transport receives role-labelled handover after stale bot history; restart/compaction preserve it, reset/forget remove without replay or cross-owner leakage (314.1335ms)
+✔ release keeps human control until context sync succeeds, blocks competing sends, and fails closed on persistence errors (25.235334ms)
+✔ context import waits behind active core work and does not learn operator memory instructions (23.753875ms)
+✔ HTTP take -> manual accepted send -> inbound while paused -> release -> next bot payload includes actual conversation and no internal notes (149.630667ms)
+✔ LINE model payload and host identity know actual staff capability/waiting state; Terminal does not inherit it (17.100083ms)
+✔ persistent memory: >20 turns, Pi compaction, next-day restart, isolation, reset and confirmed deletion (386.393458ms)
+✔ sensitive data never reaches persisted memory; questions cannot overwrite profile; failed summary/429 preserve facts (243.088292ms)
+✔ Terminal forget needs explicit confirm and cancel leaves data; reset keeps profile (28.59175ms)
+✔ separate Node processes reopen store; retention, locking and corruption fail safely (846.165ms)
+✔ context compaction commits only with a successful turn and preserves canonical history on model failure (28.795834ms)
+ℹ tests 30
+ℹ suites 0
+ℹ pass 30
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2088.646333

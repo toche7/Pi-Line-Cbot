@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { courseInstructors } from './course-instructors.js';
 import assert from 'node:assert/strict';
 import { createHmac } from 'node:crypto';
 import { createAssistantMessageEventStream, type AssistantMessage } from '@earendil-works/pi-ai';
@@ -38,10 +39,10 @@ test('public reads follow displayed scope and paginate without losing the reques
 
 test('teacher search uses verified structured names, preserves the result set for prices/count/paging and excludes unknown authors', () => {
   assert.equal(courseCatalog.schemaVersion, '1.1.0');
-  assert.equal(courseCatalog.validationWarnings.length, 26);
-  assert.equal(courseCatalog.courses.filter(c => c.record_type === 'course' && c.instructors).length, 14);
+  assert.equal(courseCatalog.validationWarnings.length, 21);
+  assert.equal(courseCatalog.courses.filter(c => c.record_type === 'course' && c.instructors).length, 19);
   const missing = courseCatalog.courses.filter(c => c.record_type === 'course' && !c.instructors);
-  assert.equal(missing.length, 5);
+  assert.equal(missing.length, 0);
   for (const c of missing) {
     assert.ok(c.missing_fields.includes('instructors'));
     assert.match(readCourseFields([c], ['instructors']), /ยังไม่พบหลักฐาน/);
@@ -51,7 +52,7 @@ test('teacher search uses verified structured names, preserves the result set fo
   assert.ok(expected.length > 3);
   assert.deepEqual(filterCourses(courseCatalog.courses, [{ field: 'instructors', value: 'ทวีศักดิ์  สมานชื่น' }]), expected);
   assert.deepEqual(filterCourses(missing, [{ field: 'instructors', value: 'taweesak samanchuen' }]), []);
-  for (const c of expected) assert.ok(c.instructor_evidence.some(e => e.name.includes('ทวีศักดิ์')));
+  for (const c of expected) assert.ok(courseInstructors(c).some(t => t.name.includes('ทวีศักดิ์')));
   const first = routeCatalog('มีหลักสูตรไหนที่อาจารย์ทวีศักดิ์สอนบ้าง')!;
   assert.deepEqual(first.state!.matchedIds, expected.map(c => c.id));
   assert.match(routeCatalog('ขอราคาแต่ละตัวด้วย', first.state)!.answer!, /ราคาใน snapshot/);

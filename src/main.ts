@@ -12,12 +12,12 @@ async function main() {
   configureResponseSettings(new ResponseSettingsStore(resolve('runtime/bot-settings')));
   configureKnowledge(new KnowledgeStore(resolve('runtime/knowledge')));
   const timeoutMs = captureResponseSettings()?.config.limits.terminalTimeoutMs ?? requestTimeout(process.env.PI_TIMEOUT_MS);
-  const { session, modelRuntime, provider, modelId } = await createDemo();
+  const { session, modelRuntime, provider, modelId } = await createDemo({ conversationMode: 'grounded' });
   try {
     console.log(`Model: ${provider}/${modelId}`);
     console.log(`Allowed tools: ${session.getActiveToolNames().join(', ')}`);
     console.log(`Request deadline: ${timeoutMs} ms`);
-    console.log('Conversation routing: model-first');
+    console.log('Conversation routing: grounded');
     if (process.argv.includes('--check')) {
       console.log(`Credentials configured: ${modelRuntime.hasConfiguredAuth(provider)}`);
       console.log('Session initialized; no model request made.');
@@ -26,7 +26,7 @@ async function main() {
     const store = new MemoryStore(resolve('.customer-memory'));
     const requests = new CourseRequests(new CourseRequestStore(resolve('runtime/course-requests')));
     const core = createCustomerCore({
-      factory: async (manager, settings) => (await createDemo({ sessionManager: manager, settings })).session,
+      factory: async (manager, settings) => (await createDemo({ sessionManager: manager, settings, conversationMode: 'grounded' })).session,
       timeoutMs, store, requests,
     });
     try {

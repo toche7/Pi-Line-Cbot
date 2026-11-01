@@ -1,5 +1,17 @@
 # ซีบอตเวอร์ชันทดลอง: สนทนาตามเจตนาและบริบท
 
+## สถานะล่าสุด: ใช้รุ่นใหม่เป็นค่าเริ่มต้นบน local
+
+คำสั่ง `npm run chat` / `npm start` / `npm run chat:line` / `npm run chat:group` ใช้ grounded แล้ว ไม่ต้องเติม next เพื่อเลือกทางใหม่ คำสั่ง next เดิมยังเป็น alias ชั่วคราวจนตรวจ LINE จริงครบ createCustomerCore เลือก grounded เป็นค่าเริ่มต้น ฝั่ง server ส่วนตัวและกลุ่มใช้ factory นี้เหมือนกัน ไม่มีการเปลี่ยน model/key/settings หรือที่เก็บข้อมูลถาวร
+
+ตรวจด้วย synthetic model plans และ signed LINE simulations: ข้อมูลหลักสูตร/ฟรี/ผู้สอน, ตอบไม่รู้ไม่พ่วง FAQ, ประวัติจากทางเก่าเปิดต่อได้, แยก identity, host help/memory/requests และข้อจำกัดกลุ่ม ชุดเฉพาะ57/57 ชุดรวม295/295 Build ผ่าน ไม่ได้เรียก provider จริงรอบนี้ จึงไม่ใช่ผลประเมินคุณภาพโมเดลเพิ่มเติม
+
+สำเนาก่อนเปลี่ยนค่าเริ่มต้น 184 ไฟล์พร้อม checksum เก็บชั่วคราวที่ `/var/folders/ly/kq_n217s673dj1jc6gckrs3h0000gn/T/cbot-before-grounded-default-v0xdheiy` ตรวจ checksum ทั้งหมดแล้ว ตัวเลือกเก่า experimentalGrounding:false ยังอยู่สำหรับเทียบ/rollback ในโค้ด สำเนาไม่มี .env, runtime หรือข้อมูลลูกค้า หากต้องย้อน local ให้คืน source/build manifests จากสำเนาก่อนเปลี่ยนและ build ใหม่ โดยคง store เดิม ไม่ reset หรือย้ายข้อมูล
+
+รอบนี้ทำเฉพาะ local ตามที่ผู้ใช้ย้ำ ยังไม่ deploy/restart LINE จริง ไม่มีการเปลี่ยน webhook หรือส่งข้อความจริง ตรวจ Railway ในช่วงเริ่มงานเป็น read-only เท่านั้น ไม่พบโปรเซส local ที่ฟังพอร์ต3000/3001 ขณะตรวจ ไม่ได้เริ่ม server จริงแทนผู้ใช้ แก้ตัวเตรียม source ให้รวม course-catalog-data.json แล้ว ตรวจแพ็กเกจใน temp ว่ามีข้อมูลและไม่มี .env/runtime แต่ไม่ได้ upload
+
+หลักฐาน `test-evidence/2026-11-01-grounded-default-local/` ขั้นต่อไปคือทดลองคำสั่งปกติบน local แล้วจึงดำเนินงาน LINE จริงแยกจากรอบนี้ การลบทางเก่าและชื่อ next รอจนยืนยัน LINE จริงครบตามข้อตกลง
+
 31 ตุลาคม 2026 · ฐาน commit `37114e8` · ทดลองบน Terminal แยกจาก LINE
 
 **อัปเดตหลังเจ้าของสั่งรวม:** นำวิธีคุยที่ตรวจรับเข้าทางTerminalและLINEคุยส่วนตัวในsource/buildแล้ว ใช้คำสั่ง `npm run chat` ตามปกติ ความจำ/คำขอกลับใช้storeเดิม คำสั่ง `chat:natural` ยังคงเป็นพื้นที่tempแยกต่างหาก โปรเซสLINEจริงยังไม่restartตามข้อจำกัดเดิม ผลและขอบเขตรอบรวมอยู่ท้ายเอกสาร ข้อความที่เล่าว่าentrypointsเดิมยังใช้rules-firstด้านล่างเป็นประวัติช่วงทดลองก่อนรวม
@@ -212,3 +224,193 @@ Full regression รอบแรกนอก sandbox ผ่าน195/196 พบ a
 ยังไม่ได้รีสตาร์ต LINE ไม่เปลี่ยน key/config/tunnel/webhook ไม่ commit/push Terminal ต้องปิดแล้วเปิดใหม่จึงโหลดโค้ด build ล่าสุด /reset ไม่โหลด module ใหม่
 
 ผลรันซ้ำหลัง build ล่าสุด: full regression ผ่าน196/196 (fail/skip/cancel0) หลักฐาน memory-recall-runtime.txt; git diff --check ผ่าน ไม่มีการแก้ข้อทดสอบเวลาเดิม
+
+
+## ถามด้านที่สนใจครั้งเดียวก่อนแสดงรายการ
+
+1 พฤศจิกายน 2026 · เจ้าของขอปรับคำถามกว้าง เช่น “มีหลักสูตรอะไรไหม” ให้ถามสั้น ๆ ว่าสนใจด้านไหน พร้อมตัวอย่าง เมื่อผู้ใช้ตอบด้าน เช่น AI ต้องแสดงรายการทันที ไม่เข้าแบบสัมภาษณ์เป้าหมาย/พื้นฐาน/เวลา เว้นแต่ผู้ใช้ขอคำแนะนำเฉพาะตัว หากระบุหัวข้อมาแล้วหรือขอดูรายการ/ทั้งหมดโดยตรง ให้ค้นหรือแสดงรายการทันที
+
+ปรับเฉพาะ policy กับ per-turn model-first contract ให้ LLM แยกเจตนานี้ ไม่เพิ่ม regex จับคำถามของผู้ใช้ ไม่เปลี่ยน adviser เดิมหรือสิทธิ์การทำรายการ เพิ่ม SDK mock conversation regression ว่าคำถามกว้าง → chat ถามด้าน → AI list และ explicit all/Canva list ยังทำงาน โดยไม่เพิ่ม profile/preferences ชุดเฉพาะ natural/runtime/adviser ผ่าน25/25, buildผ่าน
+
+ทดลองโมเดลจริงใน temp Terminal ข้อมูลสมมติ ไม่มี LINE transport: broad question → ถามด้านหนึ่งคำถาม, AI → list search AI, ขอทั้งหมด → list all, ขอเลือกที่เหมาะกับฉัน → advise ใช้5calls/4turns จากเพดาน6 (turnแรกมี bounded retryหนึ่งครั้ง) รายการและจำนวนอ้างอิง snapshot ไม่ใช่การตรวจรอบเปิดปัจจุบัน การเลือก advise ถูกทาง แต่คำตอบ adviser ยังถามชิ้นงานด้วยข้อความเดิม ไม่อ้างว่าแก้คุณภาพคำแนะนำทั้งระบบแล้ว หลักฐาน test-evidence/2026-11-01-browsing/live.json
+
+ฐานงานก่อนแก้ clean ที่106c81f ไม่มี restart LINE/เปลี่ยนkey/config/tunnel/webhook หรือ deploy/commit/push Terminalต้องเปิดใหม่จึงโหลดbuildล่าสุด
+
+ผลตรวจสุดท้าย: full regression249/249ผ่าน ไม่มีfail/skip/cancel; git diff --checkผ่าน หลักฐาน test-evidence/2026-11-01-browsing/runtime.txt
+
+
+## ความสามารถในกลุ่มและบริการที่ต้องทักส่วนตัว
+
+1 พฤศจิกายน 2026 · เจ้าของอนุญาตให้กลุ่มใช้ semantic routing เช่นเดียวกับแชตส่วนตัว และเมื่อถามความสามารถให้บอกด้วยว่าบริการใดต้องไป LINE ส่วนตัว
+
+server เปลี่ยน groupCore เป็น createCustomerCore แบบ model-first โดยยังใช้ groupMemory เดิมที่แยกจาก direct และไม่ติดตั้ง request/human-support service ในกลุ่ม เพิ่ม privateChatCapabilities เป็น metadata อธิบายบริการส่วนตัวเท่านั้น ส่งเฉพาะ identity กลุ่ม ผ่าน model contract และ host capability renderer ไม่เพิ่มสิทธิ์ทำรายการ ไม่โอนความจำหรือส่งเรื่องให้เจ้าหน้าที่จริง แนะนำฝากคำขอจอง/ฝากเรื่อง ดูความจำ/reset/forget/help และขอเจ้าหน้าที่ใน LINE ส่วนตัว โดยยังระบุว่าไม่ได้สมัคร ชำระเงิน หรือยืนยันที่นั่งแทน
+
+LineGroupReplies ยังรับเฉพาะ trigger ที่เปิดใช้งานและบล็อก slash ตามเดิม ปรับข้อความ error ให้รับ faqWithoutModel จริงเพื่อไม่สัญญาว่า FAQ ออฟไลน์ใช้ได้หลังเปลี่ยน mode
+
+เพิ่ม mock integration ผ่าน group adapter + SDK: ถามความสามารถเข้าทางโมเดล/host renderer, แยกส่วนบริการที่ทักส่วนตัว, /book ในกลุ่มไม่เข้าโมเดล, ความจำส่วนตัวไม่ปรากฏใน group context, ค้น AI ยังทำงานและ request records0 พร้อม renderer gating ไม่โฆษณาบริการที่ host ไม่ได้ส่ง และไม่แสดง referral ใน Terminal/direct ชุดเฉพาะ33/33และbuildผ่าน
+
+โมเดลจริง 2ข้อความใน group coreชั่วคราว (ไม่มี LINE transport): “เธอทำอะไรได้บ้าง” และ “แล้วอะไรต้องทักส่วนตัว” เลือก knowledge และได้ host capability summary ที่แยกส่วนตัวถูกต้อง ใช้2callsไม่มีrepair เป็นการตรวจ routing/referral ไม่ใช่ LINE E2E หรือการตรวจว่าทุก follow-up ตอบกระชับเหมาะสม หลักฐาน test-evidence/2026-11-01-group-capabilities/live.json
+
+Full regression สองรอบแรก250/251: ตรวจละเอียดพบ memory.test ล้มที่เปรียบเทียบ recent หลัง model429 เพราะ core commit compaction ก่อนโมเดลตอบ ไม่ใช่ regexจับtimestampตามที่ประเมินแรก (runtime-flaky.txt) Promptที่ยาวขึ้นทำให้ถึง threshold ได้เร็วขึ้น แก้ core ให้ stage compaction และ commit พร้อมturnสำเร็จเท่านั้น เพิ่ม deterministic regression บังคับ12turns+model429 ตรวจทั้งdisk/in-memoryไม่เปลี่ยนและturnถัดไปสำเร็จจึงcommit ข้อทดสอบเดิมไม่ได้แก้เพื่อให้ผ่าน
+
+ยังไม่ได้รีสตาร์ต LINE/deploy ไม่เปลี่ยนkey/config/tunnel/webhook ไม่ commit/push การตอบแบบใหม่ใน LINE ที่กำลังรันยังไม่ยืนยันจนโหลดbuildนี้
+
+หลังแก้ compaction: build ผ่าน ชุดเฉพาะ memory/runtime/group ผ่าน24/24 และ full regression ผ่าน252/252 (fail/skip/cancel0) โดยไม่ได้แก้ assertion เดิม หลักฐาน test-evidence/2026-11-01-group-capabilities/runtime.txt และ targeted-final.txt; git diff --check ผ่าน
+
+## จำลอง LINE ส่วนตัวและกลุ่มใน Terminal
+
+1 พฤศจิกายน 2026 · เจ้าของสั่งเพิ่มโหมดเพื่อทดสอบสองบริบทผ่าน Terminal ได้สะดวก เพิ่ม `npm run chat:line` (ส่วนตัว) และ `npm run chat:group` (กลุ่ม) หรือใช้ flags `--line-direct` / `--line-group` กับ natural entrypoint; `--check` ตรวจการตั้งค่าโดยไม่ inference ไม่รับสองโหมดพร้อมกันหรือ rules-first ใน LINE simulation
+
+ใช้ temp workspace เดิมของ natural-chat คัดลอกเฉพาะ settings/knowledge แยก direct/group memory, requests, conversation control และ room store แล้วลบทิ้งหลังออก ไม่อ่าน memory/requestsจริง ไม่สร้าง webhook/tunnel ไม่ใช้ LINE token หรือ lineReply/linePush transport ใช้ LineAdapter และ LineGroupReplies จริงกับ synthetic events/signature และ in-process reply sink ที่แสดงกลับ Terminal เท่านั้น รวม human waiting/cancel ฝั่งส่วนตัวเป็นสถานะจำลอง ไม่มีเจ้าหน้าที่จริงรับช่วง
+
+runChat ใน simulation ส่ง slash commands ให้ adapter ตัดสินตามช่องทาง ยกเว้น /exit หรือ /quit ที่ใช้ปิด CLI กลุ่มเติม CBOT ให้อัตโนมัติเพื่อให้พิมพ์คำถามได้ตรง ๆ และยังบล็อกคำสั่งส่วนตัวตามกฎจริง ข้อความตอบจาก adapter คงรูปแบบเดียวกับ LINE จึงอาจมีคำว่า “ระบบกลาง” แต่ทั้งหมดอยู่ใน temp ตามหัวหน้าจอ
+
+เพิ่ม5regressions: direct help/requests/memory/forget/waiting/cancel; group trigger/slash/private-referral/isolation; CLI forward slash/local exit; child-process checkทั้งสองmodeพร้อมcleanupและinvalid flags; legacy-mode reject ชุดเฉพาะ21/21ผ่าน, buildผ่าน, full257/257ผ่านไม่มีfail/skip/cancel
+
+CLI smoke /help→/exit ทั้งสองnpm scriptsผ่านโดยไม่ inference จากนั้นลองโมเดลจริงคำถาม “เธอทำอะไรได้บ้าง” โหมดละหนึ่งturn ได้ข้อความส่วนตัวกับกลุ่มแยกบริการตามhost flagsถูกต้อง ไม่มี LINE transport; logsไม่ได้เก็บจำนวนprovider calls จึงไม่อ้างตัวเลขcallsจริง ดู test-evidence/2026-11-01-terminal-line
+
+ผลนี้ตรวจ pipeline ภายในและ CLI ไม่ใช่ LINE E2E/network delivery/native mentionจริง ไม่restart/deploy LINE ไม่เปลี่ยนkey/configจริง ไม่commit/push
+
+## สีแยกผู้ใช้กับบอตใน Terminal
+
+1 พฤศจิกายน 2026 · ตามคำขอเจ้าของ เพิ่มสีใน runChat ที่ใช้ร่วมทุกโหมด: ป้ายผู้ใช้ฟ้า ป้ายและคำตอบผู้ช่วยเขียว callbackสถานะจาง เปิดเฉพาะ output/status ที่เป็น TTY เคารพ NO_COLOR และ TERM=dumb ไม่ใส่ ANSI ใน pipe/file ไม่เปลี่ยน routing/คำตอบหรือ LINE
+
+Buildผ่าน ชุด chat/simulation7/7ผ่าน ตรวจ ANSI แบบ offline ด้วย fake client อีก3กรณี TTY/pipe/NO_COLORผ่าน (ไม่ได้เรียกโมเดล) ไม่เพิ่มไฟล์ทดสอบสำหรับการเปลี่ยนสีที่ย้อนกลับง่าย หลักฐานชุดเดิม test-evidence/2026-11-01-terminal-colors/runtime.txt
+
+## ประวัติผู้สอนและวิธีเปิด LINE ส่วนตัวเป็นคนละเจตนา
+
+1 พฤศจิกายน 2026 · เจ้าของรายงาน “ทวีศักดิ์ สมานชื่นเป็นใคร” กลับได้รายการคอร์ส และ “add line ส่วนตัวอย่างไร” กลับได้ contact FAQ เรื่องอีเมล เพิ่ม catalog operation=instructor สำหรับ who-is/biography แยกจาก list/filterผู้สอนและ readชื่อผู้สอนของคอร์ส ใช้เฉพาะชื่อใน structured instructors พร้อม source_url ไม่ใช้ catalog author/legacy instructors_text และไม่แต่งการศึกษา ประสบการณ์งาน ตำแหน่งองค์กร หรือความเชี่ยวชาญจากหัวข้อคอร์ส ปรับความต่างจุด/ช่องว่างของชื่อให้เท่ากันเท่านั้น ไม่รวมชื่อคนละแบบหรือนามสกุลต่างกัน
+
+ปัจจุบัน snapshot มีหลักฐานการเป็นผู้สอน แต่ไม่มี biography เต็ม จึงตอบบทบาทที่ยืนยันได้และบอกส่วนที่ยังไม่มีข้อมูล หากไม่มีชื่อ/ชื่อกำกวมให้บอกตามจริง ไม่ fallback ไปแสดงคอร์ส stateรายการเดิมไม่ถูกเปลี่ยนเพราะถามประวัติ และไม่ได้ refresh/import catalog หรือเพิ่มข้อมูลชีวประวัติจากเว็บ
+
+เพิ่ม host:line-private-chat ให้ LLM เลือกจากความหมายของคำถามวิธีแอดบอต/เปิดแชตส่วนตัว โดย hostตอบขั้นตอนเปิดโปรไฟล์บอต เพิ่มเพื่อน และกดแชต ถ้าเป็น direct LINE อธิบายว่าแชตแบบตัวต่อตัวที่คุยอยู่คือส่วนตัวแล้ว ไม่มีการเดา LINE ID/linkจากdisplayNameหรือchannel ID และไม่ย้ายคำถามขอข้อมูลติดต่อส่วนตัวของบุคคลอื่นมาทางบอต ไม่เปลี่ยน contact FAQ เจ้าหน้าที่เดิม ส่ง hostanswerเข้าcontextสำหรับ follow-up ด้วย
+
+ตรวจแนวทางเพิ่มเพื่อนกับเอกสาร LINE: https://help-o.line.me/line/smartphone?contentId=200000585&lang=en และ https://developers.line.biz/en/docs/messaging-api/using-line-url-scheme/ (ไม่ได้ใช้ API อ่านtoken/profileของบัญชีจริง และยังไม่มีบัญชี add-friend URL ที่ยืนยันในruntime)
+
+เพิ่ม4tests: hostอ่านprofile/ไม่เปลี่ยนcatalogstate/schema,ไม่ใช้author/รวมเฉพาะpunctuation/ชื่อกำกวม, semantic distinction person→courses taught→course teacher, และ private-help topicไม่รับmodelreplyแต่ง ID/คงstaffFAQ ชุดเฉพาะ28/28 buildผ่าน full261/261ผ่าน (fail/skip/cancel0)
+
+โมเดลจริง temp Terminal4ข้อความ/4callsไม่มีrepair: who-is→instructor role+missingbio, เขาสอนคอร์สอะไรบ้าง→listที่กรองผู้สอน11รายการ, add line ส่วนตัวอย่างไร→private-chat guide, เพิ่มเพื่อนบอตยังไง→guideเดียวกัน หลักฐาน test-evidence/2026-11-01-person-private-chat/live.json ไม่ใช่ LINE E2E; ไม่มีrestart/deploy/key/config/tunnel/webhook/commit/push
+
+## รุ่นทดลองค้นหลักฐานก่อนเรียบเรียงคำตอบ
+
+1 พฤศจิกายน 2026 · เจ้าของอนุญาตหลังดูผังเปรียบเทียบ ให้ทำรุ่นทดลองก่อนใน Terminal ส่วนตัว/กลุ่ม ไม่ใช้การเพิ่มหัวข้อคำตอบเฉพาะรายคำถาม เป้าหมายคือเข้าใจบริบท ค้นข้อมูลที่อนุญาตแล้วเรียบเรียง ถ้าไม่รู้บอกตรง ๆ ไม่พ่วง FAQ อัตโนมัติ และยังคง host workflow สำหรับการทำรายการ
+
+เพิ่มโหมด opt-in `grounded`: chat:next (Terminal), chat:line:next (จำลองส่วนตัว), chat:group:next (จำลองกลุ่ม) ทุกโหมดอยู่ใน temp เดิม รุ่นปกติ/เซิร์ฟเวอร์ไม่เลือก grounded อัตโนมัติ ไม่restart/deploy LINE ไม่เปลี่ยน key/model/config จริง ไม่commit/push
+
+ระบบใช้ system policy สำหรับการสนทนารุ่นทดลองโดยเฉพาะ ไม่บังคับเลือก topic ID เพื่อรับ FAQ renderer เดิม publicEvidence สร้างเอกสารจาก published knowledge, public course fields และหลักฐานผู้สอน; hostEvidence แสดงเฉพาะ capabilities/วิธีเปิดส่วนตัว/สถานะที่ hostส่งให้ โมเดลส่ง contextual lookup query และเลือก document IDs จากดัชนีได้ ค้นแบบ lexical ที่มี LLM ช่วยแปล/ขยายคำและเลือกเอกสาร ไม่ใช่ vector search และไม่ค้นเว็บสด เอกสารสูงสุด6รายการ รายการละ2400ตัวอักษร ไม่มี file/shell/LINE transport tool ให้โมเดล
+
+คำตอบ fact ใช้ intent=answer พร้อม evidence ID และ quote ที่ตรงกับข้อความเอกสารซึ่งส่งให้จริงในturnนั้น hostตรวจschema/ID/quoteและแนบเฉพาะ source URLs ที่อ้าง พร้อม capturedAtเมื่อมี โมเดลเรียบเรียง reply ได้โดยไม่ถูก business-fact regexของlegacy chatทับ ห้ามใส่ URLเองหรืออ้างทำรายการสำเร็จใน prose ส่วน list/count/price/paging/readยังใช้ host catalog executor แล้วนำผลเป็น evidence ให้เรียบเรียง ไม่ให้โมเดลคำนวณจำนวนหรือทำรายการแทน host
+
+chat/unknownตอบตามบริบท ไม่มีคำตอบสำรอง FAQ ตายตัว ภาษาให้โมเดลเลือกตามคำถาม แต่ข้อความยืนยันความจำ/คำสั่ง/ข้อผิดพลาด hostยังเป็นชุดเดิม การอ่าน/เขียนความจำต้องผ่าน decideMemory และ durable commitตามเดิม retrieval phase ไม่อนุญาตให้ source หรือ final modelแทรก memory/action คำตอบจริงทุกturnส่งกลับเข้าcontextหลังcommit คำตอบ/errorสำรองใน LINE adapter ของโหมดทดลองไม่พ่วง FAQ
+
+ใช้deadlineรวมและcall budgetเดิม จำกัดสูงสุด3provider calls/turn (ค้น+ตอบปกติ2ครั้ง มีrepairได้หนึ่งครั้ง) ปิดSDK toolsระหว่างสนทนาและrestoreเมื่อจบ ถ้าตั้งbudgetต่ำเกินค้น+ตอบจะจบด้วยข้อผิดพลาด ไม่ข้ามการตรวจหรือส่งคำตอบที่ยังไม่ผ่าน จำนวนครั้งนี้อาจมากกว่าทางตอบเดิม
+
+**ผลทดสอบและข้อจำกัด**
+
+- เพิ่ม8mock regressions: contextual retrieval+English answer, unknownหลายภาษา/reactionไม่ถูกkeywordทับ, ID/quote/URL/action checks, boundedrepairและsourceไม่ให้สิทธิ์เขียน, host catalog+translated answer, explicit memory guards, retrievalbounds/no-match, และdirect/group adapterunknown/errorไม่แนบFAQ พร้อม CLI checkรองรับgroundedทั้งสองช่องทาง
+- Buildผ่าน ชุดgrounded+simulation13/13 และ full269/269ผ่าน fail/skip/cancel0 หลักฐาน test-evidence/2026-11-01-grounded/runtime.txt, targeted.txt
+- initial comparison 8messages/10calls ยืนยันlegacyunknownพ่วงFAQในทั้งสองช่องทาง แต่groundedไม่พ่วง พบEnglishqueryค้นThaiไม่ครบ เก็บหลักฐาน initial-comparison.json แล้วเพิ่มgeneric translated lookup/document-ID selection ไม่เพิ่มแพตเทิร์นคำถามสมัครรายประโยค
+- หลังแก้ค้นข้ามภาษา 6messages/8calls ดึงenroll/learningเอกสารไทยมาเรียบเรียงEnglishได้ แต่พบreactionบางครั้งหลุดบริบท/ปนภาษา จึงแยกป้าย internal index ว่าไม่ใช่รายการที่ผู้ใช้เห็น และส่งprevious rendered answerชัดเจน รอบfollow-up4messages/6callsอ้างขั้นตอนสมัครได้ตรงเรื่องและไม่มีภาษาแทรกในตัวอย่างที่ลอง ดู cross-language-comparison.json / follow-up-comparison.json ไม่อ้างว่าครอบคลุมทุกสำนวน
+- ชุดมาตรฐานที่บันทึกในrepoรันจริง8messages/10callsเสร็จ พบ4คำถามEnglishในรุ่นทดลองได้คำตอบThai จึงเก็บ standard-eval-original.json ว่าเกณฑ์ภาษาเดิมไม่ผ่าน เจ้าของบอก “ภาษาไม่ได้ serious” และให้หยุดไล่แก้ จึงแยกภาษาเป็นadvisory ไม่ใช่blocking ไม่ได้รันซ้ำเพื่อล้างผลเสีย ประเมินผลเดิมแบบofflineแล้ว core checks รุ่นทดลอง6/6ผ่าน (unknownไม่โยงCBTU, factualsignupแนบFAQที่เกี่ยวข้อง, reactionไม่พ่วงURL) ใน accepted-core-report.json
+- การตรวจ ID/quote/source ไม่ใช่ข้อพิสูจน์เชิงความหมายว่าทุกข้อความสรุปตรงหลักฐานหรือการประเมิน naturalness ต้องทบทวนคำตอบจริง ข้อมูลยังเป็นsnapshot ไม่รับรองรอบเปิด/ราคา/ประวัติผู้สอนเต็ม ภาษาอาจไม่ตรงทุกครั้งตามผลจริง และยังไม่มี LINE E2E
+
+**รันชุดเดิมเมื่อเปลี่ยนโมเดล**
+
+`npm run eval:chat:next` แสดงขอบเขตโดยไม่ inference; ใส่ `-- --live` จึงทดสอบจริง 8messages สูงสุด14provider calls (direct/group, baselineunknown+next unknown/signup/reaction) ใช้ provider/modelที่เลือกปัจจุบันและเขียนชื่อไว้ในรายงาน ต้องเก็บรายงานแต่ละรอบเพื่อเทียบข้ามโมเดล ไม่ได้สลับโมเดลให้เอง ชุดนี้คัดลอกเฉพาะ public settings/knowledge ไม่มีข้อมูลลูกค้าจริง ไม่มี LINE API transport หยุดเมื่อproviderผิดพลาดหรือถึงcap และลบtempในfinally ภาษาเก็บเป็นadvisoryและไม่ทำให้exitล้มเหลว ส่วนchecksอัตโนมัติจำกัดแค่links/source presence ต้องตรวจความหมายแยกด้วย
+
+อาการภาษาต่างจากที่ถามเกิดตั้งแต่ข้อความแรกในmemoryทดลองใหม่ จึงไม่มีหลักฐานจากรอบนี้ว่าcontextเต็ม ไม่ได้ตรวจtoken usageจริงครบทุกrequestและไม่อ้างว่าไม่มีโอกาสเกิดcontext pressure ในการคุยยาว โค้ดยังย่อบริบทตามthresholdเดิม
+
+## อ้างหลายข้อความจากแหล่งเดียวต้องไม่ถูกนับเป็นหลายแหล่ง
+
+1 พฤศจิกายน 2026 · เจ้าของรายงาน who-is/ผู้สอน/ai แล้วได้ generic service failure หรืออ้างว่าไม่มีข้อมูล ทั้งที่หลักฐานมีอยู่ การจำลอง4turns/9provider calls พบอาการgeneric failureในturnแสดงรายการ AI: โมเดลให้คำตอบพร้อม12ข้อความอ้างอิง ทุกข้อความมีอยู่จริงใน host catalog result แหล่งเดียว แต่ validator เดิมจำกัด references.length<=6 จึงปัดทิ้งทั้งคำตอบ และrepairไม่ระบุข้อจำกัดทำให้โมเดลส่งแบบเดิมซ้ำ ไม่พบstopReason length/context overflowในตัวอย่างนี้ (input+outputสูงสุดที่บันทึก10383tokens) who-is/ข้อมูลผู้สอนในรอบนั้นตอบได้ จึงไม่อ้างว่าทุกสาเหตุของรายงานต้นฉบับตรงกันหมด
+
+แก้ให้นับdistinct source IDsสูงสุด6 แยกจากจำนวนquoted passages (bounded32รายการ) ตรวจทุกquoteว่าเป็นsubstringจริงของsourceที่ได้รับ รวมURLซ้ำตอนแสดง ไม่ตัดquoteที่ผิดทิ้งแล้วปล่อยclaimที่ไม่มีหลักฐาน ทดลอง replay exactplan12quotesจากแหล่งเดียวที่เคยถูกปัดทิ้งแล้วผ่าน โดยยังrejectquoteปลอมที่อยู่หลังลำดับ6, quote payloadเกินbound และ7distinctsources
+
+ผลค้นยังเป็น weighted keyword search + LLM query translation/expansion/document-ID selection ไม่ใช่embedding/vector search และยังตัดผลค้นเป็น6เอกสารตามคะแนนเหมือนเดิม ไม่มีการเปลี่ยนระบบค้นในรอบนี้
+
+เพิ่มtyped validation reasonและบอกข้อจำกัดจริงในmodel protocol/repair เพื่อไม่วนแก้โดยไม่รู้เหตุ เพิ่มgeneral follow-up principleให้รักษาชนิดข้อมูล/fieldเดิมเมื่อผู้ใช้ตอบเพียงtarget/category ไม่เพิ่มregexจับaiหรือประโยคตัวอย่างรายคำถาม
+
+ข้อผิดพลาดในexperimental LINE adaptersแยกเป็นตรวจหลักฐาน/รูปแบบไม่ผ่าน, budgetหมด, timeout, โควตา, auth, network, memory-write โดยใช้ข้อความคงที่จากcategory ไม่echorawprovidererror/credentialsและไม่พ่วงFAQ อาการoperational failureแยกจากunknownที่เป็นคำตอบว่าไม่มีข้อมูล
+
+เพิ่ม4regressions (12quotes/same-source+ตรวจทุกquote+source/payloadbound, precise repair reason, shorttargetรักษาinstructorsfieldและpreviousclarification, fixed diagnostic categoriesไม่รั่วข้อมูล) Buildผ่าน ชุดเฉพาะ17/17 full273/273ผ่าน fail/skip/cancel0
+
+หลังแก้จำลองชุดเดิม4turns/8calls: AIlistingตอบได้11quotes/1source (มีrepair1ครั้งเพราะโมเดลส่งcatalog_queryซ้ำหลังได้ผลค้นแล้ว); who-isตอบ7quotes/6sourcesได้; ถามผู้สอนต่ออ้างข้อมูลบุคคลเดิม; aiสั้น ๆ ขอความชัดเจน ไม่อ้างว่าค้นไม่กลับมา การขอclarifyยังอาจต้องประเมินความลื่นด้วยเจ้าของ ไม่อ้างว่าแก้ทุกfollow-upหรือเปลี่ยนเป็นsemantic searchแล้ว หลักฐาน test-evidence/2026-11-01-grounded-references
+
+ใช้คำสั่งnextเดิมโดยออกและเปิดCLIใหม่ ไม่มี restart/deploy LINE, key/config/model/credentialsเปลี่ยนแปลง, commit/push
+
+## รายการ Canva และข้อจำกัดที่ตรวจเกินหน้าที่
+
+1 พฤศจิกายน 2026 · เจ้าของรายงานพิมพ์ canva แล้วได้ข้อความตรวจรูปแบบ/หลักฐานไม่ผ่าน จำลอง2turns (มีคอร์สอะไรบ้าง→canva) พบ5callsและfailureทั้งสองturn:
+
+- รายการทั้งหมดตอบพร้อมquoteยาว2026ตัวอักษรซึ่งตรงhost resultจริง แต่ถูกจำกัดquote<=800 จึงถูกปัดทิ้งทั้งก่อนและหลังrepair
+- Canvaเลือกoperation=listแต่พ่วงfields11รายการที่ไม่ได้ใช้ แล้วตัวตรวจไปใช้กติกาread fields1-5กับlistจึงreject ต่อมาmodelrepairเป็นreadแต่ยังเลือก11fieldsและไม่มีfeedbackระบุboundนี้
+
+แก้ทั่วไปในexperimentalroute ไม่เพิ่มkeyword/FAQ/คำตอบเฉพาะCanva: executeGroundedCatalogตัดprojection fieldsที่ไม่ได้ใช้กับnon-readก่อนส่งexecutor ส่วนreadยังตรวจ1-5publicfieldsและให้precise validation reason; ไม่เปลี่ยนstrict legacy catalog parser ไม่ทิ้งfilters/limitsหรือขยายสิทธิ์อ่าน
+
+ยกเลิกความยาว800เป็นข้อห้ามของquote ใช้nonempty exact substringของsourceที่ส่งให้จริงเป็นเกณฑ์ ขนาดsource/response/modeltokenbudgetและจำนวนreferencesยังboundedตามเดิม ไม่ตัดquoteยาวแล้วปล่อยclaim ไม่ยอมรับแม้เพิ่มข้อความปลอมท้ายsourceจริง กติกานี้แทนquote-length boundในหัวข้อก่อนหน้า และmodelได้รับคำแนะนำให้เลือกข้อความอ้างอิงกระชับ
+
+เพิ่ม3regressions: listไม่ล้มเพราะunusedfieldsแต่readยังstrict, longexactquoteผ่าน/inventedsuffixไม่ผ่าน, broad→subjectreplyพร้อมunusedprojection ทำงานด้วยSDKmock Buildผ่าน ชุดเฉพาะgrounded/catalog20/20 full276/276ผ่าน ไม่มีfail/skip/cancel; exact captured2026char quoteและlist11unusedfields replayผ่านโดยไม่inference
+
+Liveหลังแก้2turns/4callsไม่มีrepair: broadlistแสดง20รายการ/3ตัวแรก, canvaแสดงคอร์สสร้างสื่อสวยด้วยCanvaพร้อมลิงก์ ใช้เวลาประมาณ1.95s/2.10sตามลำดับ เป็นผลตัวอย่าง ไม่รับรองทุกสำนวนหรือทุกโมเดล ไม่มีLINEtransport/real customer data/restart/deploy/key/config/model change/commit/push หลักฐาน test-evidence/2026-11-01-grounded-canva
+
+## ต่อคำถามพร้อมหลักฐานเดิม ไม่เริ่มจากศูนย์ทุกข้อความ
+
+1 พฤศจิกายน 2026 · เจ้าของพบ research ตอบชื่อคอร์ส/วิทยากรพร้อมsource แต่ถาม “ใครสอน” กลับบอกว่าไม่มีเอกสารในข้อความปัจจุบัน ตรวจโค้ดพบว่าแม้recentและpreviousAssistantมีคำตอบเดิม แต่ evidence Mapของแต่ละturnเริ่มด้วยhost factsเท่านั้น เอกสารสาธารณะที่ค้นรอบก่อนถูกทิ้ง ทำให้follow-upต้องค้นซ้ำหรือโมเดลเลือกunknownทั้งที่หลักฐานอยู่ในระบบ
+
+แก้การส่งต่อบริบททั่วไป ไม่จับkeyword research/ใครสอน: หลังanswerผ่านการตรวจ ให้จำsource IDsสาธารณะที่อ้างจริงไว้ในcanonical Memory.evidenceIds สูงสุด6ตัว ไม่เก็บสำเนาbodyเอกสารหรือhost waiting/capabilitiesเก่า เริ่มturnถัดไปโหลดIDsเหล่านี้จากpublicEvidenceที่ยังเผยแพร่ปัจจุบัน พร้อมกรองขนาดเอกสารเท่าเดิม จึงใช้คำถามต่อได้ทันทีโดยอ้างหลักฐานจริงในturnใหม่ หากlookup/catalogใหม่จะล้างชุดpublic evidenceเดิมก่อนใส่ผลใหม่ ไม่เอาผลเก่ามาปนโดยอัตโนมัติ
+
+Metadatafieldเป็นoptionalในmemoryv1เพื่ออ่านไฟล์เดิมได้ มีvalidatorจำกัดprefix faq/course/person, ความยาว/จำนวน/ความซ้ำ ใช้ตามidentity/channel/scopeของstoreเดิม บันทึกพร้อมturnสำเร็จเท่านั้น จึงคงอยู่ผ่านcompaction/เปิดsessionใหม่ แต่reset/forget/handoverล้างบริบทนี้ เอกสารที่retireแล้วไม่ถูกนำกลับมาใช้แม้เคยมีpointer ถ้าเป็นบทสนทนาเก่าที่ยังไม่มีpointer มีfallbackจากURLที่hostอ้างในprevious rendered answerหรือshown course IDs โดยเทียบกับเอกสารที่ยังมีจริงเท่านั้น ไม่อ่านraw userข้อความเป็นหลักฐานใหม่ ไม่เพิ่มข้อมูลส่วนตัวระยะยาว/permissionจากsource
+
+เพิ่ม4tests: research→ใครสอนใช้หลักฐานเดิมไม่lookup, pointerผ่าน13turns/compaction/reopenแต่ไม่ข้ามreset/identity, ตรวจcurrent/retiredrecordsและunsafe pointers, และnewretrievalแทนoldresult ชุดเฉพาะgrounded/memory/handover30/30 buildผ่าน full280/280ผ่าน fail/skip/cancel0 (targetedรอบsandboxแรกติดlisten EPERMของHTTP จึงรันนอกsandboxตามขั้นตอน)
+
+LiveในTerminalจำลองส่วนตัว2turns/3provider calls: researchค้น+ตอบ2calls, “ใครสอน” ตอบ ผศ. ดร.ทวีศักดิ์ สมานชื่นพร้อมsourceคอร์สResearchถูกต้อง ใช้1callประมาณ689ms (ตัวอย่างเดียวไม่ใช่SLA) ไม่มีrepair ไม่ให้ระบุชื่อคอร์สซ้ำ หลักฐาน test-evidence/2026-11-01-grounded-followup/live.json เป็นcacheรหัสอ้างอิงบทสนทนา ไม่ใช่embedding/vector search และไม่รับรองว่าทุกfollow-upเข้าใจถูกเสมอ
+
+ใช้nextคำสั่งเดิมโดยออกและเปิดใหม่ ไม่มี LINE transport/อ่านข้อมูลลูกค้าจริง/restart/deploy/key/model/config change/commit/push
+
+## ฟื้นตัวจากคำตอบขาด/ว่าง/JSONไม่สำเร็จ โดยไม่โยนผลค้นที่ถูกต้องทิ้ง
+
+1 พฤศจิกายน 2026 · เจ้าของรายงาน “มีคอร์สออะไรบ้าง” / “มีหลักสูตรอะไรบ้าง” ได้ model-format error ตรวจพบ runGroundedDialogue เรียก runConversation อยู่นอก validation-repair catch จึงไม่ขอคำตอบสั้นใหม่เมื่อ providerส่งstopReason=length, empty/reasoning-only หรือJSONgenerationerror แม้hostอาจค้นสำเร็จแล้ว ต่างจากlegacy dialogueที่รับมือบางกรณีนี้อยู่แล้ว
+
+Liveก่อนแก้ในtemp2turns/4callsรอบนี้ตอบได้ทั้งคู่ จึงไม่อ้างว่าreproduceproviderfailureต้นฉบับได้แน่นอน สาเหตุย่อยของข้อความผู้ใช้ยังแยกไม่ได้จากtranscriptเพียงอย่างเดียว แต่ช่องโหว่ในcontrol-flowยืนยันจากโค้ด และจำลองforced failuresด้วยSDKmockได้
+
+แก้ให้format/empty/truncationมีshort repairได้หนึ่งครั้งในdeadline/call capเดิม หากมีcurrent-turn catalog resultที่hostตรวจแล้ว ให้ใช้ผลอ่านนั้นแทนcomposerJSONที่ล้ม ไม่ส่งpartialJSON/คำตอบที่proofไม่ผ่านให้ผู้ใช้ ไม่ต้องค้นซ้ำ ไม่เอาผลคอร์สเก่าจากturnก่อนมาสวมเป็นคำตอบใหม่ และไม่ใช้rawlookupเอกสารทั่วไปเป็นคำตอบแทนโดยเดาเอง กรณีlookupทั่วไปยังต้องเรียบเรียงด้วยevidenceหรือแจ้งข้อผิดพลาดตามจริง Auth/quota/network/timeoutไม่เข้าformat retry และไม่มีการเพิ่มtoken/model/config/key
+
+เพิ่ม5regressions: truncatedcomposer→currentcatalogfallback+sourcepointers, invalidproof→safehostread, empty/length/JSONrepairbounded, evidenceคงอยู่ตอนrepairแต่ไม่retrynetwork/quota, และไม่fallbackoldturn/ไม่commitselectionเมื่อproviderfail Buildผ่าน เฉพาะgrounded24/24 full285/285ผ่าน fail/skip/cancel0
+
+Liveหลังแก้สองประโยคเดิม2turns/4callsตอบรายการได้ทั้งคู่ ไม่มีformatfailure/repairในตัวอย่างนี้ จึงแยกผลliveที่เป็นnormalpathออกจากforced-failuretestsที่ยืนยันfallback/recovery คำถามกว้างครั้งที่สองในliveถูกmodelเลือกoperation=more; ไม่อ้างว่าชุดนี้ประเมินเจตนาpaginationหรือนaturalnessผ่านทุกสำนวน หลักฐาน test-evidence/2026-11-01-grounded-format-recovery
+
+ใช้nextคำสั่งเดิมโดยปิดแล้วเปิดCLIใหม่ ไม่มี LINE transport/restart/deploy/อ่านข้อมูลลูกค้าจริง/key/model/config change/commit/push
+
+## คำถามกว้างต้องถามด้านที่สนใจก่อนหนึ่งครั้งในรุ่น next
+
+1 พฤศจิกายน 2026 · เจ้าของยืนยันโดยรวมโอเค แล้วขอให้ “มีคอร์สอะไรบ้าง” ถามว่า “สนใจด้านไหนครับ เช่น AI วิเคราะห์ข้อมูล หรือออกแบบสื่อ?” ก่อน รุ่นgroundedเดิมใช้ may ask จึงยังเลือกแสดงรายการทันทีได้ ปรับsystem policyและper-turn contractจากoptionalเป็นต้องถามหนึ่งsubject questionด้วยchatก่อนlookup/catalog หากไม่ระบุด้าน ไม่เพิ่มregexหรือFAQhandlerเฉพาะประโยค เมื่อผู้ใช้ตอบด้านให้listทันที ไม่ถามงาน/พื้นฐาน/เวลา และไม่resumeadviser/fieldreadingเก่า คำถามที่ระบุด้าน/ชื่อ/ตัวกรองหรือขอดูทุกคอร์สโดยตรงข้ามคำถามนี้
+
+Buildผ่าน ชุดgrounded/simulation29/29ผ่าน (รอบนี้เป็นprompt/copy changeจึงไม่เพิ่มmockที่ตรวจซ้ำข้อความinstruction) Live3turns/5calls: “มีคอร์สอะไรบ้าง” → ข้อความที่ขอเป๊ะ1call680ms; “AI” → list/searchAI2calls; “ขอดูทั้งหมดเลย” → modelเลือกmoreในกลุ่มAIเดิมและแสดงส่วนที่เหลือ2calls ไม่ถามด้านซ้ำ ไม่อ้างว่าประโยคทั้งหมดที่กำกวมหมายถึงglobalcatalogแน่นอน หลักฐาน test-evidence/2026-11-01-grounded-interest
+
+ใช้nextคำสั่งเดิมโดยปิดแล้วเปิดใหม่ ไม่มีLINEtransport/restart/deploy/key/model/config changes/commit/push
+
+## คำยืนยันผู้สอน AI Agent Workshop with n8n
+
+1 พฤศจิกายน 2026 · ผู้ใช้แจ้งว่า AI Agent Workshop with n8n สอนโดย “ผศ.ดร. ทวีศักดิ์ สมานชื่น” เดิมsnapshot cbtu-10มีเพียงlegacy instructors_textจากชื่อByในcatalog จึงจงใจไม่promoteauthorเป็นteacher ไม่ใช่ชื่อหล่นระหว่างนำเข้า ตรวจหน้า https://cbtumu.net/coursenew/n8n-workshop/ ผ่านweb readerยังไม่พบชื่อผู้สอนระบุชัดในเนื้อหาที่อ่าน จึงไม่สร้างwebexcerpt/hashใหม่เพื่ออ้างข้อมูลที่ผู้ใช้ยืนยัน
+
+เพิ่มregistryคำยืนยันโครงการ course-instructor-confirmations.ts ผูกcourseId+canonicalURLเติมเฉพาะstructuredinstructorsที่หาย ระบุวันที่2026-11-01และsource=user_confirmation_in_project_chat ไม่แตะgenerated course-catalog.ts/archives/import fingerprints ถ้าอนาคตมีexplicit structuredwebteacherจะใช้webrecordก่อน ไม่ใช้By/แชตลูกค้าทั่วไปเรียนรู้คำยืนยันนี้เอง
+
+course reader/filter/retrieval/person-profile/RAGใช้courseInstructors helperเดียวกัน จึงค้นผู้สอนพบworkshopเพิ่มด้วย ค่าruntimeผู้สอนแก้แล้วแต่ยังรักษาข้อมูลsnapshotเก่าไว้ RAG evidence bodyและSourceNotesระบุคำยืนยันในแชตโครงการแยกจากหน้าเว็บ hostrendererแสดงmetadataนี้ตามsourceที่อ้าง ไม่อ้างว่าURLหน้าเว็บยืนยันชื่อที่เพิ่มเอง KM APIแสดงteacherConfirmationกับfieldSourcesและไม่ถือinstructorsเป็นmissingในeffectiveview แต่rawwebteacherEvidence/flagsยังคงเดิม
+
+ทดสอบmodelรอบแรก2turns/4callsพบว่าเลือกoperation=instructorด้วยชื่อคอร์ส ซึ่งAPIเดิมหมายถึงประวัติคน จึงยังตอบunknownทั้งWorkshopและVideoแม้ข้อมูลพร้อม (before-routing.json) แก้planner protocolให้ชื่อperson_profileชัดว่าใช้กับชื่อบุคคล ส่วนผู้สอนของคอร์สใช้read/instructors และnormalizelegacyinstructor+knowncourse-titleให้เป็นreadอย่างปลอดภัยในgroundedwrapper ไม่เพิ่มregexจับประโยคหรือคำตอบเฉพาะคอร์ส
+
+เพิ่ม5regressionsเรื่องconfirmation provenance/rawsnapshotไม่ถูกแก้, instructorsearch/ไม่promoteauthor, futurewebprecedence, source attribution, และcourse-vs-person operation; ปรับassertionเดิมที่ถือว่าrawsnapshotunknownต้องเป็นruntimeunknownเสมอให้ยอมรับเฉพาะconfirmedrecord Buildผ่าน ชุดเฉพาะ40/40 full290/290ผ่าน fail/skip/cancel0
+
+Liveหลังแก้2turns/4calls: Workshopตอบ ผศ.ดร. ทวีศักดิ์ สมานชื่นพร้อมcourseURLและคำยืนยันโครงการ; “แล้ว AI Agent with n8n ล่ะ” ตอบผู้สอนคนเดียวกันโดยใช้web-evidencedrecordของคอร์สวิดีโออีกURL ไม่รวมสองcourseเป็นรายการเดียว ไม่มีLINEtransport/realcustomerdata/restart/deploy/key/model/config changes/commit/push หลักฐาน test-evidence/2026-11-01-workshop-instructor
+
+## ชื่อผู้สอนเป็นข้อมูลปกติ
+
+ยกเลิกกลไกคำยืนยันจากแชตตามคำสั่งล่าสุด เก็บชื่อผู้สอนใน teaching.instructors โดยไม่มีวันที่ยืนยันหรือที่มาจากผู้ใช้ ตัวอ่าน ค้นหา RAG และ API ใช้ชื่อปกติ ไม่มีข้อความต่อท้ายคำยืนยันหรือ teacherConfirmation ใน API หลักฐานเว็บย้อนหลังคงแยกไว้ ไม่สร้างหลักฐานเว็บใหม่ ตัวนำเข้าเก็บชื่อปัจจุบันเมื่อเว็บไม่มีชื่อและ ID/URL ตรงกัน ปรับคู่มือแล้ว
+
+Build ผ่าน; เฉพาะส่วน 13/13, importer 11/11, runtime 292/292 ไม่มี provider call, LINE จริง, restart หรือ deploy หลักฐาน test-evidence/2026-11-01-ordinary-instructors/
+
+## เติมชื่อผู้สอนและหลักสูตรฟรี
+
+เติม AI for All, Basic Prompt Engineering (Update), Basic Prompt Engineering เป็น ผศ.ดร. ทวีศักดิ์ สมานชื่น และ Data Analyst Level 4 รุ่นที่ 4 เป็น ผศ. ดร.วรัญญู วงษ์เสรี ในช่องชื่อผู้สอนปกติ ไม่มี metadata คำยืนยัน เปลี่ยน AI Agent for ALL, AI Agents in Action, AI for All เป็นราคา 0 THB/Free แสดงเรียนฟรี ไม่มีค่าใช้จ่าย ล้าง missing_fields และตัวเตือนผู้สอนที่แก้แล้ว รวม Workshop n8n ทั้งระดับรายการและ validationWarnings ไม่เปลี่ยน archive/research หรือหลักฐานเว็บเดิม ชื่อผู้สอนครบ 19 หลักสูตรและ Bundle เหลือราคาไม่ทราบ Basic Prompt Engineering (Update) และ Basic Prompt Engineering
+
+ตัวนำเข้าเก็บชื่อ/ราคาเดิมเมื่อเว็บไม่มีข้อมูลและ ID/URL ตรงกัน พร้อมล้างตัวเตือนที่แก้แล้ว Build ผ่าน; เฉพาะ22/22, importer11/11, runtime293/293 ไม่มี provider call, ข้อความ LINE, restart หรือ deploy รอบนี้ หลักฐาน test-evidence/2026-11-01-course-completion/

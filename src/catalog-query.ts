@@ -1,11 +1,12 @@
 import { courseCatalog, type Course } from './course-catalog.js';
+import { readInstructorProfile } from './instructor-profile.js';
 import { retrieveCourses, renderCatalog, selectCatalog, type CatalogSelection } from './catalog.js';
 import { adviseCourses, validAdvice, type AdviceState } from './course-adviser.js';
 import { briefCard, briefSourceNote, renderBriefField, type BriefField } from './course-briefs.js';
 import { readCourseFields, validCourseFields, validCourseFilters, filterCourses, type CourseField, type CourseFilter } from './course-reader.js';
 
 export type CatalogState = { matchedIds: string[]; shownIds: string[]; offset: number; limit: number; query: string; field: 'list' | 'price' | 'summary' | 'details'; advice?: AdviceState; readFields?: CourseField[] };
-export type CatalogQuery = { operation: 'list' | 'count' | 'price' | 'sort_price' | 'more' | 'summary' | 'advise' | 'read'; scope: 'all' | 'previous' | 'search'; query?: string; limit?: number; order?: 'asc' | 'desc'; fields?: CourseField[]; filters?: CourseFilter[] };
+export type CatalogQuery = { operation: 'list' | 'count' | 'price' | 'sort_price' | 'more' | 'summary' | 'advise' | 'read' | 'instructor'; scope: 'all' | 'previous' | 'search'; query?: string; limit?: number; order?: 'asc' | 'desc'; fields?: CourseField[]; filters?: CourseFilter[] };
 export type CatalogRoute = { answer?: string; selection?: CatalogSelection; state?: CatalogState; topic?: string };
 const rows = courseCatalog.courses;
 const byIds = (ids: string[]) => ids.map(id => rows.find(c => c.id === id)).filter((c): c is Course => !!c);
@@ -29,10 +30,11 @@ export function parseCatalogQuery(value: any, mode: 'strict' | 'model' = 'strict
   if (mode === 'model' && Array.isArray(value?.filters) && value.filters.length === 0) {
     value = { ...value }; delete value.filters;
   }
-  if (!value || !['list', 'count', 'price', 'sort_price', 'more', 'summary', 'advise', 'read'].includes(value.operation)
+  if (!value || !['list', 'count', 'price', 'sort_price', 'more', 'summary', 'advise', 'read', 'instructor'].includes(value.operation)
     || !['all', 'previous', 'search'].includes(value.scope) || (value.query !== undefined && (typeof value.query !== 'string' || value.query.length > 200))
     || (value.scope === 'search' && !value.query?.trim())
     || (value.operation === 'advise' && !value.query?.trim())
+    || (value.operation === 'instructor' && (value.scope !== 'search' || !value.query?.trim()))
     || (value.operation === 'read' && !validCourseFields(value.fields))
     || (value.fields !== undefined && !validCourseFields(value.fields))
     || (value.filters !== undefined && !validCourseFilters(value.filters))
@@ -49,7 +51,7 @@ function search(query: string) {
 }
 function snapshotPrice(c: Course) {
   if (c.price.displayed_amount === null) return 'ไม่พบราคา (ไม่ถือว่าฟรี)';
-  return c.price.label === 'Free' ? 'หน้าเดิมแสดง Free (ต้องยืนยันเงื่อนไขปัจจุบัน)'
+  return c.price.label === 'Free' ? 'เรียนฟรี ไม่มีค่าใช้จ่าย'
     : `${c.price.displayed_amount.toLocaleString('en-US')} ${c.price.currency ?? '(ไม่ระบุสกุลเงิน)'}`;
 }
 function card(c: Course, index: number, field: CatalogState['field']) {
@@ -64,6 +66,7 @@ function card(c: Course, index: number, field: CatalogState['field']) {
 
 export function executeCatalogQuery(command: CatalogQuery, previous?: CatalogState): CatalogRoute {
   command = parseCatalogQuery(command);
+  if (command.operation === 'instructor') return { answer: readInstructorProfile(command.query!), state: previous };
   if (command.operation === 'advise') {
     const result = adviseCourses(command.query!, previous, true);
     if (!result) throw new Error('Invalid advice request');

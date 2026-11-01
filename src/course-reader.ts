@@ -1,3 +1,4 @@
+import { courseInstructors } from './course-instructors.js';
 import type { Course } from './course-catalog.js';
 import { courseBrief, briefSourceNote } from './course-briefs.js';
 
@@ -36,10 +37,10 @@ export function courseFieldValue(c: Course, field: CourseField): string | null {
     case 'duration': return c.duration_text;
     case 'sessions': return c.session_dates_text;
     // Legacy text can contain a catalog author; it is never a teacher source.
-    case 'instructors': return c.instructors?.map(t => t.name).join('; ') || null;
+    case 'instructors': return courseInstructors(c).map(t => t.name).join('; ') || null;
     case 'availability': return c.enrollment.observed_text;
     case 'certificate': return [c.certificate.observed_text, c.certificate.course_specific_pass_criteria].filter(Boolean).join('; ') || null;
-    case 'price': return c.price.displayed_amount === null ? null : c.price.label === 'Free' ? 'หน้าเดิมแสดง Free'
+    case 'price': return c.price.displayed_amount === null ? null : c.price.label === 'Free' ? 'เรียนฟรี ไม่มีค่าใช้จ่าย'
       : `${c.price.displayed_amount.toLocaleString('en-US')} ${c.price.currency ?? '(ไม่ระบุสกุลเงิน)'}`;
   }
 }
@@ -52,8 +53,8 @@ export function readCourseFields(courses: Course[], fields: CourseField[]) {
     return `${label}: ${value ?? (field === 'price' ? 'ไม่พบราคา ไม่ถือว่าฟรี' : field === 'instructors'
       ? 'ยังไม่พบหลักฐานชื่อผู้สอนที่ยืนยันได้ ไม่ใช้ชื่อผู้เขียนรายการแทนวิทยากร' : 'ไม่พบข้อมูลส่วนนี้ในแหล่งที่เก็บไว้')}`;
   }), ...(c.detail_access !== 'public' ? ['หน้ารายละเอียดล็อก ใช้เฉพาะ metadata สาธารณะที่เก็บได้'] : []),
-  ...(fields.includes('instructors') && c.instructors?.length ? [
-    `หลักฐานผู้สอน: ${[...new Set(c.instructors.map(t => t.source_url))].join(' ')}`,
+  ...(fields.includes('instructors') && courseInstructors(c).length ? [
+    ...(c.instructor_evidence.length ? [`หลักฐานผู้สอนจากเว็บ: ${[...new Set(c.instructor_evidence.map(t => t.source_url))].join(' ')}`] : []),
     ...(c.flags.includes('alternate_teacher_name_forms_in_bundle_require_review') ? ['ชื่อผู้สอนมีรูปแบบต่างกันระหว่างหน้าเดี่ยวกับ Bundle แสดงตามหลักฐานหน้าเดี่ยว ไม่รวมเป็นบุคคลเดียวกันอัตโนมัติ'] : []),
   ] : []),
   c.canonical_url].join('\n')).join('\n\n') + '\n\n' + briefSourceNote(courses, fields.some(f => ['price', 'sessions', 'availability'].includes(f)));

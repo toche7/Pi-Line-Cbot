@@ -201,3 +201,30 @@ test('separate Node processes reopen store; retention, locking and corruption fa
     assert.equal(readFileSync(file, 'utf8'), '{invalid');
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
+
+
+test('context compaction commits only with a successful turn and preserves canonical history on model failure', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'cbot-compaction-commit-'));
+  let clock = 1800000000000, limited = false;
+  const store = new MemoryStore(dir, () => clock);
+  const contexts: string[] = [], sessions: AgentSession[] = [];
+  const core = new CustomerCore(fakeFactory(contexts, sessions, () => limited), 1000, undefined, () => clock, store);
+  try {
+    const memory = emptyMemory(clock);
+    memory.profile.name = 'Kept-Fixture';
+    memory.recent = Array.from({ length: 12 }, (_, i) => ({ user: 'old-' + i, assistant: 'ตอบเดิม', at: clock - 100 + i }));
+    store.save(key(a), memory);
+    const client = core.client(a), before = store.load(key(a));
+    limited = true;
+    await assert.rejects(client.send('ทำอะไรอยู่', output), /429/);
+    assert.deepEqual(store.load(key(a)), before);
+    assert.deepEqual(JSON.parse(await client.memory!()), before);
+    limited = false; clock += 60000;
+    await client.send('สมัครเรียนอย่างไร', output);
+    const after = store.load(key(a));
+    assert.equal(after.profile.name, before.profile.name);
+    assert.equal(after.compactions, before.compactions + 1);
+    assert.equal(after.recent.length, 7);
+    assert.equal(after.recent.at(-1)?.user, 'สมัครเรียนอย่างไร');
+  } finally { await core.dispose(); store.close(); rmSync(dir, { recursive: true, force: true }); }
+});

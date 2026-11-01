@@ -1,0 +1,14 @@
+{
+  "scope": "local source/build and simulations only",
+  "routing": "grounded",
+  "backup": "/var/folders/ly/kq_n217s673dj1jc6gckrs3h0000gn/T/cbot-before-grounded-default-v0xdheiy",
+  "backupFiles": 184,
+  "backupChecksumsVerified": true,
+  "targetedPassed": 57,
+  "runtimePassed": 295,
+  "providerCalls": 0,
+  "cloudDeployment": false,
+  "lineRestart": false,
+  "realLineMessages": false,
+  "sourcePackageIncludesCatalogJson": true
+}

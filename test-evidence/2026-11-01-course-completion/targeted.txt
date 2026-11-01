@@ -1,0 +1,30 @@
+✔ real failed LINE question sequence: list, prices, shorter, paging, price ranking and total count retain correct scope (30.157875ms)
+✔ catalog aggregate operations distinguish missing prices, all/previous/search and finite pagination (1.539375ms)
+✔ legacy bounded history recovers course context; no private data or unrelated records are needed (3.520667ms)
+✔ signed LINE failed-question replay returns prices/counts and keeps dedupe (27.348625ms)
+✔ semantic plans execute host queries; catalog state survives mixed chat/compaction/restart and resets per identity (311.117208ms)
+✔ catalog snapshot retains provenance, protected/null fields and unverified offers (5.473417ms)
+✔ retrieval supports aliases, ambiguity, Thai/English, comparison and contextual follow-ups without intercepting chat (19.155125ms)
+✔ five acceptance cases use only selected catalog facts; memory and dialogue remain available (70.165875ms)
+✔ host rejects IDs outside retrieval, retains cohort warnings and answers grounded catalog during 429 (24.456459ms)
+✔ signed LINE events use the same catalog retrieval and host comparison (9.851333ms)
+✔ grouped catalog preserves website fields and fingerprint except the explicitly edited instructors and free prices (4.67425ms)
+✔ ordinary instructor names are stored separately from archived webpage evidence (0.127709ms)
+✔ completed instructor and free-price data are used by readers with no stale teacher warnings (1.687ms)
+✔ workshop stores its instructor as a normal name without confirmation metadata (1.602125ms)
+✔ reader and search use the ordinary workshop instructor and never infer a teacher from By text (4.24975ms)
+✔ normal names do not fabricate archived website teacher evidence (0.089041ms)
+✔ grounded replies include the instructor name without a project-confirmation note (6.238166ms)
+✔ legacy ambiguous instructor operation with a course title reads its teacher; person_profile remains a person lookup (5.094875ms)
+✔ public reader restricts fields and renders stored instructors and missing values faithfully (1.239292ms)
+✔ public reads follow displayed scope and paginate without losing the requested fields (1.255375ms)
+✔ teacher search uses verified structured names, preserves the result set for prices/count/paging and excludes unknown authors (15.094875ms)
+✔ semantic field reads work with candidate retrieval and follow-up context; host ignores invented model facts (60.578ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 22
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1031.27625

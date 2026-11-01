@@ -42,15 +42,17 @@ Terminal จำข้าม restart แล้ว: เก็บ recent context + 
 
 `/help` ดูคำสั่งที่รองรับในช่องทางนั้นโดยไม่เรียกโมเดล; `/memory` ดูสิ่งที่จำ; `/reset` ล้างบทสนทนา/สรุป/เรื่องค้าง แต่คงโปรไฟล์และ long-term preferences; `/forget` ตามด้วย `/confirm-forget` ภายใน60วินาทีเพื่อลบทั้งหมด หรือ `/cancel` เพื่อยกเลิก ข้อความอื่นรวม `/help` ยกเลิกคำขอยืนยันค้างและ help แจ้งชัดว่าข้อมูลยังอยู่; `/exit`, `/quit`, Ctrl-C ใช้เฉพาะTerminalเพื่อออกโดยคง memory ที่บันทึกแล้ว ผู้ทดสอบ local เริ่มต้นคือ tester; แยกอีกคนด้วย `npm run chat -- --user alice` (ไม่ใช่การยืนยันตัวตนจริง) LINE มีคำสั่ง help/memory/reset/forgetชุดเดียวกันแล้ว ใช้ `.line-memory/` แยกไฟล์/lockจากTerminal
 
-รวมวิธีสนทนาที่เจ้าของตรวจรับแล้วเข้าคำสั่งเดิม `npm run chat` / `npm start` และเส้นทางLINEแบบคุยส่วนตัวแล้วในsource/build: ใช้model-firstให้โมเดลอ่านเจตนา บริบท คำปฏิเสธและความเห็นก่อนเลือกFAQ/คำสั่งค้น แล้วhostแสดงข้อเท็จจริงจากsnapshotพร้อมURL/เวลาเก็บ คงการกรองข้อมูลและขั้นยืนยันเดิม ใช้memory/คำขอเดิม ไม่มีmigrationหรือนำข้อมูลtempเข้าruntimeจริง โปรเซสที่เปิดอยู่ต้องเริ่มใหม่จึงโหลดโค้ดใหม่; รอบรวมนี้ยังไม่restartLINE และไม่เปลี่ยนพฤติกรรมกลุ่ม
+รุ่นที่ทดสอบผ่านเป็นค่าเริ่มต้นใน source/build บน local แล้ว: `npm run chat`, `npm start`, `npm run chat:line` และ `npm run chat:group` ใช้ grounded เหมือนคำสั่ง next เดิม ให้โมเดลอ่านบริบท ค้นข้อมูลที่อนุญาต แล้วตอบจากหลักฐาน ไม่มีก็บอกตรง ๆ โดยไม่พ่วง FAQ อัตโนมัติ ทุกช่องทางใช้ข้อมูลหลักสูตรชุดเดียวกัน คงความจำ/คำขอ/สิทธิ์และการยืนยันเดิม แยกข้อมูลส่วนตัวกับกลุ่มตามเดิม กลุ่มยังแนะนำบริการที่ต้องทักส่วนตัว โดยไม่เปิดบริการส่วนตัวในกลุ่ม
 
-หาก Groq จำกัดการใช้งาน (HTTP429) จะแจ้งเวลาพักและไม่ยิงซ้ำระหว่างcooldown โหมดmodel-firstต้องใช้โมเดลตีความFAQด้วย จึงไม่รับรองFAQในแชตขณะโมเดลล้มเหลว; LINEคุยส่วนตัวจะชี้หน้าFAQสาธารณะแทน ข้อมูลเดิมไม่ถูกล้าง และคำสั่งhostเช่น/help,/memoryยังใช้ได้ ระบบใช้bounded context/auto compactionตามเดิม
+สถานะรอบนี้: เปลี่ยนค่าเริ่มต้นและตรวจบน local เท่านั้น ยังไม่ deploy หรือ restart LINE จริง การยืนยันการรับส่งใน LINE จริงเป็นขั้นถัดไป คำสั่ง next ยังเป็นชื่อเรียกที่เข้าทางเดียวกันชั่วคราวจนตรวจ LINE จริงครบ ส่วนตัวเลือก model-first เก็บไว้สำหรับย้อนกลับและทดสอบเทียบ ไม่ใช่ค่าเริ่มต้นของช่องทางใช้งาน
+
+เมื่อโมเดลจำกัดโควตาหรือไม่พร้อม จะแจ้งปัญหาโดยไม่ชี้ FAQ อัตโนมัติ คำสั่ง host เช่น `/help`, `/memory` และขั้นยืนยันยังทำตามกฎเดิม ไม่มีการล้างข้อมูลเดิมเพื่อเปลี่ยนวิธีตอบ ระบบใช้ bounded context/auto compaction ตามเดิม
 
 คีย์โมเดลตั้งใน `.env` บนเครื่อง ปัจจุบันใช้ `PI_PROVIDER=groq`, `PI_MODEL=qwen/qwen3.8-27b` และ `GROQ_API_KEY` หากเริ่มใหม่ให้ใช้ .env.example เป็นตัวอย่าง ห้ามคัดลอกทับ .env ที่มีค่าแล้ว ไม่ค้น/อ่าน Pi auth เก่า และไม่ต้องส่ง secrets ในแชต
 
 ## พื้นที่ทดลองสนทนาแยกข้อมูล
 
-คำสั่งเดิม `npm run chat` ใช้วิธีคุยใหม่และเก็บความจำถาวรแล้ว ส่วน `npm run chat:natural` ยังเก็บไว้สำหรับทดลองกับtemp memory/requestsที่ลบทิ้งเมื่อออก ไม่มีLINE transport ใช้ `npm run check:natural` เพื่อตรวจconfigโดยไม่เรียกโมเดล หรือเปรียบเทียบกฎเดิมในtempด้วย `npm run chat:natural -- --rules-first` model-firstใช้โมเดลจริงแม้เป็นคำทักทาย/FAQ ต้องมีkeyใช้งานได้และใช้โควตา ดู [ขอบเขต ผลทดสอบ และสถานะรวม](./NATURAL_CHAT_EXPERIMENT.md)
+คำสั่งเดิม `npm run chat` ใช้ grounded และเก็บความจำถาวรแล้ว ส่วน `npm run chat:natural` ยังเก็บไว้สำหรับทดลองกับtemp memory/requestsที่ลบทิ้งเมื่อออก ไม่มีLINE transport ใช้ `npm run check:natural` เพื่อตรวจconfigโดยไม่เรียกโมเดล หรือเปรียบเทียบกฎเดิมในtempด้วย `npm run chat:natural -- --rules-first` groundedใช้โมเดลจริงแม้เป็นคำทักทาย/FAQ ต้องมีkeyใช้งานได้และใช้โควตา ดู [ขอบเขต ผลทดสอบ และสถานะรวม](./NATURAL_CHAT_EXPERIMENT.md)
 
 ## LINE local
 
@@ -80,7 +82,8 @@ LINE persistent memory เปิดแล้ว: `.line-memory/` แยกจา
 
 - `src/core.ts`: แยก session/channel/customer, คิวรายลูกค้า, idle TTL, auto compaction และ memory controls
 - `src/memory.ts`: local bounded persistence, profile/long-term preference extraction, summary, Pi context restoration และ confirmed deletion
-- `src/catalog.ts`, `src/course-catalog.ts`: public course snapshot, lexical ranking/aliases, bounded model candidates และ host-rendered facts
+- `src/course-catalog-data.json`: ข้อมูลหลักสูตรแยกหมวด พร้อมชื่อผู้สอนปกติและหลักฐานเว็บเดิมที่เก็บแยกไว้; `src/course-types.ts` กำหนดรูปแบบ และ `src/course-catalog.ts` โหลดให้ตัวอ่านเดิมใช้ต่อ
+- `src/catalog.ts`: lexical ranking/aliases, bounded model candidates และ host-rendered facts
 - `src/agent.ts`: สร้าง Pi session, provider config, tool allowlist ไม่มี shell/file tools; Qwen ใช้ system role แทน developer role
 - `src/knowledge.ts`: แหล่งความรู้สาธารณะ กติกา conflict/unknown, read-only knowledge tool และ persona ซีบอต
 - `src/chat.ts`, `src/main.ts`: Terminal adapters; `src/conversation.ts`: model streaming/progress/timeout/call limits
@@ -113,3 +116,33 @@ Git local baseline เริ่มจาก `31365a3`; .env/secrets/runtime data
 เปิด [จัดการบอต](http://127.0.0.1:3001/#bot) บนเว็บเดิม ส่วนตั้งค่าการตอบอยู่บนและความรู้บอตอยู่ล่าง แก้FAQผ่านdraft/review/publish/rollback และตั้งmodel/บุคลิก/limitsผ่านdraft/ลอง/ตรวจ/ยืนยันใช้จริงได้ โดยต้องให้เจ้าของยืนยันเอง การลองโมเดลใช้providerจริงและquotaแต่ไม่ส่งLINE รายละเอียด [KM_GUIDE.md](./KM_GUIDE.md) และ [RESPONSE_SETTINGS_GUIDE.md](./RESPONSE_SETTINGS_GUIDE.md) ค่าใช้งานจริงยังเป็นinitialเดิมหลังเปิดฟังก์ชัน ไม่ได้applyค่าทดสอบให้เอง
 
 - [การแบ่งหน้าและขอบเขตการรองรับรายการจำนวนมาก](PAGINATION_GUIDE.md)
+
+ทดสอบบริบท LINE ผ่าน Terminal แบบข้อมูลชั่วคราว:
+
+```sh
+npm run chat:line
+npm run chat:group
+```
+
+คำสั่งแรกจำลองแชตส่วนตัว คำสั่งที่สองจำลองกลุ่มโดยเติมคำเรียก CBOT ให้อัตโนมัติ ใช้ adapter/กติกาของช่องทางจริง แต่แสดงคำตอบใน Terminal ไม่ส่ง LINE และไม่อ่านความจำลูกค้าจริง พิมพ์ `/exit` เพื่อออก ข้อมูลทดลองลบทิ้งเมื่อปิด ต่างจาก `npm run chat` ที่เก็บความจำเดิม ข้อความทั่วไปเรียกโมเดลจริงและใช้โควตา ส่วน `npm run chat:line -- --check` หรือ `npm run chat:group -- --check` ตรวจการตั้งค่าโดยไม่เรียกโมเดล สถานะเจ้าหน้าที่เป็นการจำลอง ไม่มีการรับช่วงจากเจ้าหน้าที่จริง
+
+Terminal แยกสีผู้ใช้เป็นสีฟ้า ผู้ช่วยเป็นสีเขียว และสถานะระหว่างตอบเป็นสีจาง ใช้กับทั้ง chat ปกติและโหมดจำลอง LINE เปิดสีเฉพาะหน้าจอ Terminal ที่รองรับ เมื่อ redirect/pipe หรือกำหนด NO_COLOR จะเป็นข้อความธรรมดา
+
+### รุ่นทดลองสนทนาแบบค้นหลักฐานก่อนตอบ
+
+```sh
+npm run chat:line:next
+npm run chat:group:next
+```
+
+ใช้จำลองส่วนตัว/กลุ่มใน Terminal ตามลำดับ พิมพ์ `/exit` เพื่อออก ข้อมูลอยู่ใน temp และลบทิ้งเมื่อปิด ไม่มีการส่ง LINE จริง โหมดเดิม `chat:line` / `chat:group` ยังใช้เทียบได้ รุ่นใหม่ค้นเอกสารที่เผยแพร่ไว้แล้วและเรียบเรียงคำตอบจากหลักฐาน ไม่พ่วง FAQ เมื่อไม่รู้ ไม่ได้เปิดค้นเว็บทั่วไป การจอง บันทึก ลบข้อมูลยังผ่าน host workflow เดิม
+
+เมื่อเปลี่ยนโมเดล ให้ใช้ชุดเดิมตรวจซ้ำ:
+
+```sh
+npm run build
+npm test
+npm run eval:chat:next -- --live
+```
+
+คำสั่งสุดท้ายใช้โมเดลจริงกับ 8 ข้อความสมมติ สูงสุด14ครั้งเรียกโมเดล เปรียบเทียบทางตอบเดิมกับรุ่นทดลองบนโมเดลที่เลือกอยู่ในแต่ละรอบ ผลรายงานระบุ provider/model ไว้ ใช้เทียบรายงานข้ามโมเดลได้ หากไม่ใส่ `--live` จะไม่เรียกโมเดล ภาษาเป็นข้อสังเกตตามที่เจ้าของตกลง ไม่ใช่เงื่อนไขตัดสินผ่าน การตรวจอัตโนมัติดูการพ่วงเว็บและการแนบแหล่งข้อมูล ไม่รับรองความหมาย/ความเป็นธรรมชาติทุกประโยค ข้อความยืนยันคำสั่งและข้อผิดพลาดของ host ยังใช้ข้อความเดิม ผลและข้อจำกัดล่าสุดดู NATURAL_CHAT_EXPERIMENT.md ส่วน “รุ่นทดลองค้นหลักฐานก่อนเรียบเรียงคำตอบ”

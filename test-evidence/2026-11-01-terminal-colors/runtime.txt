@@ -1,0 +1,15 @@
+✔ chat processes queued turns in one session and exits on /exit or EOF (23.322042ms)
+✔ Ctrl-C aborts an active SDK request and closes chat cleanly (9.821292ms)
+✔ direct simulation runs real LINE commands, temporary requests, waiting/cancel and semantic capabilities (69.168875ms)
+✔ group simulation adds CBOT trigger, blocks private slash commands and shares no direct memory (100.855333ms)
+✔ Terminal forwards simulated slash commands to channel adapters but keeps local exit (30.0015ms)
+✔ simulation CLI checks both channels without inference and rejects conflicting modes (1960.67625ms)
+✔ natural simulation rejects legacy mode before creating a temporary workspace (0.446459ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2710.786

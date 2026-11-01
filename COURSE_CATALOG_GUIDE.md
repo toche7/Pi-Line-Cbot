@@ -1,5 +1,38 @@
 # ค้นหลักสูตร CBTU จาก snapshot
 
+## โครงสร้างข้อมูลปัจจุบัน — 1 พฤศจิกายน 2026
+
+ข้อมูลหลักสูตรอยู่ใน `src/course-catalog-data.json` แยกจากโค้ด มี 19 หลักสูตรและ 1 bundle เหมือนเดิม ไม่ใช่การเก็บข้อมูลเว็บรอบใหม่
+
+| ส่วน | ข้อมูลที่เก็บ |
+| --- | --- |
+| `snapshot` | วันเก็บข้อมูล รุ่น schema และลายนิ้วมือ source/report/validation ของเว็บเดิม |
+| `id`, `type`, `name`, `url` | ตัวตนและลิงก์หลักสูตร |
+| `overview` | คำอธิบายและหัวข้อ |
+| `learning` | ผลการเรียนรู้ กลุ่มเป้าหมาย พื้นฐาน รูปแบบ และระยะเวลา |
+| `teaching` | รายชื่อผู้สอนปกติ และหลักฐานเว็บเดิมที่เก็บแยกไว้ |
+| `registration` | ราคา ข้อความเปิดรับสมัคร และรอบเรียนจากสำเนาเว็บ |
+| `certificate` | ข้อมูลใบประกาศและเงื่อนไขที่ทราบ |
+| `includedCourseIds` | รหัสหลักสูตรที่รวมอยู่ใน bundle |
+| `sources` | สิทธิ์เข้าถึงหน้าเว็บ วันเก็บ hash ลิงก์ และหลักฐานรายช่อง |
+| `quality` | ข้อมูลที่ยังขาดและข้อควรตรวจสอบในสำเนาเว็บ |
+
+เช่น `cbtu-10` (AI Agent Workshop with n8n) เก็บชื่อผู้สอนปกติใน `teaching.instructors`:
+
+```json
+{
+  "instructors": [{ "name": "ผศ.ดร. ทวีศักดิ์ สมานชื่น" }]
+}
+```
+
+รายชื่อผู้สอนไม่มีส่วนคำยืนยัน วันที่ยืนยัน หรือที่มาจากแชต `teaching.webInstructors` และ `webEvidence` เป็นสำเนาหลักฐานเว็บเดิม เก็บแยกไว้โดยไม่สร้างข้อความอ้างอิงเว็บขึ้นใหม่ ตัวอ่านใช้ `teaching.instructors` เป็นรายชื่อปัจจุบัน ส่วนช่อง `instructors` ในข้อมูลที่ยังขาดจะไม่แสดงเมื่อมีรายชื่อแล้ว
+
+`src/course-types.ts` กำหนดรูปแบบข้อมูล ส่วน `src/course-catalog.ts` เป็นตัวโหลดและแปลงกลับให้ตัวอ่านเดิมใช้ต่อได้ ไม่เก็บ JSON ก้อนใหญ่ในไฟล์โค้ดอีกแล้ว `src/course-instructors.ts` อ่านชื่อผู้สอนปกติ ไม่มีรายชื่ออีกชุดฝังในโค้ด
+
+เมื่อนำเข้าเว็บใหม่ ตัวนำเข้าจะเขียน JSON แบบ atomic ถ้าเว็บใหม่ยังไม่มีชื่อผู้สอนหรือราคา จะเก็บข้อมูลปัจจุบันเฉพาะหลักสูตรที่ ID และ URL ตรงกัน ถ้ามีข้อมูลจากเว็บใหม่จะใช้ข้อมูลนั้น และล้างตัวเตือนที่ไม่พบผู้สอนเมื่อมีรายชื่อแล้ว
+
+ขั้นตอนปรับปรุง: ชื่อผู้สอนแก้ใน `teaching.instructors` ของหลักสูตรที่เกี่ยวข้อง แล้ว build/test ใหม่ ข้อมูลเว็บให้ผ่านการตรวจและตัวนำเข้าด้านล่าง ไม่แก้ `dist/` หรือสำเนาหลักฐานเว็บย้อนหลัง
+
 สถานะ 23 ตุลาคม 2026: เชื่อม 19 หลักสูตร + 1 bundle เข้ากับ CustomerCore เดียวกันสำหรับ Terminal/LINE ตามการอนุญาตของเจ้าของ ไม่มี vector DB หรือ dependency ใหม่ ไม่ใช้ข้อมูล Notion/ผู้เรียนจริง ไม่เปลี่ยนคีย์ โมเดล OA หรือ tunnel
 
 ## แก้จาก history จริง: browsing และ context
@@ -10,9 +43,9 @@
 
 ## แหล่งข้อมูลและการนำเข้า
 
-อ่าน `research/cbtu-website/courses.json`, `SOURCE_REPORT.md` และ `validation.json` แบบ read-only ตรวจ JSON/counts, IDs/URLs ไม่ซ้ำ, canonical HTTPS ของ cbtumu.net, provenance/capture time/hash, source refs, flags/missing fields และ offer/availability verified=false ตรงกับรายงาน 19 courses + 1 bundle มีหน้ารายละเอียดล็อก 1 รายการ
+อ่าน `research/cbtu-website/courses.json`, `SOURCE_REPORT.md` และ `validation_report.json` แบบ read-only ตรวจ JSON/counts, IDs/URLs ไม่ซ้ำ, canonical HTTPS ของ cbtumu.net, provenance/capture time/hash, source refs, flags/missing fields และ offer/availability verified=false ตรงกับรายงาน 19 courses + 1 bundle มีหน้ารายละเอียดล็อก 1 รายการ
 
-Research มีสถานะ `research_for_owner_review_not_runtime_ingestion` อยู่ตามเดิม เจ้าของอนุญาตให้เชื่อมเฉพาะ public metadata snapshot นี้แล้ว จึงสร้าง projection แยกที่ `src/course-catalog.ts` พร้อมสถานะการนำเข้าและ SHA256 ของ source/report/validation ไม่แก้ collector หรือไฟล์ research และไม่ถือว่าข้อขัดแย้งได้รับการแก้ ไม่ได้นำ review_required/payment accounts หรือข้อมูล cohort เว็บย่อยที่ยังไม่ยืนยันเข้าบอต
+Research มีสถานะ `research_for_owner_review_not_runtime_ingestion` อยู่ตามเดิม เจ้าของอนุญาตให้เชื่อมเฉพาะ public metadata snapshot นี้แล้ว จึงสร้าง projection แยกที่ `src/course-catalog-data.json` และโหลดผ่าน `src/course-catalog.ts` พร้อมสถานะการนำเข้าและ SHA256 ของ source/report/validation ไม่แก้ collector หรือไฟล์ research และไม่ถือว่าข้อขัดแย้งได้รับการแก้ ไม่ได้นำ review_required/payment accounts หรือข้อมูล cohort เว็บย่อยที่ยังไม่ยืนยันเข้าบอต
 
 Source SHA256 ของชุดปัจจุบัน schema 1.1.0: `9c2f2098b34a147808eac29835c3eddad8238e56995a43e76f8ff9d8ec7c4cac` ตรวจตรงกับ validation report และ archive ใน versions แล้ว รายละเอียดผู้สอน/ข้อจำกัดอยู่ใน [COURSE_INSTRUCTORS_GUIDE.md](./COURSE_INSTRUCTORS_GUIDE.md)
 

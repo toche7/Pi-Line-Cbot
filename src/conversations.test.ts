@@ -122,8 +122,8 @@ test('conversation HTTP gates host/origin/token, account/allowlist, confirmation
     assert.equal((await post(take)).status,200);assert.equal((await post(take)).status,409);
     const send={action:'send',customerId:id('alice'),epoch:1,id:randomUUID(),text:'fixture outbound'};
     assert.equal((await post(send)).status,400);
-    assert.equal((await post({...send,confirmed:true})).status,200);assert.equal((await post({...send,confirmed:true})).status,200);assert.equal(calls,1);assert.deepEqual(sentTexts,['【Staff】 fixture outbound']);
-    const prefixed={...send,id:randomUUID(),text:'【Staff】 already labelled',confirmed:true};assert.equal((await post(prefixed)).status,200);assert.equal(sentTexts.at(-1),'【Staff】 already labelled');
+    assert.equal((await post({...send,confirmed:true})).status,200);assert.equal((await post({...send,confirmed:true})).status,200);assert.equal(calls,1);assert.deepEqual(sentTexts,['Staff: fixture outbound']);
+    const prefixed={...send,id:randomUUID(),text:'Staff: already labelled',confirmed:true};assert.equal((await post(prefixed)).status,200);assert.equal(sentTexts.at(-1),'Staff: already labelled');
     const long={...send,id:randomUUID(),text:'x'.repeat(4500),confirmed:true};assert.equal((await post(long)).status,400);assert.equal(calls,2);
     assert.equal((await post({action:'take',customerId:id('old'),epoch:0})).status,200);
     assert.equal((await post({...send,customerId:id('old'),confirmed:true,id:randomUUID()})).status,403);

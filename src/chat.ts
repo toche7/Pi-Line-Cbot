@@ -10,10 +10,13 @@ export async function runChat(
   session: AgentSession | ChatClient, timeoutMs: number,
   input: Readable = process.stdin, output: Writable = process.stdout,
   status: Writable = process.stderr,
-  options: { temporary?: boolean } = {},
+  options: { temporary?: boolean; forwardCommands?: boolean } = {},
 ) {
   const terminal = Boolean((input as NodeJS.ReadStream).isTTY && (output as NodeJS.WriteStream).isTTY);
-  const rl = createInterface({ input, output, terminal, prompt: 'คุณ > ' });
+  const paint = (text: string, code: string, stream: Writable = output) =>
+    (stream as NodeJS.WriteStream).isTTY && process.env.NO_COLOR === undefined && process.env.TERM !== 'dumb'
+      ? `\u001b[${code}m${text}\u001b[0m` : text;
+  const rl = createInterface({ input, output, terminal, prompt: paint('คุณ > ', '1;96') });
   let interrupted = false;
   let busy = false;
   let forgetToken: string | undefined;
@@ -33,14 +36,14 @@ export async function runChat(
       if (interrupted) break;
       const prompt = line.trim();
       if (prompt === '/exit' || prompt === '/quit') break;
-      if (prompt === '/forget' && 'requestForget' in session && session.requestForget) {
+      if (!options.forwardCommands && prompt === '/forget' && 'requestForget' in session && session.requestForget) {
         forgetToken = await session.requestForget();
         if ('requestsEnabled' in session && session.requestsEnabled) output.write(options.temporary ? '[การยืนยันนี้จะลบคำขอทดลองใน temp ของรอบนี้ด้วย]\n' : '[การยืนยันนี้จะลบคำขอของคุณในระบบกลางด้วย]\n');
         output.write('[จะลบข้อความ สรุป เรื่องค้าง และโปรไฟล์ของคุณทั้งหมดจาก memory บนเครื่อง พิมพ์ /confirm-forget ภายใน 60 วินาทีเพื่อยืนยัน หรือ /cancel เพื่อยกเลิก]\n');
         if (terminal) rl.prompt();
         continue;
       }
-      if (prompt === '/confirm-forget' || prompt === '/cancel') {
+      if (!options.forwardCommands && (prompt === '/confirm-forget' || prompt === '/cancel')) {
         try {
           if (prompt === '/confirm-forget') {
             if (!forgetToken || !('forget' in session) || !session.forget) throw new DemoFailure('ต้องใช้ /forget และอ่านคำอธิบายก่อนยืนยัน');
@@ -58,19 +61,19 @@ export async function runChat(
       const cancelledForget = !!forgetToken;
       forgetToken = undefined;
       if ('cancelForget' in session) session.cancelForget?.();
-      if (prompt === '/help') {
+      if (!options.forwardCommands && prompt === '/help') {
         if (cancelledForget) output.write('[ยกเลิกคำขอ /forget ที่รอยืนยันแล้ว ข้อมูลยังอยู่]\n');
         const help = commandHelp('terminal', 'send' in session ? session : undefined);
         output.write((options.temporary ? help.replaceAll('ระบบกลาง', 'พื้นที่ทดลองชั่วคราว') : help) + '\n');
         if (terminal) rl.prompt();
         continue;
       }
-      if (prompt === '/memory' && 'memory' in session && session.memory) {
+      if (!options.forwardCommands && prompt === '/memory' && 'memory' in session && session.memory) {
         output.write(await session.memory() + '\n');
         if (terminal) rl.prompt();
         continue;
       }
-      if (prompt === '/reset') {
+      if (!options.forwardCommands && prompt === '/reset') {
         if ('reset' in session && session.reset) {
           await session.reset();
           output.write('[เริ่มบทสนทนาใหม่ ล้างข้อความ/สรุป/เรื่องค้างแล้ว คงโปรไฟล์และข้อมูลที่ขอจำระยะยาวไว้]\n');
@@ -79,13 +82,13 @@ export async function runChat(
         continue;
       }
       if (prompt) {
-        if (!terminal) output.write(`คุณ > ${prompt}\n`);
-        output.write('ผู้ช่วย > ');
+        if (!terminal) output.write(paint(`คุณ > ${prompt}\n`, '96'));
+        output.write(paint('ผู้ช่วย > ', '1;92'));
         busy = true;
         try {
           const callbacks = {
-            text: value => { output.write(value); },
-            status: value => { status.write(`${value}\n`); },
+            text: value => { output.write(paint(value, '92')); },
+            status: value => { status.write(paint(`${value}\n`, '2', status)); },
           } satisfies import('./core.js').Output;
           if ('send' in session) await session.send(prompt, callbacks);
           else await runConversation(session, prompt, timeoutMs, callbacks);

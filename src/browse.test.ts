@@ -48,3 +48,20 @@ test('work, news, recipients, staff, pending and knowledge collections page with
   assert.equal(readFileSync(join(f.root,'news','news.json'),'utf8'),before,'browsing must not mutate or authorize any campaign');
  }finally{f.clean()}
 });
+
+test('conversation cursor retains incoming text and paused-bot event with the same webhook ID and timestamp',()=>{
+ const f=paginationFixture();try{
+  const person=f.all.find((c:any)=>c.profile.nickname==='Customer 119');
+  const event={id:'shared-webhook-id',account:'fixture-oa',userId:person.identity.user,at:new Date(Date.now()+1000).toISOString()};
+  f.monitor.record({...event,direction:'in',text:'Customer reply during handover',status:'received'});
+  f.monitor.record({...event,direction:'out',text:'',status:'bot_paused'});
+  const selected=JSON.stringify([event.account,event.userId]);
+  const first=browseSnapshot('conversations',query({selected,size:1}),f);
+  const older=browseSnapshot('conversations',query({selected,size:1,before:first.messagesPage.before}),f);
+  const pair=[...first.events,...older.events];
+  assert.equal(pair.length,2);
+  assert.ok(pair.every((e:any)=>e.id===event.id));
+  assert.ok(pair.some((e:any)=>e.direction==='in'&&e.text==='Customer reply during handover'));
+  assert.ok(pair.some((e:any)=>e.direction==='out'&&e.status==='bot_paused'));
+ }finally{f.clean()}
+});

@@ -1,0 +1,135 @@
+{
+  "status": "completed",
+  "calls": 5,
+  "plans": [
+    {
+      "intent": "chat",
+      "stopReason": "stop"
+    },
+    {
+      "intent": "chat",
+      "stopReason": "stop"
+    },
+    {
+      "intent": "catalog_query",
+      "operation": "list",
+      "scope": "search",
+      "query": "AI",
+      "stopReason": "stop"
+    },
+    {
+      "intent": "catalog_query",
+      "operation": "list",
+      "scope": "all",
+      "stopReason": "stop"
+    },
+    {
+      "intent": "catalog_query",
+      "operation": "advise",
+      "scope": "previous",
+      "query": "ช่วยเลือกคอร์สที่เหมาะกับฉันหน่อย",
+      "stopReason": "stop"
+    }
+  ],
+  "turns": [
+    {
+      "prompt": "มีหลักสูตรอะไรไหม",
+      "answer": "ได้เลยครับ สนใจดูด้านไหนเป็นพิเศษไหมครับ เช่น AI, วิเคราะห์ข้อมูล หรือออกแบบสื่อ?",
+      "elapsedMs": 1637
+    },
+    {
+      "prompt": "AI",
+      "answer": "พบ 12 รายการ แสดง 1–3\n1. CBTU AI Day : AI for Research\nใช้กับงาน: ค้นคว้าและวางโครงบทความวิชาการ\nการเรียน: มีวิดีโอบรรยายย้อนหลังและเอกสารประกอบ · 1 ชั่วโมง 30 นาที\nhttps://cbtumu.net/coursenew/cbtu-ai-day-ai-for-research/\n\n2. CBTU AI Day : AI for Work\nใช้กับงาน: ช่วยร่างงานและทำสื่อสำหรับงานประจำ\nการเรียน: มีวิดีโอบรรยายย้อนหลังและเอกสารประกอบ · 2 ชั่วโมง\nhttps://cbtumu.net/coursenew/cbtu-ai-day-ai-for-work/\n\n3. AI Agent for ALL\nใช้กับงาน: รู้จักการใช้ AI Agent เชื่อมงานและเครื่องมือ\nการเรียน: วิดีโอออนไลน์ · 2 ชั่วโมง 30 นาที\nhttps://cbtumu.net/coursenew/aiagentforall/\n\nยังมีรายการต่อ พิมพ์ “ดูต่อ” ได้\nข้อมูลเว็บที่เก็บ 2026-10-23",
+      "elapsedMs": 549
+    },
+    {
+      "prompt": "ขอดูรายการทั้งหมดเลย",
+      "answer": "พบ 20 รายการ แสดง 1–10\n1. Data Analysis with AI\nใช้กับงาน: เตรียมและสำรวจข้อมูลโดยใช้ AI ช่วย\nการเรียน: Online workshop ผ่าน Zoom · 4 สัปดาห์ / 4 วัน / 12 ชั่วโมง\nhttps://cbtumu.net/coursenew/dataanalysiswithai/\n\n2. CBTU AI Day : AI for Research\nใช้กับงาน: ค้นคว้าและวางโครงบทความวิชาการ\nการเรียน: มีวิดีโอบรรยายย้อนหลังและเอกสารประกอบ · 1 ชั่วโมง 30 นาที\nhttps://cbtumu.net/coursenew/cbtu-ai-day-ai-for-research/\n\n3. CBTU AI Day : AI for Work\nใช้กับงาน: ช่วยร่างงานและทำสื่อสำหรับงานประจำ\nการเรียน: มีวิดีโอบรรยายย้อนหลังและเอกสารประกอบ · 2 ชั่วโมง\nhttps://cbtumu.net/coursenew/cbtu-ai-day-ai-for-work/\n\n4. Mini AI Agent Engineering\nใช้กับงาน: พัฒนา AI Agent เป็นโครงงานต่อเนื่อง\nการเรียน: Hybrid workshop / Onsite สลับ Online ผ่าน Zoom · 14 สัปดาห์ สัปดาห์ละ 6 ชั่วโมง\nhttps://cbtumu.net/coursenew/miniaiagentengineer/\n\n5. Mini Data Science รุ่นที่ 10\nใช้กับงาน: ศึกษางาน Data Science ตั้งแต่โมเดลถึงการประยุกต์ธุรกิจ\nการเรียน: Hybrid workshop · 17 วัน วันละ 6 ชั่วโมง รวม 102 ชั่วโมง\nhttps://cbtumu.net/coursenew/minidatascience10/\n\n6. การวิเคราะห์ข้อมูลด้วย Microsoft Excel\nใช้กับงาน: สรุปยอดขายหรือข้อมูลจากตาราง Excel\nการเรียน: วิดีโอออนไลน์ เรียนด้วยตนเอง\nhttps://cbtumu.net/coursenew/analyticsmicrosoftexcel/\n\n7. สร้างสื่อสวยด้วย Canva\nใช้กับงาน: ทำโปสเตอร์และสไลด์นำเสนอ\nการเรียน: วิดีโอ เรียนด้วยตนเองและทบทวนซ้ำได้\nhttps://cbtumu.net/coursenew/creativemediadesignwithcanva/\n\n8. Generative AI in Health Product Marketing\nใช้กับงาน: ใช้ AI ช่วยงานการตลาดผลิตภัณฑ์สุขภาพ\nการเรียน: วิดีโอออนไลน์ · 5 ชั่วโมง\nhttps://cbtumu.net/coursenew/generativeaiinhealthproductmarketing/\n\n9. AI Agent with n8n\nใช้กับงาน: เชื่อมงานซ้ำและเครื่องมือด้วย workflow\nการเรียน: เรียนจากวิดีโอเนื้อหาหลัก พร้อมตัวอย่างปฏิบัติ\nhttps://cbtumu.net/coursenew/aiagentwithn8n/\n\n10. AI Agent Workshop with n8n\nใช้กับงาน: ฝึกสร้าง AI workflow ในรูปแบบ workshop\nการเรียน: Onsite hands-on workshop · 2 วัน\nhttps://cbtumu.net/coursenew/n8n-workshop/\n\nยังมีรายการต่อ พิมพ์ “ดูต่อ” ได้\nข้อมูลเว็บที่เก็บ 2026-10-23 · บางรายการเป็นรุ่นเก่า ต้องตรวจรอบใหม่",
+      "elapsedMs": 1026
+    },
+    {
+      "prompt": "ช่วยเลือกคอร์สที่เหมาะกับฉันหน่อย",
+      "answer": "ยังไม่มีข้อมูลหลักสูตรในชุดนี้ที่เชื่อมกับงานดังกล่าวได้ชัดเจนครับ อยากระบุชิ้นงานที่ต้องทำ หรือทักษะอื่นที่อยากพัฒนาเพิ่มไหม?",
+      "elapsedMs": 782
+    }
+  ],
+  "memory": {
+    "version": 1,
+    "updatedAt": 1793524849794,
+    "profile": {},
+    "longTerm": [],
+    "recent": [
+      {
+        "user": "มีหลักสูตรอะไรไหม",
+        "assistant": "ได้เลยครับ สนใจดูด้านไหนเป็นพิเศษไหมครับ เช่น AI, วิเคราะห์ข้อมูล หรือออกแบบสื่อ?",
+        "at": 1793524847436
+      },
+      {
+        "user": "AI",
+        "assistant": "พบ 12 รายการ แสดง 1–3\n1. CBTU AI Day : AI for Research\nใช้กับงาน: ค้นคว้าและวางโครงบทความวิชาการ\nการเรียน: มีวิดีโอบรรยายย้อนหลังและเอกสารประกอบ · 1 ชั่วโมง 30 นาที\nhttps://cbtumu.net/coursenew/cbtu-ai-day-ai-for-research/\n\n2. CBTU AI Day : AI for Work\nใช้กับงาน: ช่วยร่างงานและทำสื่อสำหรับงานประจำ\nการเรียน: มีวิดีโอบรรยายย้อนหลังและเอกสารประกอบ · 2 ชั่วโมง\nhttps://cbtumu.net/coursenew/cbtu-ai-day-ai-for-work/\n\n3. AI Agent for ALL\nใช้กับงาน: รู้จักการใช้ AI Agent เชื่อมงานและเครื่องมือ\nการเรียน: วิดีโอออนไลน์ · 2 ชั่วโมง 30 นาที\nhttps://cbtumu.net/coursenew/aiagentforall/\n\nยังมีรายการต่อ พิมพ์ “ดูต่อ” ได้\nข้อมูลเว็บที่เก็บ 2026-10-23",
+        "at": 1793524847985
+      },
+      {
+        "user": "ขอดูรายการทั้งหมดเลย",
+        "assistant": "พบ 20 รายการ แสดง 1–10\n1. Data Analysis with AI\nใช้กับงาน: เตรียมและสำรวจข้อมูลโดยใช้ AI ช่วย\nการเรียน: Online workshop ผ่าน Zoom · 4 สัปดาห์ / 4 วัน / 12 ชั่วโมง\nhttps://cbtumu.net/coursenew/dataanalysiswithai/\n\n2. CBTU AI Day : AI for Research\nใช้กับงาน: ค้นคว้าและวางโครงบทความวิชาการ\nการเรียน: มีวิดีโอบรรยายย้อนหลังและเอกสารประกอบ · 1 ชั่วโมง 30 นาที\nhttps://cbtumu.net/coursenew/cbtu-ai-day-ai-for-research/\n\n3. CBTU AI Day : AI for Work\nใช้กับงาน: ช่วยร่างงานและทำสื่อสำหรับงานประจำ\nการเรียน: มีวิดีโอบรรยายย้อนหลังและเอกสารประกอบ · 2 ชั่วโมง\nhttps://cbtumu.net/coursenew/cbtu-ai-day-ai-for-work/\n\n4. Mini AI Agent Engineering\nใช้กับงาน: พัฒนา AI Agent เป็นโครงงานต่อเนื่อง\nการเรียน: Hybrid workshop / Onsite สลับ Online ผ่าน Zoom · 14 สัปดาห์ สัปดาห์ละ 6 ชั่วโมง\nhttps://cbtumu.net/coursenew/miniaiagentengineer/\n\n5. Mini Data Science รุ่นที่ 10\nใช้กับงาน: ศึกษางาน Data Science ตั้งแต่โมเดลถึงการประยุกต์ธุรกิจ\nการเรียน: Hybrid workshop · 17 วัน วันละ 6 ชั่วโมง รวม 102 ชั่วโมง\nhttps://cbtum",
+        "at": 1793524849010
+      },
+      {
+        "user": "ช่วยเลือกคอร์สที่เหมาะกับฉันหน่อย",
+        "assistant": "ยังไม่มีข้อมูลหลักสูตรในชุดนี้ที่เชื่อมกับงานดังกล่าวได้ชัดเจนครับ อยากระบุชิ้นงานที่ต้องทำ หรือทักษะอื่นที่อยากพัฒนาเพิ่มไหม?",
+        "at": 1793524849794
+      }
+    ],
+    "summary": {
+      "notes": [],
+      "topics": [],
+      "pending": []
+    },
+    "compactions": 2,
+    "lastTopic": "catalog:interest",
+    "catalog": {
+      "matchedIds": [
+        "cbtu-01",
+        "cbtu-02",
+        "cbtu-03",
+        "cbtu-04",
+        "cbtu-05",
+        "cbtu-06",
+        "cbtu-07",
+        "cbtu-08",
+        "cbtu-09",
+        "cbtu-10",
+        "cbtu-11",
+        "cbtu-12",
+        "cbtu-13",
+        "cbtu-14",
+        "cbtu-15",
+        "cbtu-16",
+        "cbtu-17",
+        "cbtu-18",
+        "cbtu-19",
+        "cbtu-20"
+      ],
+      "shownIds": [
+        "cbtu-01",
+        "cbtu-02",
+        "cbtu-03",
+        "cbtu-04",
+        "cbtu-05",
+        "cbtu-06",
+        "cbtu-07",
+        "cbtu-08",
+        "cbtu-09",
+        "cbtu-10"
+      ],
+      "offset": 0,
+      "limit": 10,
+      "query": "AI",
+      "field": "list",
+      "advice": {
+        "stage": "goal"
+      }
+    }
+  },
+  "environment": "temporary Terminal, synthetic user, no LINE transport"
+}

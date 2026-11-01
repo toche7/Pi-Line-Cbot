@@ -49,7 +49,7 @@ test('catalog aggregate operations distinguish missing prices, all/previous/sear
   assert.match(executeCatalogQuery({ operation: 'more', scope: 'previous' }, next.state).answer!, /แสดงครบ 20/);
   const sorted = executeCatalogQuery({ operation: 'sort_price', scope: 'all', order: 'desc', limit: 1 });
   assert.match(sorted.answer!, /Mini Data Science รุ่นที่ 10/); assert.match(sorted.answer!, /ไม่มีราคา.*ไม่รวม/);
-  const missing = executeCatalogQuery({ operation: 'price', scope: 'search', query: 'AI Agent for ALL' });
+  const missing = executeCatalogQuery({ operation: 'price', scope: 'search', query: 'Basic Prompt Engineering (Update)' });
   assert.match(missing.answer!, /ไม่พบราคา \(ไม่ถือว่าฟรี\)/);
   assert.throws(() => parseCatalogQuery({ operation: 'delete', scope: 'all' }));
   assert.throws(() => parseCatalogQuery({ operation: 'list', scope: 'all', limit: 100 }));

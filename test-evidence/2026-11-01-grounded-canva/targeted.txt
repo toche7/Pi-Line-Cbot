@@ -1,0 +1,28 @@
+✔ real failed LINE question sequence: list, prices, shorter, paging, price ranking and total count retain correct scope (23.478834ms)
+✔ catalog aggregate operations distinguish missing prices, all/previous/search and finite pagination (1.229333ms)
+✔ legacy bounded history recovers course context; no private data or unrelated records are needed (4.207459ms)
+✔ signed LINE failed-question replay returns prices/counts and keeps dedupe (27.237625ms)
+✔ semantic plans execute host queries; catalog state survives mixed chat/compaction/restart and resets per identity (210.36725ms)
+✔ retrieves evidence with a contextual query and composes an English answer instead of selecting a FAQ reply (44.870292ms)
+✔ unknown and reactions preserve the user language without CBTU links, identity boilerplate or keyword overrides (35.902958ms)
+✔ renderer rejects unseen IDs, invented quotes, reply URLs, false completed actions and references on unknown (0.211708ms)
+✔ bad evidence gets at most one repair; a retrieved source cannot grant a memory write (22.948084ms)
+✔ catalog operations remain host-executed but the reply can be composed in another language (22.009625ms)
+✔ explicit memory writes/recall retain consent guards in the experimental conversation (25.74875ms)
+✔ lexical retrieval only returns bounded published documents and leaves a no-match query empty (4.777ms)
+✔ experimental direct/group adapters preserve channel gates and never attach FAQ on unknown or service failure (95.66975ms)
+✔ ten-course listing can cite twelve exact passages from one source without being rejected (1.401875ms)
+✔ repair explains the precise violated bound instead of asking for the same invalid output again (12.777083ms)
+✔ short target reply retains the pending instructor field and actual previous clarification in context (14.838291ms)
+✔ experimental operational errors distinguish validation, timeout, quota and network without leaking private errors or FAQ links (0.24275ms)
+✔ unused field projections do not invalidate a listing; read still enforces its public projection schema (0.9355ms)
+✔ an exact long quote is accepted without truncation while any invented suffix still fails verification (0.119791ms)
+✔ broad browsing followed by a subject reply executes despite an unused full field projection (13.995708ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1177.618084

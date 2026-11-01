@@ -1,0 +1,36 @@
+✔ real failed LINE question sequence: list, prices, shorter, paging, price ranking and total count retain correct scope (22.898625ms)
+✔ catalog aggregate operations distinguish missing prices, all/previous/search and finite pagination (1.135416ms)
+✔ legacy bounded history recovers course context; no private data or unrelated records are needed (3.13675ms)
+✔ signed LINE failed-question replay returns prices/counts and keeps dedupe (24.27425ms)
+✔ semantic plans execute host queries; catalog state survives mixed chat/compaction/restart and resets per identity (218.666041ms)
+✔ who-is instructor returns verified role and missing-biography explanation, never a course listing (18.371167ms)
+✔ instructor profile ignores catalog authors, collapses punctuation only, and distinguishes genuinely different names (0.54825ms)
+✔ natural experiment sends negation/correction/greeting to model instead of keyword FAQ; keeps actual host facts in context (33.461875ms)
+✔ natural experiment lets model interpret ambiguous follow-up and laughter without automatically repeating FAQ or paging courses (21.804375ms)
+✔ natural experiment does not preempt a correction mentioning a course with catalog keyword routing (9.540917ms)
+✔ legacy low-level core retains rule-based FAQ and greetings without model requests (11.502958ms)
+✔ natural catalog reaction repairs guarded chat in the same budget instead of silently rendering not-found (20.58975ms)
+✔ natural chat repair remains bounded and keeps factual guards intact (6.929792ms)
+✔ conversational repair cannot change intent and execute a catalog action instead (4.943416ms)
+✔ exact live catalog plan with empty filters executes once in experiment; default parser remains strict (5.05275ms)
+✔ model catalog parser preserves real filters and still rejects invalid fields/limits; repair gets catalog-specific instructions (10.448916ms)
+✔ repeated invalid catalog plans report a command error instead of blaming JSON or suggesting reset (9.272333ms)
+✔ natural check runs SDK initialization in temp and preserves source files/cwd without inference or importing private stores (10.679291ms)
+✔ temporary CLI help and exit label requests/memory as temporary without sending any model turn (1.672042ms)
+✔ a model cannot enable request capabilities by choosing a host topic when request support is absent (5.145458ms)
+✔ browsing asks one area question then lists immediately; explicit all/filtered requests bypass advice (16.336542ms)
+✔ person biography, courses taught and course instructor are separate semantic operations (10.682875ms)
+✔ opening the bot private LINE chat uses a dedicated host topic and preserves staff contact FAQ (5.044125ms)
+✔ direct simulation runs real LINE commands, temporary requests, waiting/cancel and semantic capabilities (57.31975ms)
+✔ group simulation adds CBOT trigger, blocks private slash commands and shares no direct memory (122.834ms)
+✔ Terminal forwards simulated slash commands to channel adapters but keeps local exit (40.162708ms)
+✔ simulation CLI checks both channels without inference and rejects conflicting modes (1829.671459ms)
+✔ natural simulation rejects legacy mode before creating a temporary workspace (0.457167ms)
+ℹ tests 28
+ℹ suites 0
+ℹ pass 28
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2594.608833

@@ -1,0 +1,126 @@
+{
+  "status": "completed",
+  "calls": 8,
+  "requestCap": 12,
+  "environment": "temporary LINE adapters, synthetic events, in-process reply sink, no real LINE transport",
+  "records": [
+    {
+      "mode": "line-direct",
+      "version": "next",
+      "prompt": "What is the exact number of people in my kitchen right now?",
+      "answer": "I don’t have access to your kitchen or real-time information about who is there, so I can’t tell you the exact number of people.",
+      "calls": 1,
+      "elapsedMs": 560,
+      "statuses": []
+    },
+    {
+      "mode": "line-direct",
+      "version": "next",
+      "prompt": "Could you walk me through signing up for a course?",
+      "answer": "You can choose a course from the Home page and then register. If you don’t already have a membership, create one by following the steps on the website. I can’t complete membership registration, enrollment, or payment for you.\n\nSources:\nhttps://cbtumu.net/faq/",
+      "calls": 2,
+      "elapsedMs": 1733,
+      "statuses": []
+    },
+    {
+      "mode": "line-direct",
+      "version": "next",
+      "prompt": "เยอะเลยนะ",
+      "answer": "ใช่ครับ มีหลายหลักสูตรให้เลือกเลย ถ้าอยากได้คำแนะนำตามความสนใจหรือพื้นฐานของคุณ บอกมาได้เลยครับ",
+      "calls": 1,
+      "elapsedMs": 796,
+      "statuses": [],
+      "trace": [
+        {
+          "intent": "unknown",
+          "reply": "I don’t have access to your kitchen or real-time information about who is there, so I can’t tell you the exact number of people.",
+          "stopReason": "stop"
+        },
+        {
+          "intent": "lookup",
+          "query": "ขั้นตอนการสมัครและลงทะเบียนเรียน course enrollment registration steps",
+          "stopReason": "stop"
+        },
+        {
+          "intent": "answer",
+          "reply": "You can choose a course from the Home page and then register. If you don’t already have a membership, create one by following the steps on the website. I can’t complete membership registration, enrollment, or payment for you.",
+          "evidence": [
+            {
+              "id": "faq:enroll",
+              "quote": "เลือกคอร์สจากหน้า Home แล้วลงทะเบียน หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนบนเว็บไซต์"
+            },
+            {
+              "id": "host:capabilities",
+              "quote": "ยังสมัครสมาชิก ลงทะเบียน ชำระเงิน หรือยืนยันที่นั่งแทนไม่ได้ครับ"
+            }
+          ],
+          "stopReason": "stop"
+        },
+        {
+          "intent": "chat",
+          "reply": "ใช่ครับ มีหลายหลักสูตรให้เลือกเลย ถ้าอยากได้คำแนะนำตามความสนใจหรือพื้นฐานของคุณ บอกมาได้เลยครับ",
+          "stopReason": "stop"
+        }
+      ]
+    },
+    {
+      "mode": "line-group",
+      "version": "next",
+      "prompt": "What is the exact number of people in my kitchen right now?",
+      "answer": "I don't have access to your kitchen or any real-time information about who is there, so I can't tell you the exact number of people.",
+      "calls": 1,
+      "elapsedMs": 483,
+      "statuses": []
+    },
+    {
+      "mode": "line-group",
+      "version": "next",
+      "prompt": "Could you walk me through signing up for a course?",
+      "answer": "Sure. To sign up for a course, choose a course from the Home page and then register. If you don’t already have an account, create one by following the steps on the website. After that, you can log in and find the course under Dashboard > Enrolled Courses.\n\nSources:\nhttps://cbtumu.net/faq/",
+      "calls": 2,
+      "elapsedMs": 1649,
+      "statuses": []
+    },
+    {
+      "mode": "line-group",
+      "version": "next",
+      "prompt": "เยอะเลยนะ",
+      "answer": "ใช่ครับ ขั้นตอนมีหลายอย่างหน่อย แต่พอทำจริงก็จะชิน很快的ครับ ถ้าติดตรงไหนถามได้เลยนะ",
+      "calls": 1,
+      "elapsedMs": 480,
+      "statuses": [],
+      "trace": [
+        {
+          "intent": "unknown",
+          "reply": "I don't have access to your kitchen or any real-time information about who is there, so I can't tell you the exact number of people.",
+          "stopReason": "stop"
+        },
+        {
+          "intent": "lookup",
+          "query": "ขั้นตอนการสมัครและลงทะเบียนเรียนหลักสูตร",
+          "stopReason": "stop"
+        },
+        {
+          "intent": "answer",
+          "reply": "Sure. To sign up for a course, choose a course from the Home page and then register. If you don’t already have an account, create one by following the steps on the website. After that, you can log in and find the course under Dashboard > Enrolled Courses.",
+          "evidence": [
+            {
+              "id": "faq:enroll",
+              "quote": "เลือกคอร์สจากหน้า Home แล้วลงทะเบียน หากยังไม่มีสมาชิกให้สมัครตามขั้นตอนบนเว็บไซต์"
+            },
+            {
+              "id": "faq:learning",
+              "quote": "เข้าสู่ระบบด้วยบัญชีที่ลงทะเบียน แล้วดู Dashboard > Enrolled Courses"
+            }
+          ],
+          "stopReason": "stop"
+        },
+        {
+          "intent": "chat",
+          "reply": "ใช่ครับ ขั้นตอนมีหลายอย่างหน่อย แต่พอทำจริงก็จะชิน很快的ครับ ถ้าติดตรงไหนถามได้เลยนะ",
+          "stopReason": "stop"
+        }
+      ]
+    }
+  ]
+}

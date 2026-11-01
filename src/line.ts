@@ -2,7 +2,7 @@ import { humanIntent, humanRequestReply } from './human-request.js';
 import { createHmac, timingSafeEqual, randomUUID } from 'node:crypto';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { CustomerCore } from './core.js';
-import { failureCategory, lineFailureReply } from './diagnostics.js';
+import { failureCategory, lineFailureReply, neutralFailureReply } from './diagnostics.js';
 import type { MonitorEvent } from './monitor.js';
 import { conversationKey, type ConversationControl } from './conversation-control.js';
 import { LineConversations } from './line-memory.js';
@@ -31,7 +31,7 @@ type LineOptions = {
   secret: string; account: string; allowedUsers: Set<string>; dryRun: boolean;
   reply: (token: string, text: string) => Promise<void>;
   control?: ConversationControl;
-  core: Pick<CustomerCore, 'client'> & Partial<Pick<CustomerCore, 'faqWithoutModel'>>;
+  core: Pick<CustomerCore, 'client'> & Partial<Pick<CustomerCore, 'faqWithoutModel' | 'neutralFallback'>>;
   log?: (record: object) => void;
   observe?: (event: MonitorEvent) => void;
   observePendingUser?: (account: string, userId: string) => void;
@@ -148,9 +148,9 @@ export class LineAdapter {
         } catch (error) {
           fallback = true;
           record('core_failed', failureCategory(error));
-          text = lineFailureReply(error, this.options.core.faqWithoutModel ?? true);
+          text = this.options.core.neutralFallback ? neutralFailureReply(error) : lineFailureReply(error, this.options.core.faqWithoutModel ?? true);
         }
-        if (!text.trim()) text = 'ยังไม่พบคำตอบที่ยืนยันได้ กรุณาดู https://cbtumu.net/faq/';
+        if (!text.trim()) text = this.options.core.neutralFallback ? 'ยังไม่มีข้อมูลเรื่องนี้ครับ' : 'ยังไม่พบคำตอบที่ยืนยันได้ กรุณาดู https://cbtumu.net/faq/';
         if (this.closed) return;
         if (Date.now() - receivedAt > 50000) { record('reply_expired'); observe('out', text, 'reply_expired'); return; }
         if (this.options.dryRun) { record('dry_run_no_send'); observe('out', text, 'dry_run_no_send'); return; }

@@ -1,0 +1,33 @@
+✔ reviewed briefs cover every course, keep real topics/provenance and distinguish inferred work from taught outcomes (1.843083ms)
+✔ job-first advice asks one stage at a time and does not pad weakly related choices (87.12975ms)
+✔ advice state persists through restart and remains isolated; reset/forget clear answers (89.420167ms)
+✔ ordinary runtime uses accepted model-first routing while preserving persistent memory, request confirmation and identity isolation (167.650417ms)
+✔ signed direct LINE uses ordinary model-first runtime and retains host help, requests, waiting, pause/release and memory reset (45.623417ms)
+✔ direct LINE failure message no longer promises model-free FAQ for ordinary model-first runtime (0.652458ms)
+✔ signed LINE booking draft yields to capability questions and reactions without losing selection or creating a record (20.126875ms)
+✔ ordinary Terminal entrypoint opens help/memory/exit in an isolated cwd without invoking a model turn (526.633083ms)
+✔ booking capability facts use the same host answer across typo/repeated questions and cannot be overridden by a model denial (19.701708ms)
+✔ what-can-you-do renders enabled customer capabilities and help rather than the identity paragraph, per channel (10.095666ms)
+✔ capability summary cannot advertise request support that is not wired in the current runtime (4.893708ms)
+✔ natural experiment sends negation/correction/greeting to model instead of keyword FAQ; keeps actual host facts in context (47.777791ms)
+✔ natural experiment lets model interpret ambiguous follow-up and laughter without automatically repeating FAQ or paging courses (23.346542ms)
+✔ natural experiment does not preempt a correction mentioning a course with catalog keyword routing (9.916ms)
+✔ legacy low-level core retains rule-based FAQ and greetings without model requests (13.560167ms)
+✔ natural catalog reaction repairs guarded chat in the same budget instead of silently rendering not-found (18.68425ms)
+✔ natural chat repair remains bounded and keeps factual guards intact (5.104875ms)
+✔ conversational repair cannot change intent and execute a catalog action instead (5.217083ms)
+✔ exact live catalog plan with empty filters executes once in experiment; default parser remains strict (6.10825ms)
+✔ model catalog parser preserves real filters and still rejects invalid fields/limits; repair gets catalog-specific instructions (6.8315ms)
+✔ repeated invalid catalog plans report a command error instead of blaming JSON or suggesting reset (17.911416ms)
+✔ natural check runs SDK initialization in temp and preserves source files/cwd without inference or importing private stores (14.347666ms)
+✔ temporary CLI help and exit label requests/memory as temporary without sending any model turn (1.467666ms)
+✔ a model cannot enable request capabilities by choosing a host topic when request support is absent (5.743959ms)
+✔ browsing asks one area question then lists immediately; explicit all/filtered requests bypass advice (13.497958ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 25
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1695.3145

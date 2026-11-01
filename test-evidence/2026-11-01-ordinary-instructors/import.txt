@@ -1,0 +1,19 @@
+✔ valid schema/evidence publishes an atomic independent projection with provenance (214.532ms)
+✔ grouping and flattening preserve every field, including explicit nulls (0.715417ms)
+✔ refresh retains ordinary instructor names for the same ID and URL when web teacher data is missing (575.164208ms)
+✔ rejects unsupported schema, preserving last-good runtime bytes (226.912375ms)
+✔ rejects unknown field, preserving last-good runtime bytes (291.640208ms)
+✔ rejects wrong field type, preserving last-good runtime bytes (289.998708ms)
+✔ rejects catalog author masquerading as instructor, preserving last-good runtime bytes (288.705917ms)
+✔ rejects missing teacher evidence, preserving last-good runtime bytes (293.09875ms)
+✔ rejects unlabelled teacher excerpt, preserving last-good runtime bytes (289.934541ms)
+✔ rejects invalid report fingerprint, preserving last-good runtime bytes (215.103875ms)
+✔ rejects invalid validation report, preserving last-good runtime bytes (213.762458ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2987.961542

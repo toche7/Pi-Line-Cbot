@@ -1,0 +1,25 @@
+✔ retrieves evidence with a contextual query and composes an English answer instead of selecting a FAQ reply (46.655792ms)
+✔ unknown and reactions preserve the user language without CBTU links, identity boilerplate or keyword overrides (46.692833ms)
+✔ renderer rejects unseen IDs, invented quotes, reply URLs, false completed actions and references on unknown (0.2605ms)
+✔ bad evidence gets at most one repair; a retrieved source cannot grant a memory write (24.566666ms)
+✔ catalog operations remain host-executed but the reply can be composed in another language (26.680209ms)
+✔ explicit memory writes/recall retain consent guards in the experimental conversation (30.427917ms)
+✔ lexical retrieval only returns bounded published documents and leaves a no-match query empty (4.97025ms)
+✔ experimental direct/group adapters preserve channel gates and never attach FAQ on unknown or service failure (105.842125ms)
+✔ ten-course listing can cite twelve exact passages from one source without being rejected (1.426667ms)
+✔ repair explains the precise violated bound instead of asking for the same invalid output again (12.595ms)
+✔ short target reply retains the pending instructor field and actual previous clarification in context (20.282084ms)
+✔ experimental operational errors distinguish validation, timeout, quota and network without leaking private errors or FAQ links (0.279167ms)
+✔ direct simulation runs real LINE commands, temporary requests, waiting/cancel and semantic capabilities (78.623458ms)
+✔ group simulation adds CBOT trigger, blocks private slash commands and shares no direct memory (123.786291ms)
+✔ Terminal forwards simulated slash commands to channel adapters but keeps local exit (38.443541ms)
+✔ simulation CLI checks both channels without inference and rejects conflicting modes (4199.305292ms)
+✔ natural simulation rejects legacy mode before creating a temporary workspace (0.552375ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5311.132834

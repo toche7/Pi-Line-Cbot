@@ -1,0 +1,29 @@
+✔ chat processes queued turns in one session and exits on /exit or EOF (26.045958ms)
+✔ Ctrl-C aborts an active SDK request and closes chat cleanly (8.947875ms)
+✔ natural experiment sends negation/correction/greeting to model instead of keyword FAQ; keeps actual host facts in context (41.6055ms)
+✔ natural experiment lets model interpret ambiguous follow-up and laughter without automatically repeating FAQ or paging courses (24.419458ms)
+✔ natural experiment does not preempt a correction mentioning a course with catalog keyword routing (7.096875ms)
+✔ legacy low-level core retains rule-based FAQ and greetings without model requests (13.38225ms)
+✔ natural catalog reaction repairs guarded chat in the same budget instead of silently rendering not-found (22.2745ms)
+✔ natural chat repair remains bounded and keeps factual guards intact (5.378375ms)
+✔ conversational repair cannot change intent and execute a catalog action instead (5.540416ms)
+✔ exact live catalog plan with empty filters executes once in experiment; default parser remains strict (4.577ms)
+✔ model catalog parser preserves real filters and still rejects invalid fields/limits; repair gets catalog-specific instructions (5.886458ms)
+✔ repeated invalid catalog plans report a command error instead of blaming JSON or suggesting reset (14.886375ms)
+✔ natural check runs SDK initialization in temp and preserves source files/cwd without inference or importing private stores (8.758625ms)
+✔ temporary CLI help and exit label requests/memory as temporary without sending any model turn (1.4035ms)
+✔ a model cannot enable request capabilities by choosing a host topic when request support is absent (4.2545ms)
+✔ browsing asks one area question then lists immediately; explicit all/filtered requests bypass advice (11.526791ms)
+✔ direct simulation runs real LINE commands, temporary requests, waiting/cancel and semantic capabilities (70.788375ms)
+✔ group simulation adds CBOT trigger, blocks private slash commands and shares no direct memory (101.8315ms)
+✔ Terminal forwards simulated slash commands to channel adapters but keeps local exit (28.644708ms)
+✔ simulation CLI checks both channels without inference and rejects conflicting modes (2078.832625ms)
+✔ natural simulation rejects legacy mode before creating a temporary workspace (0.542833ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3126.837208

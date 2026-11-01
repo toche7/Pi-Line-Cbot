@@ -8,8 +8,13 @@ import { validCatalogState, type CatalogState } from './catalog-query.js';
 
 export type Profile = { name?: string; interests?: string; goals?: string };
 export type Summary = { notes: string[]; topics: string[]; pending: string[] };
-export type Memory = { version: 1; updatedAt: number; profile: Profile; longTerm: string[]; recent: { user: string; assistant: string; at: number }[]; summary: Summary; lastTopic?: string; catalog?: CatalogState; compactions: number; handover?: HandoverTranscript };
+export type Memory = { version: 1; updatedAt: number; profile: Profile; longTerm: string[]; recent: { user: string; assistant: string; at: number }[]; summary: Summary; lastTopic?: string; catalog?: CatalogState; evidenceIds?: string[]; compactions: number; handover?: HandoverTranscript };
 export type Summarizer = (memory: Memory) => Summary;
+// Conversation source pointers only, not remembered personal facts or authority.
+export function validEvidenceIds(value: unknown): value is string[] {
+  return Array.isArray(value) && value.length <= 6 && new Set(value).size === value.length
+    && value.every(id => typeof id === 'string' && id.length <= 240 && /^(?:faq|course|person):[\p{L}\p{M}\p{N}_:-]+$/u.test(id));
+}
 export const emptyMemory = (now: number): Memory => ({ version: 1, updatedAt: now, profile: {}, longTerm: [], recent: [], summary: { notes: [], topics: [], pending: [] }, compactions: 0 });
 
 export function safeText(text: string): string {
@@ -114,7 +119,7 @@ export class MemoryStore {
     if (lstatSync(path).isSymbolicLink() || lstatSync(path).size > 65536) throw new DemoFailure('Memory file invalid; preserved for manual recovery.');
     let data: any;
     try { data = JSON.parse(readFileSync(path, 'utf8')); } catch { throw new DemoFailure('Memory file invalid; preserved for manual recovery.'); }
-    if ((data.handover !== undefined && !validHandover(data.handover)) || data.version !== 1 || !Number.isFinite(data.updatedAt) || !validSummary(data.summary) || !Array.isArray(data.recent) || data.recent.length > 12
+    if ((data.evidenceIds !== undefined && !validEvidenceIds(data.evidenceIds)) || (data.handover !== undefined && !validHandover(data.handover)) || data.version !== 1 || !Number.isFinite(data.updatedAt) || !validSummary(data.summary) || !Array.isArray(data.recent) || data.recent.length > 12
       || !data.recent.every((t: any) => typeof t.user === 'string' && typeof t.assistant === 'string' && safeText(t.user) === t.user && safeText(t.assistant) === t.assistant)
       || !Array.isArray(data.longTerm) || data.longTerm.length > 8 || data.longTerm.some((s: unknown) => typeof s !== 'string' || profileValue(s) !== s)
       || !Number.isInteger(data.compactions) || data.compactions < 0 || (data.catalog !== undefined && (!validCatalogState(data.catalog) || safeText(data.catalog.query) !== data.catalog.query))

@@ -1,0 +1,32 @@
+✔ ordinary runtime uses accepted model-first routing while preserving persistent memory, request confirmation and identity isolation (180.200042ms)
+✔ signed direct LINE uses ordinary model-first runtime and retains host help, requests, waiting, pause/release and memory reset (92.731375ms)
+✔ direct LINE failure message no longer promises model-free FAQ for ordinary model-first runtime (0.666625ms)
+✔ signed LINE booking draft yields to capability questions and reactions without losing selection or creating a record (23.623125ms)
+✔ ordinary Terminal entrypoint opens help/memory/exit in an isolated cwd without invoking a model turn (557.542334ms)
+✔ booking capability facts use the same host answer across typo/repeated questions and cannot be overridden by a model denial (20.264416ms)
+✔ what-can-you-do renders enabled customer capabilities and help rather than the identity paragraph, per channel (11.789208ms)
+✔ capability summary cannot advertise request support that is not wired in the current runtime (4.978667ms)
+✔ group runtime shares semantic capability routing, refers private services, and retains isolated memory and slash blocking (97.495125ms)
+✔ private-chat referral only advertises supplied direct services and never appears in Terminal/direct summaries (0.261625ms)
+✔ native self mention is required; name text, other users, all, forged target, malformed offsets and missing sender remain silent (1.138125ms)
+✔ CBOT prefix accepts case-insensitive deliberate calls only, without LINE native mention metadata (176.818208ms)
+✔ CBOT rooms accept native self mentions as a second trigger and reject plain @names, all, other users and disabled rooms (89.580125ms)
+✔ only enabled rooms reply to native tags; signed adapter keeps direct monitor/control separate and reply redelivery is durable (53.0825ms)
+✔ different senders and rooms receive isolated identities; quiet messages do not reach group core (49.402916ms)
+✔ dry run, closed service, left room and failed/ambiguous transport never produce automatic repeated messages (28.400334ms)
+✔ group slash commands and bare tags reply locally without touching core or private memory commands (30.411417ms)
+✔ real core group identity uses dedicated persistent memory and cannot load private or other group/sender facts (54.346708ms)
+✔ changing mode off then on while generating cancels the old reply, without sending to LINE (36.739458ms)
+✔ persistent memory: >20 turns, Pi compaction, next-day restart, isolation, reset and confirmed deletion (498.042708ms)
+✔ sensitive data never reaches persisted memory; questions cannot overwrite profile; failed summary/429 preserve facts (188.424292ms)
+✔ Terminal forget needs explicit confirm and cancel leaves data; reset keeps profile (9.754959ms)
+✔ separate Node processes reopen store; retention, locking and corruption fail safely (997.312167ms)
+✔ context compaction commits only with a successful turn and preserves canonical history on model failure (23.418166ms)
+ℹ tests 24
+ℹ suites 0
+ℹ pass 24
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2309.504958

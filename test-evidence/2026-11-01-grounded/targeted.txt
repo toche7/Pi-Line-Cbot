@@ -1,0 +1,21 @@
+✔ retrieves evidence with a contextual query and composes an English answer instead of selecting a FAQ reply (39.245ms)
+✔ unknown and reactions preserve the user language without CBTU links, identity boilerplate or keyword overrides (25.538417ms)
+✔ renderer rejects unseen IDs, invented quotes, reply URLs, false completed actions and references on unknown (0.222667ms)
+✔ bad evidence gets at most one repair; a retrieved source cannot grant a memory write (27.959875ms)
+✔ catalog operations remain host-executed but the reply can be composed in another language (15.992417ms)
+✔ explicit memory writes/recall retain consent guards in the experimental conversation (38.080125ms)
+✔ lexical retrieval only returns bounded published documents and leaves a no-match query empty (5.251125ms)
+✔ experimental direct/group adapters preserve channel gates and never attach FAQ on unknown or service failure (88.005833ms)
+✔ direct simulation runs real LINE commands, temporary requests, waiting/cancel and semantic capabilities (72.826375ms)
+✔ group simulation adds CBOT trigger, blocks private slash commands and shares no direct memory (99.746125ms)
+✔ Terminal forwards simulated slash commands to channel adapters but keeps local exit (34.952667ms)
+✔ simulation CLI checks both channels without inference and rejects conflicting modes (3569.3465ms)
+✔ natural simulation rejects legacy mode before creating a temporary workspace (0.440334ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4324.371542

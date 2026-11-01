@@ -1,0 +1,21 @@
+✔ grouped catalog preserves website fields and fingerprint except the edited workshop instructor (5.568208ms)
+✔ ordinary instructor names are stored separately from archived webpage evidence (0.154417ms)
+✔ workshop stores its instructor as a normal name without confirmation metadata (1.443208ms)
+✔ reader and search use the ordinary workshop instructor and never infer a teacher from By text (4.112417ms)
+✔ normal names do not fabricate archived website teacher evidence (0.079834ms)
+✔ grounded replies include the instructor name without a project-confirmation note (5.607167ms)
+✔ legacy ambiguous instructor operation with a course title reads its teacher; person_profile remains a person lookup (4.604959ms)
+✔ public reader restricts fields and renders stored instructors and missing values faithfully (1.176417ms)
+✔ public reads follow displayed scope and paginate without losing the requested fields (1.200125ms)
+✔ teacher search uses verified structured names, preserves the result set for prices/count/paging and excludes unknown authors (13.963083ms)
+✔ semantic field reads work with candidate retrieval and follow-up context; host ignores invented model facts (42.594875ms)
+✔ who-is instructor returns verified role and missing-biography explanation, never a course listing (20.54225ms)
+✔ instructor profile ignores catalog authors, collapses punctuation only, and distinguishes genuinely different names (0.533375ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 739.531667

@@ -1,0 +1,355 @@
+{
+  "status": "completed",
+  "calls": 5,
+  "turns": [
+    {
+      "prompt": "มีคอร์สอะไรบ้าง",
+      "answer": "สนใจด้านไหนครับ เช่น AI วิเคราะห์ข้อมูล หรือออกแบบสื่อ?",
+      "calls": 1,
+      "elapsedMs": 680
+    },
+    {
+      "prompt": "AI",
+      "answer": "คอร์สด้าน AI ที่พบ 12 รายการ (แสดง 10 รายการแรก) ครับ\n1. CBTU AI Day : AI for Research — วิดีโอย้อนหลังและเอกสารประกอบ · 1 ชม. 30 นาที\n2. CBTU AI Day : AI for Work — วิดีโอย้อนหลังและเอกสารประกอบ · 2 ชม.\n3. AI Agent for ALL — วิดีโอออนไลน์ · 2 ชม. 30 นาที\n4. Data Analysis with AI — Online workshop ผ่าน Zoom · 4 สัปดาห์ / 4 วัน / 12 ชม.\n5. Mini AI Agent Engineering — Hybrid/Onsite สลับ Online ผ่าน Zoom · 14 สัปดาห์ สัปดาห์ละ 6 ชม.\n6. Generative AI in Health Product Marketing — วิดีโอออนไลน์ · 5 ชม.\n7. AI Agents in Action — วิดีโอออนไลน์\n8. AI Agent with n8n — วิดีโอเนื้อหาหลักพร้อมตัวอย่างปฏิบัติ\n9. AI Agent Workshop with n8n — Onsite hands-on workshop · 2 วัน\n10. AI for All — วิดีโอ แบบฝึกหัดและ Quiz · 2 ชม.\n\nยังมีรายการต่อ พิมพ์ “ดูต่อ” ได้ครับ ข้อมูลเป็น snapshot จากเว็บ 2026-10-23 บางรายการอาจเป็นรุ่นเก่า ต้องตรวจรอบใหม่ก่อนสมัคร\n\nข้อมูลหลักสูตร CBTU:\nhttps://cbtumu.net/coursenew/cbtu-ai-day-ai-for-research/\nhttps://cbtumu.net/coursenew/cbtu-ai-day-ai-for-work/\nhttps://cbtumu.net/coursenew/aiagentforall/\nhttps://cbtumu.net/coursenew/dataanalysiswithai/\nhttps://cbtumu.net/coursenew/miniaiagentengineer/\nhttps://cbtumu.net/coursenew/generativeaiinhealthproductmarketing/\nhttps://cbtumu.net/coursenew/ai-agents-in-action/\nhttps://cbtumu.net/coursenew/aiagentwithn8n/\nhttps://cbtumu.net/coursenew/n8n-workshop/\nhttps://cbtumu.net/coursenew/ai-for-all/",
+      "calls": 2,
+      "elapsedMs": 2836
+    },
+    {
+      "prompt": "ขอดูทั้งหมดเลย",
+      "answer": "รายการที่เหลือจาก 12 รายการครับ\n11. Basic Prompt Engineering (2026) — วิดีโอออนไลน์ · 2 ชั่วโมง\n12. สร้างสื่อสวยด้วย Canva — วิดีโอ เรียนด้วยตนเองและทบทวนซ้ำได้\n\nครบทั้ง 12 รายการแล้ว ข้อมูลเป็น snapshot จากเว็บ 2026-10-23 บางรายการอาจเป็นรุ่นเก่า ต้องตรวจรอบใหม่ก่อนสมัคร\n\nข้อมูลหลักสูตร CBTU:\nhttps://cbtumu.net/coursenew/basicpromptengineering2026/\nhttps://cbtumu.net/coursenew/creativemediadesignwithcanva/",
+      "calls": 2,
+      "elapsedMs": 2237
+    }
+  ],
+  "trace": [
+    {
+      "plan": {
+        "intent": "chat",
+        "reply": "สนใจด้านไหนครับ เช่น AI วิเคราะห์ข้อมูล หรือออกแบบสื่อ?"
+      },
+      "stopReason": "stop",
+      "usage": {
+        "input": 3264,
+        "output": 22,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "reasoning": 0,
+        "totalTokens": 3286,
+        "cost": {
+          "input": 0.0026112,
+          "output": 0.000088,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0.0026992
+        }
+      },
+      "evidenceIds": [
+        "host:identity",
+        "host:capabilities",
+        "host:private-chat",
+        "host:requests",
+        "host:support"
+      ]
+    },
+    {
+      "plan": {
+        "intent": "catalog_query",
+        "operation": "list",
+        "scope": "search",
+        "query": "AI",
+        "limit": 10
+      },
+      "stopReason": "stop",
+      "usage": {
+        "input": 6127,
+        "output": 24,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "reasoning": 0,
+        "totalTokens": 6151,
+        "cost": {
+          "input": 0.004901600000000001,
+          "output": 0.000096,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0.0049976000000000005
+        }
+      },
+      "evidenceIds": [
+        "host:identity",
+        "host:capabilities",
+        "host:private-chat",
+        "host:requests",
+        "host:support"
+      ]
+    },
+    {
+      "plan": {
+        "intent": "answer",
+        "reply": "คอร์สด้าน AI ที่พบ 12 รายการ (แสดง 10 รายการแรก) ครับ\n1. CBTU AI Day : AI for Research — วิดีโอย้อนหลังและเอกสารประกอบ · 1 ชม. 30 นาที\n2. CBTU AI Day : AI for Work — วิดีโอย้อนหลังและเอกสารประกอบ · 2 ชม.\n3. AI Agent for ALL — วิดีโอออนไลน์ · 2 ชม. 30 นาที\n4. Data Analysis with AI — Online workshop ผ่าน Zoom · 4 สัปดาห์ / 4 วัน / 12 ชม.\n5. Mini AI Agent Engineering — Hybrid/Onsite สลับ Online ผ่าน Zoom · 14 สัปดาห์ สัปดาห์ละ 6 ชม.\n6. Generative AI in Health Product Marketing — วิดีโอออนไลน์ · 5 ชม.\n7. AI Agents in Action — วิดีโอออนไลน์\n8. AI Agent with n8n — วิดีโอเนื้อหาหลักพร้อมตัวอย่างปฏิบัติ\n9. AI Agent Workshop with n8n — Onsite hands-on workshop · 2 วัน\n10. AI for All — วิดีโอ แบบฝึกหัดและ Quiz · 2 ชม.\n\nยังมีรายการต่อ พิมพ์ “ดูต่อ” ได้ครับ ข้อมูลเป็น snapshot จากเว็บ 2026-10-23 บางรายการอาจเป็นรุ่นเก่า ต้องตรวจรอบใหม่ก่อนสมัคร",
+        "evidence": [
+          {
+            "id": "turn:catalog",
+            "quote": "พบ 12 รายการ แสดง 1–10"
+          },
+          {
+            "id": "turn:catalog",
+            "quote": "1. CBTU AI Day : AI for Research"
+          },
+          {
+            "id": "turn:catalog",
+            "quote": "2. CBTU AI Day : AI for Work"
+          },
+          {
+            "id": "turn:catalog",
+            "quote": "3. AI Agent for ALL"
+          },
+          {
+            "id": "turn:catalog",
+            "quote": "4. Data Analysis with AI"
+          },
+          {
+            "id": "turn:catalog",
+            "quote": "5. Mini AI Agent Engineering"
+          },
+          {
+            "id": "turn:catalog",
+            "quote": "6. Generative AI in Health Product Marketing"
+          },
+          {
+            "id": "turn:catalog",
+            "quote": "7. AI Agents in Action"
+          },
+          {
+            "id": "turn:catalog",
+            "quote": "8. AI Agent with n8n"
+          },
+          {
+            "id": "turn:catalog",
+            "quote": "9. AI Agent Workshop with n8n"
+          },
+          {
+            "id": "turn:catalog",
+            "quote": "10. AI for All"
+          },
+          {
+            "id": "turn:catalog",
+            "quote": "ยังมีรายการต่อ พิมพ์ “ดูต่อ” ได้"
+          },
+          {
+            "id": "turn:catalog",
+            "quote": "ข้อมูลเว็บที่เก็บ 2026-10-23 · บางรายการเป็นรุ่นเก่า ต้องตรวจรอบใหม่"
+          }
+        ],
+        "sourceLabel": "ข้อมูลหลักสูตร CBTU"
+      },
+      "stopReason": "stop",
+      "usage": {
+        "input": 9771,
+        "output": 548,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "reasoning": 0,
+        "totalTokens": 10319,
+        "cost": {
+          "input": 0.0078168,
+          "output": 0.002192,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0.0100088
+        }
+      },
+      "refs": [
+        {
+          "id": "turn:catalog",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 22
+        },
+        {
+          "id": "turn:catalog",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 32
+        },
+        {
+          "id": "turn:catalog",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 28
+        },
+        {
+          "id": "turn:catalog",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 19
+        },
+        {
+          "id": "turn:catalog",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 24
+        },
+        {
+          "id": "turn:catalog",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 28
+        },
+        {
+          "id": "turn:catalog",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 44
+        },
+        {
+          "id": "turn:catalog",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 22
+        },
+        {
+          "id": "turn:catalog",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 20
+        },
+        {
+          "id": "turn:catalog",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 29
+        },
+        {
+          "id": "turn:catalog",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 14
+        },
+        {
+          "id": "turn:catalog",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 32
+        },
+        {
+          "id": "turn:catalog",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 68
+        }
+      ],
+      "evidenceIds": [
+        "host:identity",
+        "host:capabilities",
+        "host:private-chat",
+        "host:requests",
+        "host:support",
+        "turn:catalog"
+      ]
+    },
+    {
+      "plan": {
+        "intent": "catalog_query",
+        "operation": "more",
+        "scope": "previous",
+        "query": "AI",
+        "limit": 10
+      },
+      "stopReason": "stop",
+      "usage": {
+        "input": 6279,
+        "output": 24,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "reasoning": 0,
+        "totalTokens": 6303,
+        "cost": {
+          "input": 0.0050232,
+          "output": 0.000096,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0.0051192
+        }
+      },
+      "evidenceIds": [
+        "host:identity",
+        "host:capabilities",
+        "host:private-chat",
+        "host:requests",
+        "host:support",
+        "course:cbtu-01",
+        "course:cbtu-02",
+        "course:cbtu-03",
+        "course:cbtu-04",
+        "course:cbtu-08",
+        "course:cbtu-09"
+      ]
+    },
+    {
+      "plan": {
+        "intent": "answer",
+        "reply": "รายการที่เหลือจาก 12 รายการครับ\n11. Basic Prompt Engineering (2026) — วิดีโอออนไลน์ · 2 ชั่วโมง\n12. สร้างสื่อสวยด้วย Canva — วิดีโอ เรียนด้วยตนเองและทบทวนซ้ำได้\n\nครบทั้ง 12 รายการแล้ว ข้อมูลเป็น snapshot จากเว็บ 2026-10-23 บางรายการอาจเป็นรุ่นเก่า ต้องตรวจรอบใหม่ก่อนสมัคร",
+        "evidence": [
+          {
+            "id": "turn:catalog",
+            "quote": "พบ 12 รายการ แสดง 11–12"
+          },
+          {
+            "id": "turn:catalog",
+            "quote": "11. Basic Prompt Engineering (2026)\nใช้กับงาน: สั่งงาน AI เพื่อช่วยเอกสาร ภาพ และตาราง\nการเรียน: วิดีโอออนไลน์ · 2 ชั่วโมง"
+          },
+          {
+            "id": "turn:catalog",
+            "quote": "12. สร้างสื่อสวยด้วย Canva\nใช้กับงาน: ทำโปสเตอร์และสไลด์นำเสนอ\nการเรียน: วิดีโอ เรียนด้วยตนเองและทบทวนซ้ำได้"
+          }
+        ],
+        "sourceLabel": "ข้อมูลหลักสูตร CBTU"
+      },
+      "stopReason": "stop",
+      "usage": {
+        "input": 10140,
+        "output": 225,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "reasoning": 0,
+        "totalTokens": 10365,
+        "cost": {
+          "input": 0.008112000000000001,
+          "output": 0.0009,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0.009012000000000001
+        }
+      },
+      "refs": [
+        {
+          "id": "turn:catalog",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 23
+        },
+        {
+          "id": "turn:catalog",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 122
+        },
+        {
+          "id": "turn:catalog",
+          "seen": true,
+          "exactQuote": true,
+          "quoteLength": 108
+        }
+      ],
+      "evidenceIds": [
+        "host:identity",
+        "host:capabilities",
+        "host:private-chat",
+        "host:requests",
+        "host:support",
+        "turn:catalog"
+      ]
+    }
+  ]
+}

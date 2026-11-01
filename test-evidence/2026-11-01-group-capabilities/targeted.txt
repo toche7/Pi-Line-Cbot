@@ -1,0 +1,41 @@
+✔ ordinary runtime uses accepted model-first routing while preserving persistent memory, request confirmation and identity isolation (97.115ms)
+✔ signed direct LINE uses ordinary model-first runtime and retains host help, requests, waiting, pause/release and memory reset (62.058916ms)
+✔ direct LINE failure message no longer promises model-free FAQ for ordinary model-first runtime (0.568958ms)
+✔ signed LINE booking draft yields to capability questions and reactions without losing selection or creating a record (25.436334ms)
+✔ ordinary Terminal entrypoint opens help/memory/exit in an isolated cwd without invoking a model turn (519.85975ms)
+✔ booking capability facts use the same host answer across typo/repeated questions and cannot be overridden by a model denial (19.573ms)
+✔ what-can-you-do renders enabled customer capabilities and help rather than the identity paragraph, per channel (9.493334ms)
+✔ capability summary cannot advertise request support that is not wired in the current runtime (4.456833ms)
+✔ group runtime shares semantic capability routing, refers private services, and retains isolated memory and slash blocking (74.087916ms)
+✔ private-chat referral only advertises supplied direct services and never appears in Terminal/direct summaries (0.241208ms)
+✔ native self mention is required; name text, other users, all, forged target, malformed offsets and missing sender remain silent (1.098875ms)
+✔ CBOT prefix accepts case-insensitive deliberate calls only, without LINE native mention metadata (76.370083ms)
+✔ CBOT rooms accept native self mentions as a second trigger and reject plain @names, all, other users and disabled rooms (61.430125ms)
+✔ only enabled rooms reply to native tags; signed adapter keeps direct monitor/control separate and reply redelivery is durable (48.202666ms)
+✔ different senders and rooms receive isolated identities; quiet messages do not reach group core (32.062875ms)
+✔ dry run, closed service, left room and failed/ambiguous transport never produce automatic repeated messages (22.417958ms)
+✔ group slash commands and bare tags reply locally without touching core or private memory commands (20.557292ms)
+✔ real core group identity uses dedicated persistent memory and cannot load private or other group/sender facts (50.935625ms)
+✔ changing mode off then on while generating cancels the old reply, without sending to LINE (27.217958ms)
+✔ natural experiment sends negation/correction/greeting to model instead of keyword FAQ; keeps actual host facts in context (34.298625ms)
+✔ natural experiment lets model interpret ambiguous follow-up and laughter without automatically repeating FAQ or paging courses (24.605541ms)
+✔ natural experiment does not preempt a correction mentioning a course with catalog keyword routing (14.489625ms)
+✔ legacy low-level core retains rule-based FAQ and greetings without model requests (12.354042ms)
+✔ natural catalog reaction repairs guarded chat in the same budget instead of silently rendering not-found (16.16775ms)
+✔ natural chat repair remains bounded and keeps factual guards intact (7.319416ms)
+✔ conversational repair cannot change intent and execute a catalog action instead (12.909042ms)
+✔ exact live catalog plan with empty filters executes once in experiment; default parser remains strict (4.917ms)
+✔ model catalog parser preserves real filters and still rejects invalid fields/limits; repair gets catalog-specific instructions (5.6555ms)
+✔ repeated invalid catalog plans report a command error instead of blaming JSON or suggesting reset (10.701834ms)
+✔ natural check runs SDK initialization in temp and preserves source files/cwd without inference or importing private stores (17.047833ms)
+✔ temporary CLI help and exit label requests/memory as temporary without sending any model turn (1.680291ms)
+✔ a model cannot enable request capabilities by choosing a host topic when request support is absent (13.129625ms)
+✔ browsing asks one area question then lists immediately; explicit all/filtered requests bypass advice (11.349833ms)
+ℹ tests 33
+ℹ suites 0
+ℹ pass 33
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1583.922916

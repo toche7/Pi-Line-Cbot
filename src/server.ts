@@ -22,7 +22,6 @@ import { ConversationControl, linePush } from './conversation-control.js';
 import { createServer } from 'node:http';
 import { adminHandler } from './admin.js';
 import { ConversationMonitor } from './monitor.js';
-import { CustomerCore } from './core.js';
 import { createCustomerCore } from './customer-runtime.js';
 import { LineAdapter, lineReply, webhookHandler } from './line.js';
 import { requestTimeout } from './diagnostics.js';
@@ -86,7 +85,8 @@ async function start() {
   const newsWorker = new NewsWorker(news, () => log({ event: 'news_worker_suspended', reason: 'storage_or_dispatch_error' }), lockRoot ? join(lockRoot, 'news') : undefined);
   const lineGroups = new LineGroupService(groupStore, token, fetch, () => Date.now(), { name: (process.env.SERVER_NAME || process.env.RAILWAY_SERVICE_NAME || 'ซีบอต').slice(0,100), environment: deployment.cloud ? 'cloud'+(process.env.RAILWAY_ENVIRONMENT_NAME ? ' · '+process.env.RAILWAY_ENVIRONMENT_NAME.slice(0,80) : '') : 'local' });
   const groupMemory = new MemoryStore(dataPath('runtime/line-group-memory'), undefined, lockRoot ? join(lockRoot, 'group') : undefined);
-  const groupCore = new CustomerCore(undefined, timeout, log, undefined, groupMemory);
+  const groupCore = createCustomerCore({ timeoutMs: timeout, log, store: groupMemory,
+    privateChatCapabilities: { requests: true, commands: true, humanSupport: true } });
   const groupReplies = new LineGroupReplies(groupStore, groupCore, process.env.LINE_CHANNEL_ID || '', dryRun, lineReply(token), log);
   const pendingLineUsers = new PendingLineUsers(dataPath('runtime/line-pending-users'));
   const statusWork = new RequestWorkStore(dataPath('runtime/request-work'), requestStore);
@@ -123,7 +123,7 @@ async function start() {
     console.log(`ซีบอต webhook: http://${host}:${port}/webhook/line`);
     console.log(`LINE dry run: ${dryRun}; allowlist configured: ${allowedUsers.size > 0}; cloud mode: ${cloud}`);
     console.log('LINE persistent memory enabled; separate directory/lock from Terminal; retention 90 days');
-    console.log('Direct LINE conversation routing: model-first; group routing unchanged');
+    console.log('Direct LINE conversation routing: grounded; group LINE conversation routing: grounded');
   });
   monitorServer.on('error', () => { console.error('Monitor server unavailable'); void stop(); process.exitCode = 1; });
   if (!cloud) monitorServer.listen(monitorPort, '127.0.0.1', () => console.log(`ติดตามบทสนทนา: http://127.0.0.1:${monitorPort}`));
