@@ -35,25 +35,31 @@ test('native self mention is required; name text, other users, all, forged targe
  assert.equal(groupMentionPrompt(event(),undefined),undefined);
  assert.equal(groupMentionPrompt(event('empty',''),botId),'');
 });
-test('CBOT prefix accepts case-insensitive deliberate calls only, without LINE native mention metadata',async()=>{
+test('current bot name accepts calls with or without spaces and changes on rename',async()=>{
  const f=setup();f.store.enableCallWord(groupId);const questions:string[]=[],sent:string[]=[];
- const replies=new LineGroupReplies(f.store,{client:()=>({send:async(p,out)=>{questions.push(p);out.text('คำตอบทดสอบ')},abort:async()=>{}})},'oa',false,async(_t,text)=>{sent.push(text)});
+ let name='น้องคอร์ส';
+ const replies=new LineGroupReplies(f.store,{client:()=>({send:async(p,out)=>{questions.push(p);out.text('คำตอบทดสอบ')},abort:async()=>{}})},'oa',false,async(_t,text)=>{sent.push(text)},undefined,()=>name);
  try{
-  for(const [i,text] of ['CBOT สมัครเรียนยังไง','cbot ราคาเท่าไร','  Cbot: สวัสดี','CBOT','CBOTสมัครเรียนยังไง','cbotany','พูดถึง CBOT เฉย ๆ','@CBOT คำถาม','ซีบอต คำถาม'].entries()){
-   const e=event('call-'+i);e.message.text=text;delete(e.message as any).mention;
+  const call=(id:string,text:string)=>{
+   const e=event(id);e.message.text=text;delete(e.message as any).mention;
    replies.accept(e,undefined);
-  }
-  await replies.drain();assert.deepEqual(questions,['สมัครเรียนยังไง','ราคาเท่าไร','สวัสดี','สมัครเรียนยังไง','any']);assert.equal(sent.length,6);
-  const bad=event();bad.mode='standby';bad.message.text='CBOT test';assert.equal(groupCallWordPrompt(bad),undefined);
+  };
+  for(const [i,text] of ['น้องคอร์ส สมัครเรียนยังไง','น้องคอร์สราคาเท่าไร','น้องคอร์ส','พูดถึง น้องคอร์ส','@น้องคอร์ส คำถาม','CBOT คำถาม'].entries())call('call-'+i,text);
+  name='CourseBot';
+  call('old-name','น้องคอร์ส สวัสดี');
+  call('new-name','coursebot: สวัสดี');
+  await replies.drain();assert.deepEqual(questions,['สมัครเรียนยังไง','ราคาเท่าไร','สวัสดี']);assert.equal(sent.length,4);
+  assert.match(sent[2],/น้องคอร์ส/);
+  const bad=event();bad.mode='standby';bad.message.text='ซีบอต test';assert.equal(groupCallWordPrompt(bad),undefined);
   assert.equal(f.store.replyMode(otherGroup),undefined);
   const restart=new LineGroupStore(join(f.dir,'rooms'),'oa');assert.equal(restart.replyMode(groupId),'cbot');
  }finally{replies.close();f.clean()}
 });
-test('CBOT rooms accept native self mentions as a second trigger and reject plain @names, all, other users and disabled rooms',async()=>{
+test('call-word rooms accept native self mentions as a second trigger and reject plain @names, all, other users and disabled rooms',async()=>{
  const f=setup();f.store.enableCallWord(groupId);const questions:string[]=[],tokens:string[]=[];
  const service=new LineGroupReplies(f.store,{client:()=>({send:async(p,out)=>{questions.push(p);out.text('fixture response')},abort:async()=>{}})},'oa',false,async(token)=>{tokens.push(token)});
  try{
-  const word=event('word');word.message.text='cBoTสมัครสมาชิกอย่างไร';delete(word.message as any).mention;
+  const word=event('word');word.message.text='ซีบอตสมัครสมาชิกอย่างไร';delete(word.message as any).mention;
   const native=event('native','ราคาเท่าไร');
   const bare=event('bare','');
   const middle=event('middle');middle.message.text='ช่วยหน่อย @bot เวลาเรียน';middle.message.mention.mentionees[0].index=10;

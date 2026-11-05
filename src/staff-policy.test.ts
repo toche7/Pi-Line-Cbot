@@ -7,11 +7,11 @@ test('staff policy applies the approved role matrix and separately grants only n
   for (const p of [staff, content, admin]) assert.equal(hasPermission(p, 'conversation.takeover'), true);
   assert.equal(hasPermission(staff, 'news.draft'), false);
   assert.equal(hasPermission(content, 'news.draft'), true);
-  assert.equal(hasPermission(content, 'knowledge.publish'), false);
+  assert.equal(hasPermission(content, 'knowledge.publish'), true);
   assert.equal(hasPermission(admin, 'knowledge.publish'), true);
   assert.deepEqual(visibleSettings(staff), []);
-  assert.deepEqual(visibleSettings(content), ['knowledge']);
-  assert.deepEqual(visibleSettings(admin), ['knowledge', 'ai', 'system', 'users']);
+  assert.deepEqual(visibleSettings(content), ['knowledge', 'system']);
+  assert.deepEqual(visibleSettings(admin), ['profile', 'line', 'knowledge', 'ai', 'system', 'users']);
   staff.extras = ['news.send', 'line.approve'];
   assert.equal(hasPermission(staff, 'news.send'), true);
   assert.equal(hasPermission(staff, 'line.approve'), true);

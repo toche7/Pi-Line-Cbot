@@ -36,5 +36,5 @@ test('KM API previews bound draft versus actual published answers with no networ
  }finally{rmSync(root,{recursive:true,force:true})}
 });
 test('KM browser script parses, uses safe text rendering and separate navigation preserving the five work tabs',()=>{
- assert.doesNotThrow(()=>new Function(knowledgeScript));assert.ok(!knowledgeScript.includes('innerHTML'));const html=adminPage('fixture');assert.equal((html.match(/role="tab"/g)||[]).length,5);assert.match(html,/aria-label="จัดการข้อมูลบอต"/);assert.match(html,/id="knowledge-panel"/);assert.match(html,/\/api\/knowledge/);assert.ok(!html.includes('3002'));
+ assert.doesNotThrow(()=>new Function(knowledgeScript));assert.ok(!knowledgeScript.includes('innerHTML'));const html=adminPage('fixture');assert.equal((html.match(/id="tab-[^"]+"[^>]*role="tab"/g)||[]).length,5);assert.match(html,/aria-label="จัดการข้อมูลบอต"/);assert.match(html,/id="knowledge-panel"/);assert.match(html,/\/api\/knowledge/);assert.ok(!html.includes('3002'));
 });

@@ -97,7 +97,7 @@ test('room API enforces local access, CSRF and refresh-only operations; integrat
     assert.equal((await post(JSON.stringify({ action: 'refresh-name', groupId }))).status, 200);
     assert.equal((await fetch(url, { method: 'DELETE', headers })).status, 405);
     const html = adminPage('fixture'); new Script(html.match(/<script>([\s\S]*?)<\/script>/)![1]);
-    assert.ok(html.includes('/api/line-groups')); assert.equal((html.match(/role="tab"/g) ?? []).length, 5);
+    assert.ok(html.includes('/api/line-groups')); assert.equal((html.match(/id="tab-[^"]+"[^>]*role="tab"/g) ?? []).length, 5);
   } finally { server.closeAllConnections(); await new Promise<void>(resolve => server.close(() => resolve())); f.clean(); }
 });
 

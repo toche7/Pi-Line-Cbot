@@ -1,4 +1,5 @@
 import type { LineProfiles } from './line-profile.js';
+import { hasPermission, roleLabels } from './staff-policy.js';
 import { staffIdentity } from './staff-context.js';
 import type { IncomingMessage,ServerResponse } from 'node:http';
 import type { ConversationMonitor } from './monitor.js';
@@ -7,7 +8,7 @@ import type { CourseRequestStore } from './course-requests.js';
 import type { RequestWorkStore } from './request-work.js';
 import type { ConversationService } from './conversations-api.js';
 import type { NewsService } from './news.js';
-import type { LineGroupService } from './line-groups.js';
+import { roomAcceptsNews, type LineGroupService } from './line-groups.js';
 import type { PendingUserService } from './line-pending-admin.js';
 import type { StaffStore } from './staff-store.js';
 import type { KnowledgeStore } from './knowledge-store.js';
@@ -18,6 +19,9 @@ const conversationKey=(c:any)=>JSON.stringify([c.identity.scope.replace(/:direct
 const identityKey=(r:any)=>JSON.stringify([r.owner.channel,r.owner.scope,r.owner.user]);
 const customerKey=(c:any)=>JSON.stringify([c.identity.channel,c.identity.scope,c.identity.user]);
 const byNewest=(a:any,b:any)=>String(b.lastContactAt||b.updatedAt||b.createdAt||'').localeCompare(String(a.lastContactAt||a.updatedAt||a.createdAt||''))||String(a.id).localeCompare(String(b.id));
+function staffEmails(store?: StaffStore) {
+  return new Map(store?.snapshot().accounts.flatMap(a => a.subject ? [['staff:' + a.subject, a.email] as const] : []));
+}
 export function browseSnapshot(resource:string,q:PageQuery,s:Sources):any {
   if(resource.startsWith('knowledge')){
     if(!s.knowledge)throw new PageError(503,'ยังไม่เปิดความรู้บอต');const state=knowledgeSnapshot(s.knowledge);
@@ -40,20 +44,28 @@ export function browseSnapshot(resource:string,q:PageQuery,s:Sources):any {
   }
   if(resource==='staff'){
     if(!s.staff)throw new PageError(503,'ยังไม่เปิดบัญชีเจ้าหน้าที่');
-    const state=s.staff.snapshot(),list=pageOf(state.accounts.filter(a=>matches(q.q,a.email,a.role)).sort((a,b)=>a.email.localeCompare(b.email)),q);
+    const state=s.staff.snapshot(),list=pageOf(state.accounts.filter(a=>matches(q.q,a.email,a.role,roleLabels[a.role])).sort((a,b)=>a.email.localeCompare(b.email)),q);
     return {...state,accounts:list.items,history:[],pagination:list.pagination};
   }
   if(resource==='pending'){
     if(!s.pending)throw new PageError(503,'ยังไม่เปิดผู้ทักใหม่');
     const service=s.pending,access=service.access?.snapshot(),all=service.store.list().filter(u=>u.account===service.account&&!service.allowedUsers.has(u.userId));
     const list=pageOf(all.filter(u=>matches(q.q,u.userId)).sort((a,b)=>b.lastSeenAt.localeCompare(a.lastSeenAt)||a.userId.localeCompare(b.userId)),q);
-    return {users:list.items,grants:[],revision:access?.revision||0,allowedUserCount:service.allowedUsers.size,readOnly:!service.access,pagination:list.pagination};
+    return {users:list.items,pendingCount:all.length,grants:[],revision:access?.revision||0,allowedUserCount:service.allowedUsers.size,readOnly:!service.access,pagination:list.pagination};
   }
-  if(resource==='rooms'){
+  if(resource==='rooms'||resource==='room-profiles'){
     if(!s.rooms)throw new PageError(503,'ยังไม่เปิดห้อง LINE');
-    const state=s.rooms.store.list(),list=pageOf(state.filter(r=>matches(q.q,r.name,r.groupId)).sort((a,b)=>b.seenAt.localeCompare(a.seenAt)||a.groupId.localeCompare(b.groupId)),q);
-    const selected=state.find(r=>r.groupId===q.selected),messages=olderMessages(selected?.messages||[],q,(m:any)=>String(m.eventId)+':'+m.direction);
-    return {server:s.rooms.serverIdentity,canManageMode:staffIdentity()?.role==='admin',rooms:list.items.map(r=>({...r,messages:[]})),selectedRoom:selected?{...selected,messages:messages.items}:null,messagesPage:messages.messagesPage,pagination:list.pagination,replyEnabled:state.some(r=>!!r.replyMode&&r.status!=='left')};
+    const state=s.rooms.store.list(),list=pageOf(state.filter(r=>matches(q.q,r.name,r.groupId,...(r.profile?.tags??[]))).sort((a,b)=>b.seenAt.localeCompare(a.seenAt)||a.groupId.localeCompare(b.groupId)),q);
+    const selected=state.find(r=>r.groupId===q.selected);
+    const emails=staffEmails(s.staff);
+    if(resource==='room-profiles'){
+      const profile=selected?.profile;
+      return {rooms:list.items.map(({messages, ...r})=>r),selectedRoom:selected?{...selected,messages:[],
+        updatedByEmail:profile&&emails.get(profile.updatedBy),newsChangedByEmail:profile&&emails.get(profile.newsChangedBy)}:null,
+        pagination:list.pagination,canEdit:hasPermission(staffIdentity(), 'room.manage')};
+    }
+    const messages=olderMessages(selected?.messages||[],q,(m:any)=>String(m.eventId)+':'+m.direction);
+    return {server:s.rooms.serverIdentity,canSend:!!selected&&s.rooms.canSend(selected),canManageMode:hasPermission(staffIdentity(), 'room.manage'),rooms:list.items.map(r=>({...r,messages:[]})),selectedRoom:selected?{...selected,messages:messages.items.map(m=>({...m,actorEmail:m.actor?emails.get(m.actor):undefined}))}:null,messagesPage:messages.messagesPage,pagination:list.pagination,replyEnabled:state.some(r=>!!r.replyMode&&r.status!=='left')};
   }
   const needsRegistry=['customers','conversations','requests','membership','options'].includes(resource);
   const events=needsRegistry?s.monitor.snapshot().events:[],jobs=needsRegistry?s.requests.list(undefined,true):[];
@@ -62,7 +74,7 @@ export function browseSnapshot(resource:string,q:PageQuery,s:Sources):any {
     let rows:{id:string;name:string;consent?:string}[]=[];
     if(q.kind==='customers')rows=(registry?.customers||[]).map(c=>({id:c.id,name:customerName(c),consent:c.consent}));
     else if(q.kind==='groups')rows=(registry?.groups||[]).map(g=>({id:g.id,name:g.name}));
-    else if(q.kind==='rooms')rows=(s.rooms?.store.list()||[]).filter(r=>r.status!=='left').map(r=>({id:r.groupId,name:r.name||r.groupId}));
+    else if(q.kind==='rooms')rows=(s.rooms?.store.list()||[]).filter(r=>!!s.news&&roomAcceptsNews(r,s.news.account)).map(r=>({id:r.groupId,name:r.name||r.groupId}));
     else throw new PageError(400,'ประเภทตัวเลือกไม่ถูกต้อง');
     const list=pageOf(rows.filter(r=>matches(q.q,r.name,r.id)).sort((a,b)=>a.name.localeCompare(b.name)||a.id.localeCompare(b.id)),q);return {items:list.items,pagination:list.pagination};
   }
@@ -93,12 +105,13 @@ export function browseSnapshot(resource:string,q:PageQuery,s:Sources):any {
       .sort((a,b)=>Number(!!mode(b).waiting)-Number(!!mode(a).waiting)||(mode(a).waiting&&mode(b).waiting?mode(a).waiting!.requestedAt.localeCompare(mode(b).waiting!.requestedAt):byNewest(a,b))||a.id.localeCompare(b.id));
     const list=pageOf(all,q),selected=registry.customers.find(c=>conversationKey(c)===q.selected),key=selected&&conversationKey(selected);
     const relevant=events.filter(e=>JSON.stringify([e.account,e.userId])===key).map(e=>({...e,source:'monitor'}));
-    const deliveries=(control?.deliveries||[]).filter(d=>d.key===key).map(d=>({...d,source:'staff'}));
+    const emails=staffEmails(s.staff);
+    const deliveries=(control?.deliveries||[]).filter(d=>d.key===key).map(d=>({...d,actorEmail:emails.get(d.actor),source:'staff'}));
     const combined=olderMessages<any>([...relevant,...deliveries],q,r=>JSON.stringify([r.source,r.id,r.direction]));
     const relevantKeys=new Set([...list.items,...(selected?[selected]:[])].map(conversationKey));
     const recent=!!selected&&relevant.some(e=>e.direction==='in'&&Date.now()-Date.parse(e.at)>=0&&Date.now()-Date.parse(e.at)<7*86400000);
     return {...registry,customers:list.items.map(customerSummary),selectedCustomer:selected||null,events:combined.items.filter(e=>e.source==='monitor'),
-      requests:selected?jobs.filter(r=>identityKey(r)===customerKey(selected)):[],control:control?{...control,modes:Object.fromEntries(Object.entries(control.modes).filter(([k])=>relevantKeys.has(k))),deliveries:combined.items.filter(e=>e.source==='staff')}:null,
+      requests:selected?jobs.filter(r=>identityKey(r)===customerKey(selected)):[],control:control?{...control,modes:Object.fromEntries(Object.entries(control.modes).filter(([k])=>relevantKeys.has(k)).map(([k,m])=>[k,{...m,actorEmail:k===key&&m.actor?emails.get(m.actor):undefined}])),deliveries:combined.items.filter(e=>e.source==='staff')}:null,
       allowedUsers:selected&&service?.allowedUsers.has(selected.identity.user)?[selected.identity.user]:[],sendEnabled:!!service&&!service.dryRun,account:service?.account||'',selectedRecent:recent,
       waitingCount:registry.customers.filter(c=>c.identity.channel==='line'&&mode(c).waiting).length,messagesPage:combined.messagesPage,pagination:list.pagination};
   }

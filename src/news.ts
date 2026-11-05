@@ -3,7 +3,7 @@ import { mkdirSync, chmodSync, lstatSync, readFileSync, openSync, closeSync, wri
 import { join } from 'node:path';
 import { createHash, randomUUID } from 'node:crypto';
 import type { NewsMediaStore, NewsImage } from './news-media.js';
-import type { LineGroupStore } from './line-groups.js';
+import { roomAcceptsNews, type LineGroupStore } from './line-groups.js';
 import { localActor, type CustomerStore } from './customers.js';
 
 export class NewsError extends Error { constructor(readonly status: number, message: string) { super(message); } }
@@ -113,10 +113,10 @@ export class NewsService {
     const personCount = recipients.length;
     const roomIds = selection.lineRoomIds ?? [];
     const knownRooms = this.rooms?.list() ?? [];
-    if (roomIds.some(id => !knownRooms.some(r => r.groupId === id && r.account === this.account && !r.leftAt && ['joined','observed'].includes(r.status ?? '')))) fail('ห้อง LINE เปลี่ยนหรือบอตออกแล้ว กรุณาตรวจรายชื่อใหม่', 409);
+    if (roomIds.some(id => !knownRooms.some(r => r.groupId === id && roomAcceptsNews(r, this.account)))) fail('ห้อง LINE ยังไม่อนุญาตรับข่าวหรือบอตออกแล้ว กรุณาตรวจรายชื่อใหม่', 409);
     for (const id of roomIds) {
       const room = knownRooms.find(r => r.groupId === id)!;
-      recipients.push({ kind: 'room', id: 'room:' + id, name: room.name || 'ห้อง LINE ' + id, user: id, consentStamp: hash([this.account, id, room.firstSeenAt ?? null, room.name ?? null]) });
+      recipients.push({ kind: 'room', id: 'room:' + id, name: room.name || 'ห้อง LINE ' + id, user: id, consentStamp: hash([this.account, id, room.firstSeenAt ?? null, room.name ?? null, room.profile?.newsRevision]) });
     }
     recipients.sort((a,b) => a.id.localeCompare(b.id));
     if (recipients.length > 1000) fail('ปลายทางรวมมากเกิน 1,000 รายการ');
@@ -125,7 +125,7 @@ export class NewsService {
   snapshot(includeRecipients = true) {
     const s = includeRecipients ? this.customers.snapshot({ events: [], requests: [] }) : {customers:[],groups:[]};
     const enabled = this.enabled;
-    return { selfServiceConfirmation: !this.gated, imageUploadEnabled: this.media?.ready ?? false, enabled, actor: currentStaffActor(localActor), customers: s.customers.map(c => ({ id: c.id, name: c.profile.nickname || c.displayName || c.id, consent: c.consent, groupIds: c.groupIds })), lineRooms: (includeRecipients ? (this.rooms?.list() ?? []) : []).filter(r => r.account === this.account && !r.leftAt && ['joined','observed'].includes(r.status ?? '')).map(r => ({ id: r.groupId, name: r.name || 'ห้อง LINE ' + r.groupId })), groups: s.groups.map(g => ({ id: g.id, name: g.name })), campaigns: this.store.list().map(c => ({ ...c, canConfirm: enabled && c.status === 'reviewed' && (!this.gated || this.authorized(c)) && !!c.review && this.now() - c.review.at <= 600000 })) };
+    return { selfServiceConfirmation: !this.gated, imageUploadEnabled: this.media?.ready ?? false, enabled, actor: currentStaffActor(localActor), customers: s.customers.map(c => ({ id: c.id, name: c.profile.nickname || c.displayName || c.id, consent: c.consent, groupIds: c.groupIds })), lineRooms: (includeRecipients ? (this.rooms?.list() ?? []) : []).filter(r => roomAcceptsNews(r, this.account)).map(r => ({ id: r.groupId, name: r.name || 'ห้อง LINE ' + r.groupId })), groups: s.groups.map(g => ({ id: g.id, name: g.name })), campaigns: this.store.list().map(c => ({ ...c, canConfirm: enabled && c.status === 'reviewed' && (!this.gated || this.authorized(c)) && !!c.review && this.now() - c.review.at <= 600000 })) };
   }
   mutate(input: any) {
     if (!input || typeof input !== 'object') fail('ข้อมูลไม่ถูกต้อง');

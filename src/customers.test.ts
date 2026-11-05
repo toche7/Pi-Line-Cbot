@@ -141,7 +141,7 @@ test('integrated admin JavaScript parses and keeps five main tabs, same-origin e
   const html = adminPage('fixture-token');
   const script = html.match(/<script>([\s\S]*?)<\/script>/)![1];
   assert.doesNotThrow(() => new Script(script));
-  assert.equal((html.match(/role="tab"/g) ?? []).length, 5);
+  assert.equal((html.match(/id="tab-[^"]+"[^>]*role="tab"/g) ?? []).length, 5);
   for (const label of ['ภาพรวม', 'บทสนทนา', 'ลูกค้าและกลุ่ม', 'งานรอดูแล', 'ส่งข่าว']) assert.ok(html.includes(label));
   assert.ok(html.includes("fetch('/api/customers'")); assert.ok(html.includes('n.textContent=text'));
   assert.doesNotMatch(script, /innerHTML|outerHTML|insertAdjacentHTML/);

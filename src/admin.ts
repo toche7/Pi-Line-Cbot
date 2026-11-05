@@ -1,8 +1,12 @@
+import { adminFavicon } from './admin-brand.js';
+import { botProfileHandler, defaultBotName, type BotProfile } from './bot-profile.js';
+import { botProfileScript } from './bot-profile-admin.js';
+import { roomProfilesBody, roomProfilesScript, roomProfilesStyle } from './room-profiles-admin.js';
 import { currentBuildInfo } from './program-version.js';
 import { systemStatusHandler, type SystemStatusService } from './system-status.js';
 import { systemStatusScript, systemStatusBody } from './system-status-admin.js';
 import { hasPermission, visibleSettings, type StaffPrincipal } from './staff-policy.js';
-import { staffStyle, staffAccountBody, staffBrowserScript, settingsWorkspace } from './staff-admin.js';
+import { staffStyle, staffAccountBody, staffBrowserScript, settingsWorkspace, settingsNavigationScript } from './staff-admin.js';
 import { responseSettingsBody } from './response-settings-admin.js';
 import type { StaffAuth } from './staff-auth.js';
 import { browseHandler } from './browse.js';
@@ -14,7 +18,7 @@ import { RequestWorkStore } from './request-work.js';
 import { join } from 'node:path';
 import { responseSettingsHandler } from './response-settings-api.js';
 import type { ResponseSettingsService } from './response-settings-service.js';
-import { botManagementBody, botManagementStyle, botSettingsScript, adminNavigationScript } from './bot-admin.js';
+import { botManagementStyle, botSettingsScript, adminNavigationScript } from './bot-admin.js';
 import { knowledgeStyle, knowledgeBody, knowledgeScript } from './knowledge-admin.js';
 import { knowledgeHandler } from './knowledge-api.js';
 import type { KnowledgeStore } from './knowledge-store.js';
@@ -36,7 +40,7 @@ import { lineGroupsStyle, lineGroupsBody, lineGroupsScript } from './line-groups
 import { pendingUsersHandler, pendingUsersStyle, pendingUsersBody, pendingUsersScript, type PendingUserService } from './line-pending-admin.js';
 
 // Reuse the existing panels and their same-origin APIs without frames or extra ports.
-export function adminPage(token = '', staff?: { principal: StaffPrincipal; csrf: string }, serverIdentity?: {name:string;environment:string}) {
+export function adminPage(token = '', staff?: { principal: StaffPrincipal; csrf: string }, serverIdentity?: {name:string;environment:string}, botName = defaultBotName, setupEnabled = false) {
   const escapeServer = (text:string) => text.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));
   const build = currentBuildInfo();
   const buildLabel = build ? build.code.slice(0,12) : 'ไม่ระบุ';
@@ -48,8 +52,11 @@ export function adminPage(token = '', staff?: { principal: StaffPrincipal; csrf:
   const showSystem = can('system.inspect');
   const showPending = can('line.approve');
   const roleNewsScript = !staff ? newsScript : newsScript.replace("n.onclick=fn;return n", "n.onclick=fn;" + (!can('news.send') ? "if(/^ยืนยันส่ง|^ยกเลิก/.test(text))n.hidden=true;" : "") + (!can('news.draft') ? "if(/ทำสำเนา|บันทึก|ตรวจ|อัปโหลด|ลบรูป|แนบรูป/.test(text))n.hidden=true;" : "") + "return n").replace("const editable=['draft','reviewed'].includes(c.status)", "const editable=" + String(can('news.draft')) + "&&['draft','reviewed'].includes(c.status)");
-  const management = staff ? settingsWorkspace(staff.principal, responseSettingsBody, knowledgeBody, systemStatusBody + versionDetails) : botManagementBody(knowledgeBody);
-  const statusScript = !showSystem ? '' : staff ? systemStatusScript.replace("document.getElementById('overview-panel').hidden", "document.getElementById('bot-management-panel').hidden||document.getElementById('settings-system').hidden") : systemStatusScript;
+  const management = settingsWorkspace(staff?.principal, responseSettingsBody, knowledgeBody, systemStatusBody + versionDetails, setupEnabled);
+  const statusScript = showSystem ? systemStatusScript.replace(
+    "document.getElementById('overview-panel').hidden",
+    "document.getElementById('settings-system').closest('[hidden]')"
+  ) : '';
   const parts = (html: string) => ({
     style: html.match(/<style>([\s\S]*?)<\/style>/)![1],
     body: html.split('</style>')[1].split('<script>')[0].replace(/<header>[\s\S]*?<\/header>/, ''),
@@ -62,22 +69,25 @@ export function adminPage(token = '', staff?: { principal: StaffPrincipal; csrf:
   const requestScript = requests.script.replace('document.getElementById(id)', "document.getElementById('requests-'+id)");
   // Add navigation inside the existing customer closure without changing its owned module.
   const navigableCustomerScript = customerScript.replace('refresh();setInterval(', String.raw`window.addEventListener('admin-open-customer',async e=>{selected=e.detail.id;view='profile';try{await fetchState();render()}catch(error){$('state').textContent=error.message}});refresh();setInterval(`);
-  const html = `<!doctype html><html lang="th"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CBot · Care Center</title>
+  const html = `<!doctype html><html lang="th"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ALS · ${escapeServer(botName)}</title>${adminFavicon}
 <style>${paginationStyle}${monitor.style}\n${requestStyle}
-[hidden]{display:none!important}.admin-tabs{display:flex;gap:8px;padding:16px 5%;background:#142e47;border-bottom:1px solid #dde5ed;overflow:auto}.admin-tabs button{width:auto;margin:0;font:inherit;padding:12px 20px;white-space:nowrap}.admin-tabs button[aria-selected=true]{background:#d9f7f2;border-color:#168779;color:#116c5e;font-weight:700}.admin-tabs button:focus-visible{outline:3px solid #168779;outline-offset:2px}.admin-tabs button:disabled{opacity:.5;cursor:default}#requests-panel main{display:block}#requests-panel article{white-space:normal}#requests-panel h2{margin:0 0 12px}${customerStyle}${pendingUsersStyle}${conversationStyle}${lineGroupsStyle}${newsStyle}${knowledgeStyle}${botManagementStyle}${overviewStyle}${staffStyle}${staff && !can("knowledge.publish") ? "#km-confirm-area,[data-knowledge-restore]{display:none!important}" : ""}
-.admin-navigation{display:flex;align-items:stretch;gap:8px;padding:16px 5%;background:#142e47;border-bottom:1px solid #dde5ed;overflow-x:auto}.admin-navigation .admin-tabs{padding:0;flex-shrink:0;overflow:visible;border:0;background:transparent}.admin-navigation .admin-km-nav{display:flex;flex:0 0 auto;padding:0;background:transparent}.admin-navigation .admin-km-nav button{padding:12px 20px;white-space:nowrap}.admin-navigation .admin-km-nav button:focus-visible{outline:3px solid #168779;outline-offset:2px}
-</style><header><h1>CBot · Care Center</h1>${serverBadge}</header>${staff ? staffAccountBody(staff.principal) : ""}
-<div class="admin-navigation"><nav class="admin-tabs" role="tablist" aria-label="ส่วนงาน"><button id="tab-overview" type="button" role="tab" aria-selected="false" aria-controls="overview-panel" tabindex="-1">ภาพรวม</button><button id="tab-monitor" type="button" role="tab" aria-selected="true" aria-controls="monitor-panel">บทสนทนา</button><button id="tab-customers" type="button" role="tab" aria-selected="false" aria-controls="customers-panel" tabindex="-1">ลูกค้าและกลุ่ม</button><button id="tab-requests" type="button" role="tab" aria-selected="false" aria-controls="requests-panel" tabindex="-1">งานรอดูแล</button><button id="tab-news" ${showNews ? "" : "hidden"} type="button" role="tab" aria-selected="false" aria-controls="news-panel" tabindex="-1">ส่งข่าว</button></nav><nav class="admin-km-nav" aria-label="จัดการข้อมูลบอต"><button id="tab-knowledge" ${showSettings ? "" : "hidden"} type="button" aria-selected="false" aria-controls="bot-management-panel">${staff ? "ตั้งค่า" : "จัดการบอต"}</button></nav></div>
-<div id="overview-panel" role="tabpanel" aria-labelledby="tab-overview" hidden>${staff ? overviewBody.replace(systemStatusBody, showSystem ? '<p><a href="#settings-system">ดูสถานะระบบและการเชื่อมต่อ →</a></p>' : "") : overviewBody}</div><div id="monitor-panel" role="tabpanel" aria-labelledby="tab-monitor">${conversationBody}</div><div id="customers-panel" role="tabpanel" aria-labelledby="tab-customers" hidden>${customerBody}<div id="customers-rooms-content" hidden>${lineGroupsBody}</div>${showPending ? pendingUsersBody : ""}</div><div id="requests-panel" role="tabpanel" aria-labelledby="tab-requests" hidden>${requestBody}</div><div id="news-panel" role="tabpanel" aria-labelledby="tab-news" hidden>${showNews ? (staff && !can("news.draft") ? newsBody.replace('id="news-new"', 'id="news-new" hidden') : newsBody) : ""}</div>
+[hidden]{display:none!important}.admin-tabs{display:flex;gap:8px;padding:16px 5%;background:#142e47;border-bottom:1px solid #dde5ed;overflow:auto}.admin-tabs button{width:auto;margin:0;font:inherit;padding:12px 20px;white-space:nowrap}.admin-tabs button[aria-selected=true]{background:#d9f7f2;border-color:#168779;color:#116c5e;font-weight:700}.admin-tabs button:focus-visible{outline:3px solid #168779;outline-offset:2px}.admin-tabs button:disabled{opacity:.5;cursor:default}#requests-panel main{display:block}#requests-panel article{white-space:normal}#requests-panel h2{margin:0 0 12px}${customerStyle}${pendingUsersStyle}${conversationStyle}${lineGroupsStyle}${roomProfilesStyle}${newsStyle}${knowledgeStyle}${botManagementStyle}${overviewStyle}${staffStyle}${staff && !can("knowledge.publish") ? "#km-confirm-area,[data-knowledge-restore]{display:none!important}" : ""}
+.conversation-views{display:flex;gap:8px;flex-wrap:wrap;padding:16px 3% 0}.conversation-views button{width:auto;margin:0}.conversation-views button[aria-pressed=true]{background:#d9f7f2;color:#116c5e;border-color:#168779;font-weight:700}.admin-navigation{display:flex;align-items:stretch;gap:8px;padding:16px 5%;background:#142e47;border-bottom:1px solid #dde5ed;overflow-x:auto}.admin-navigation .admin-tabs{padding:0;flex-shrink:0;overflow:visible;border:0;background:transparent}.admin-navigation .admin-km-nav{display:flex;flex:0 0 auto;padding:0;background:transparent}.admin-navigation .admin-km-nav button{padding:12px 20px;white-space:nowrap}.admin-navigation .admin-km-nav button:focus-visible{outline:3px solid #168779;outline-offset:2px}
+</style><header><h1>ALS · <span id="admin-bot-name">${escapeServer(botName)}</span></h1>${serverBadge}</header>${staff ? staffAccountBody(staff.principal) : ""}
+<div class="admin-navigation"><nav class="admin-tabs" role="tablist" aria-label="ส่วนงาน"><button id="tab-overview" type="button" role="tab" aria-selected="false" aria-controls="overview-panel" tabindex="-1">ภาพรวม</button><button id="tab-monitor" type="button" role="tab" aria-selected="true" aria-controls="monitor-panel">บทสนทนา</button><button id="tab-customers" type="button" role="tab" aria-selected="false" aria-controls="customers-panel" tabindex="-1">ลูกค้าและกลุ่ม</button><button id="tab-requests" type="button" role="tab" aria-selected="false" aria-controls="requests-panel" tabindex="-1">งานรอดูแล</button><button id="tab-news" ${showNews ? "" : "hidden"} type="button" role="tab" aria-selected="false" aria-controls="news-panel" tabindex="-1">ส่งข่าว</button></nav><nav class="admin-km-nav" aria-label="จัดการข้อมูลบอต"><button id="tab-knowledge" ${showSettings ? "" : "hidden"} type="button" aria-selected="false" aria-controls="bot-management-panel">ตั้งค่า</button></nav></div>
+<div id="overview-panel" role="tabpanel" aria-labelledby="tab-overview" hidden>${overviewBody.replace(systemStatusBody, showSystem ? '<p><a href="#settings-system">ดูสถานะระบบและการเชื่อมต่อ →</a></p>' : "")}</div><div id="monitor-panel" role="tabpanel" aria-labelledby="tab-monitor"><div class="conversation-views" aria-label="มุมมองบทสนทนา"><button id="monitor-direct-tab" type="button" aria-controls="monitor-direct-content" aria-pressed="true">แชตส่วนตัว</button><button id="monitor-rooms-tab" type="button" aria-controls="monitor-rooms-content" aria-pressed="false">ห้องกลุ่ม LINE</button></div><div id="monitor-direct-content">${conversationBody}</div><div id="monitor-rooms-content" hidden>${lineGroupsBody}</div></div><div id="customers-panel" role="tabpanel" aria-labelledby="tab-customers" hidden>${customerBody}${showPending ? pendingUsersBody : ""}${roomProfilesBody}</div><div id="requests-panel" role="tabpanel" aria-labelledby="tab-requests" hidden>${requestBody}</div><div id="news-panel" role="tabpanel" aria-labelledby="tab-news" hidden>${showNews ? (staff && !can("news.draft") ? newsBody.replace('id="news-new"', 'id="news-new" hidden') : newsBody) : ""}</div>
 ${management}
-<script>${paginationScript}${staff ? staffBrowserScript(staff.principal,staff.csrf) : ""}(()=>{${requestScript}})();const CUSTOMER_CSRF_TOKEN=${JSON.stringify(token)};${navigableCustomerScript}\n${showPending ? pendingUsersScript : ""}\n${conversationScript}\n${lineGroupsScript}\n${showNews ? roleNewsScript : ""}\n${can("knowledge.draft") ? knowledgeScript : ""}\n${can("ai.manage") ? botSettingsScript() : ""}\n${adminNavigationScript}\n${overviewScript}\n${statusScript}</script></html>`;
+<script>${paginationScript}${staff ? staffBrowserScript(staff.csrf) : ""}(()=>{${requestScript}})();const CUSTOMER_CSRF_TOKEN=${JSON.stringify(token)};${navigableCustomerScript}\n${showPending ? pendingUsersScript : ""}\n${conversationScript}\n${lineGroupsScript}\n${roomProfilesScript}\n${showNews ? roleNewsScript : ""}\n${can("knowledge.draft") ? knowledgeScript : ""}\n${can("ai.manage") ? botSettingsScript() : ""}\n${settingsNavigationScript}\n${adminNavigationScript}\n${can("bot.manage") || can("line.connection.manage") ? botProfileScript : ""}\n${overviewScript}\n${statusScript}</script></html>`;
   return staff ? html.replaceAll("ยังไม่มีระบบเข้าสู่ระบบ", "ใช้บัญชี Google ที่ยืนยันแล้ว").replaceAll("ยังไม่มี login", "ยืนยันบัญชีแล้ว").replaceAll("ผู้ใช้บนเครื่องนี้", "บัญชีเจ้าหน้าที่").replaceAll("ยังไม่มีการแยกสิทธิ์ทีม", "แยกสิทธิ์ตามบทบาท") : html;
 }
 
-export function adminHandler(monitor: ConversationMonitor, requests: CourseRequestStore, customers?: CustomerStore, profiles?: LineProfiles, conversations?: ConversationService, news?: NewsService, knowledge?: KnowledgeStore, responseSettings?: ResponseSettingsService, lineGroups?: LineGroupService, pendingUsers?: PendingUserService, systemStatus?: SystemStatusService, staffAuth?: StaffAuth) {
+export function adminHandler(monitor: ConversationMonitor, requests: CourseRequestStore, customers?: CustomerStore, profiles?: LineProfiles, conversations?: ConversationService, news?: NewsService, knowledge?: KnowledgeStore, responseSettings?: ResponseSettingsService, lineGroups?: LineGroupService, pendingUsers?: PendingUserService, systemStatus?: SystemStatusService, staffAuth?: StaffAuth, botProfile?: BotProfile) {
   const token = randomBytes(32).toString('hex');
   const statusRoutes = systemStatusHandler(systemStatus, token);
-  const monitorRoutes = monitorHandler(monitor, adminPage(token, undefined, lineGroups?.serverIdentity));
+  const profileRoutes = botProfileHandler(botProfile, systemStatus, token);
+  const page = (staff?: { principal: StaffPrincipal; csrf: string }) =>
+    adminPage(token, staff, lineGroups?.serverIdentity, botProfile?.name(), !!botProfile);
+  const monitorRoutes = monitorHandler(monitor, () => page());
   const work = new RequestWorkStore(join(requests.root, '..', 'request-work'), requests);
   const requestRoutes = requestsAdminHandler(requests, token, work);
   const overviewRoutes = overviewHandler({ monitor, work, customers, conversations, news, pending: pendingUsers });
@@ -90,6 +100,7 @@ export function adminHandler(monitor: ConversationMonitor, requests: CourseReque
   const newsRoutes = news ? newsHandler(news, token) : undefined;
   const browseRoutes = browseHandler({ profiles,monitor,customers,requests,work,conversations,news,rooms:lineGroups,pending:pendingUsers,staff:staffAuth?.store,knowledge });
   const handler = (req: IncomingMessage, res: ServerResponse) => {
+    if (req.url === '/api/bot-profile' || req.url === '/api/bot-line') return void profileRoutes(req, res);
     if (req.url?.startsWith('/api/browse/')) return browseRoutes(req,res);
     if (req.url === '/api/system-status' || req.url === '/api/system-status/check') { void statusRoutes(req, res); return; }
     if (req.url === '/api/overview') return overviewRoutes(req, res);
@@ -121,5 +132,5 @@ export function adminHandler(monitor: ConversationMonitor, requests: CourseReque
     if (req.url === '/api/requests') return requestRoutes(req, res);
     return monitorRoutes(req, res);
   };
-  return staffAuth ? staffAuth.wrap((req, res) => handler(legacyAdminRequest(req), res), (principal, csrf) => adminPage(token, { principal, csrf }, lineGroups?.serverIdentity)) : handler;
+  return staffAuth ? staffAuth.wrap((req, res) => handler(legacyAdminRequest(req), res), (principal, csrf) => page({ principal, csrf })) : handler;
 }

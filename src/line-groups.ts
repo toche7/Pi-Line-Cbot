@@ -1,16 +1,32 @@
 import { mkdirSync, chmodSync, lstatSync, readdirSync, readFileSync, openSync, writeFileSync, fsyncSync, closeSync, renameSync, unlinkSync } from 'node:fs';
 import { join } from 'node:path';
 import { staffIdentity, currentStaffActor } from './staff-context.js';
+import { staffMessage } from './staff-message.js';
+import { hasPermission } from './staff-policy.js';
 import { randomUUID } from 'node:crypto';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 
 export type GroupObservation = { groupId: string; eventId?: string; type: string; userId?: string; text?: string; at: string };
-type GroupMessage = { eventId: string; userId?: string; text: string; at: string; direction?: 'in' | 'out'; status?: string };
+type GroupMessage = { eventId: string; userId?: string; text: string; at: string; direction?: 'in' | 'out'; status?: string; actor?: string };
+type RoomProfile = { purpose: string; note: string; tags: string[]; newsAllowed: boolean;
+  revision: string; newsRevision: string; newsChangedAt: string; newsChangedBy: string; updatedAt: string; updatedBy: string };
 export type LineRoom = { groupId: string; account?: string; seenAt: string; firstSeenAt?: string;
-  name?: string; nameFetchedAt?: string; leftAt?: string; messages?: GroupMessage[]; status?: 'observed' | 'joined' | 'left'; replyMode?: 'mention' | 'cbot'; modeRevision?: string; modeChangedAt?: string; modeChangedBy?: string };
+  name?: string; nameFetchedAt?: string; leftAt?: string; messages?: GroupMessage[]; status?: 'observed' | 'joined' | 'left'; replyMode?: 'mention' | 'cbot'; modeRevision?: string; modeChangedAt?: string; modeChangedBy?: string; profile?: RoomProfile };
 const groupPattern = /^C[0-9a-f]{32}$/i;
 const userPattern = /^U[0-9a-f]{32}$/i;
 const validDate = (value: unknown): value is string => typeof value === 'string' && Number.isFinite(Date.parse(value));
+
+function validProfileFields(value: unknown): value is Pick<RoomProfile, 'purpose' | 'note' | 'tags' | 'newsAllowed'> {
+  const p = value as Partial<RoomProfile> | null;
+  return !!p && typeof p.purpose === 'string' && p.purpose.length <= 300
+    && typeof p.note === 'string' && p.note.length <= 2000
+    && Array.isArray(p.tags) && p.tags.length <= 20 && p.tags.every(t => typeof t === 'string' && t.length > 0 && t.length <= 50)
+    && typeof p.newsAllowed === 'boolean';
+}
+
+export function roomAcceptsNews(room: LineRoom, account: string) {
+  return room.account === account && !room.leftAt && (room.status === 'joined' || room.status === 'observed') && room.profile?.newsAllowed === true;
+}
 
 // Kept separate from customer categories, direct-message history, memory and jobs.
 export class LineGroupStore {
@@ -36,6 +52,8 @@ export class LineGroupStore {
         || (r.modeRevision !== undefined && (typeof r.modeRevision !== 'string' || !/^[a-f0-9-]{36}$/.test(r.modeRevision)))
         || (r.modeChangedAt !== undefined && !validDate(r.modeChangedAt))
         || (r.modeChangedBy !== undefined && (typeof r.modeChangedBy !== 'string' || r.modeChangedBy.length > 150))
+        || (r.profile !== undefined && (!validProfileFields(r.profile) || typeof r.profile.revision !== 'string'
+          || typeof r.profile.newsRevision !== 'string' || !validDate(r.profile.newsChangedAt) || typeof r.profile.newsChangedBy !== 'string' || !validDate(r.profile.updatedAt) || typeof r.profile.updatedBy !== 'string'))
         || (r.replyMode !== undefined && !['mention', 'cbot'].includes(r.replyMode))
         || (r.messages !== undefined && (!Array.isArray(r.messages) || r.messages.length > 1000 || r.messages.some(m =>
           typeof m.eventId !== 'string' || m.eventId.length > 128 || typeof m.text !== 'string' || m.text.length > 4000
@@ -111,6 +129,40 @@ export class LineGroupStore {
     if (!room || !message) throw Error('Reply reservation missing');
     Object.assign(message, { text: text.slice(0, 4000), status, at: new Date(this.now()).toISOString() }); this.write(room);
   }
+  saveProfile(groupId: string, input: unknown, revision: unknown) {
+    if (!validProfileFields(input)) throw new RoomModeError(400, 'ข้อมูลโปรไฟล์ห้องไม่ถูกต้อง');
+    const room = this.list().find(r => r.groupId === groupId);
+    if (!room) throw new RoomModeError(404, 'ไม่พบห้องที่เลือก');
+    if (revision !== (room.profile?.revision ?? 'initial')) throw new RoomModeError(409, 'โปรไฟล์เปลี่ยนแล้ว กรุณาเปิดห้องใหม่ก่อนบันทึก');
+    const newsChanged = !room.profile || room.profile.newsAllowed !== input.newsAllowed;
+    const updatedAt = new Date(this.now()).toISOString(), updatedBy = currentStaffActor('local-admin');
+    room.profile = { purpose: input.purpose.trim(), note: input.note.trim(), tags: [...new Set(input.tags.map(t => t.trim()).filter(Boolean))],
+      newsAllowed: input.newsAllowed, revision: randomUUID(),
+      newsRevision: newsChanged ? randomUUID() : room.profile!.newsRevision,
+      newsChangedAt: newsChanged ? updatedAt : room.profile!.newsChangedAt,
+      newsChangedBy: newsChanged ? updatedBy : room.profile!.newsChangedBy, updatedAt, updatedBy };
+    this.write(room);
+    return room.profile;
+  }
+  canPush(room: LineRoom) {
+    return room.account === this.account && !room.leftAt && (room.status === 'joined' || room.status === 'observed');
+  }
+  reserveStaffMessage(groupId: string, id: string, text: string, actor: string) {
+    const rooms = this.list();
+    const room = rooms.find(r => r.groupId === groupId);
+    if (rooms.some(r => r.groupId !== groupId && r.messages?.some(m => m.eventId === id && m.direction === 'out')))
+      throw new RoomModeError(409, 'รหัสส่งข้อความนี้ถูกใช้กับห้องอื่นแล้ว');
+    if (!room || !this.canPush(room)) throw new RoomModeError(409, 'ห้องนี้ยังส่งข้อความไม่ได้');
+    const prior = room.messages?.find(m => m.direction === 'out' && m.eventId === id);
+    if (prior) {
+      if (prior.text !== text || prior.actor !== actor) throw new RoomModeError(409, 'รหัสส่งข้อความนี้ถูกใช้แล้ว');
+      return { message: prior, fresh: false };
+    }
+    const message: GroupMessage = { eventId: id, text, actor, direction: 'out', status: 'pending', at: new Date(this.now()).toISOString() };
+    (room.messages ??= []).push(message);
+    this.write(room);
+    return { message, fresh: true };
+  }
   saveName(groupId: string, name: string) {
     const room = this.list().find(r => r.groupId === groupId);
     if (!room) throw Error('Unknown room');
@@ -124,7 +176,25 @@ export class RoomModeError extends Error { constructor(readonly status: number, 
 export class LineGroupService {
   private attempts = new Map<string, number>();
   private inFlight = new Map<string, Promise<void>>();
-  constructor(readonly store: LineGroupStore, private token: string, private fetcher: typeof fetch = fetch, private now = () => Date.now(), readonly serverIdentity = { name: 'ซีบอต', environment: 'local' }) {}
+  constructor(readonly store: LineGroupStore, private token: string, private fetcher: typeof fetch = fetch, private now = () => Date.now(), readonly serverIdentity = { name: 'ซีบอต', environment: 'local' }, private push?: (to: string, id: string, text: string) => Promise<void>) {}
+  canSend(room: LineRoom) {
+    return !!this.push && this.store.canPush(room) && hasPermission(staffIdentity(), 'conversation.takeover');
+  }
+  async sendStaffMessage(groupId: string, id: unknown, input: unknown, confirmed: unknown) {
+    const room = this.store.list().find(r => r.groupId === groupId);
+    if (!room || !this.canSend(room)) throw new RoomModeError(403, 'บัญชีหรือห้องนี้ยังส่งข้อความไม่ได้');
+    if (confirmed !== true || typeof id !== 'string' || !/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(id)
+      || typeof input !== 'string' || input.length > 3900) throw new RoomModeError(400, 'กรุณาตรวจห้องและยืนยันข้อความก่อนส่ง');
+    let text: string;
+    try { text = staffMessage(input); } catch { throw new RoomModeError(400, 'ข้อความไม่ถูกต้อง'); }
+    const key = 'staff:' + id;
+    const { message, fresh } = this.store.reserveStaffMessage(groupId, key, text, currentStaffActor('local-admin'));
+    if (!fresh) return message.status;
+    let status: 'accepted' | 'failed' = 'failed';
+    try { await this.push!(groupId, id, text); status = 'accepted'; } catch { /* No automatic retry after uncertain delivery. */ }
+    this.store.finishReply(groupId, key, text, status);
+    return status;
+  }
   async refreshName(groupId: string) {
     const room = this.store.list().find(r => r.groupId === groupId);
     if (!room || !this.token) throw Error('ยังไม่พบห้องหรือยังไม่ได้เชื่อมบัญชี LINE');
@@ -152,7 +222,7 @@ export class LineGroupService {
       && (!this.attempts.has(r.groupId) || this.now() - this.attempts.get(r.groupId)! > 5 * 60_000)).slice(0, 4);
     await Promise.allSettled(due.map(r => this.refreshName(r.groupId)));
     const rooms = this.store.list();
-    return { server: this.serverIdentity, canManageMode: staffIdentity()?.role === 'admin', rooms, replyEnabled: rooms.some(r => !!r.replyMode && r.status !== 'left'), pushEnabled: false, retentionDays: 90, maxMessagesPerRoom: 1000 };
+    return { server: this.serverIdentity, canManageMode: hasPermission(staffIdentity(), 'room.manage'), rooms, replyEnabled: rooms.some(r => !!r.replyMode && r.status !== 'left'), pushEnabled: false, retentionDays: 90, maxMessagesPerRoom: 1000 };
   }
 }
 
@@ -165,14 +235,21 @@ export function lineGroupsHandler(service: LineGroupService, token: string) {
       if (req.method === 'GET') { send(200, await service.snapshot()); return; }
       if (req.method !== 'POST') { send(405, { error: 'ยังไม่รองรับคำสั่งนี้' }); return; }
       if (req.headers.origin !== 'http://' + req.headers.host || req.headers['x-customer-token'] !== token || req.headers['content-type'] !== 'application/json') { send(403, { error: 'กรุณาเปิดเว็บเดิมเพื่อจัดการห้อง' }); return; }
-      let raw = ''; for await (const part of req) { raw += part; if (Buffer.byteLength(raw) > 2048) { send(413, { error: 'คำขอใหญ่เกินกำหนด' }); return; } }
+      let raw = ''; for await (const part of req) { raw += part; if (Buffer.byteLength(raw) > 32768) { send(413, { error: 'คำขอใหญ่เกินกำหนด' }); return; } }
       let input: any; try { input = JSON.parse(raw); } catch { send(400, { error: 'รูปแบบคำขอไม่ถูกต้อง' }); return; }
-      if (!['refresh-name', 'set-reply-mode'].includes(input?.action) || typeof input.groupId !== 'string' || !groupPattern.test(input.groupId)) { send(400, { error: 'คำสั่งหรือรหัสห้องไม่ถูกต้อง' }); return; }
+      if (!['refresh-name', 'set-reply-mode', 'save-profile', 'send-staff'].includes(input?.action) || typeof input.groupId !== 'string' || !groupPattern.test(input.groupId)) { send(400, { error: 'คำสั่งหรือรหัสห้องไม่ถูกต้อง' }); return; }
       if (!service.store.list().some(r => r.groupId === input.groupId)) { send(404, { error: 'ไม่พบห้องที่เลือก' }); return; }
       if (input.action === 'set-reply-mode') {
-        if (staffIdentity()?.role !== 'admin' || !staffIdentity()?.enabled) { send(403, { error: 'เฉพาะผู้ดูแลระบบที่เข้าสู่ระบบเท่านั้น' }); return; }
+        if (!hasPermission(staffIdentity(), 'room.manage')) { send(403, { error: 'บัญชีนี้ไม่มีสิทธิ์เปลี่ยนโหมดตอบของห้อง' }); return; }
         if (Object.keys(input).some(key => !['action','groupId','mode','revision'].includes(key)) || !['off','mention','cbot'].includes(input.mode) || typeof input.revision !== 'string') { send(400, { error: 'โหมดหรือเวอร์ชันไม่ถูกต้อง' }); return; }
         send(200, { ok: true, ...service.store.setReplyMode(input.groupId, input.mode, input.revision) }); return;
+      }
+      if (input.action === 'save-profile') {
+        if (!hasPermission(staffIdentity(), 'room.manage')) { send(403, { error: 'บัญชีนี้ไม่มีสิทธิ์แก้โปรไฟล์ห้อง' }); return; }
+        send(200, { profile: service.store.saveProfile(input.groupId, input.profile, input.revision) }); return;
+      }
+      if (input.action === 'send-staff') {
+        send(200, { status: await service.sendStaffMessage(input.groupId, input.id, input.text, input.confirmed) }); return;
       }
       await service.refreshName(input.groupId); send(200, { ok: true });
     } catch (error) { if (error instanceof RoomModeError) { send(error.status, { error: error.message }); return; } send(503, { error: 'อ่านข้อมูลหรือดึงชื่อห้องไม่ได้ กรุณาตรวจว่าบอตยังอยู่ในกลุ่ม แล้วลองใหม่' }); }

@@ -1,3 +1,4 @@
+import { adminFavicon } from './admin-brand.js';
 import { IncomingMessage, type ServerResponse } from 'node:http';
 import { Readable } from 'node:stream';
 import { createHmac, randomBytes } from 'node:crypto';
@@ -9,16 +10,18 @@ import { pageQuery } from './pagination.js';
 export type AdminRequestHandler = (req: IncomingMessage, res: ServerResponse) => unknown;
 const cookie = (req: IncomingMessage, key: string) => (req.headers.cookie || '').split(';').map(v => v.trim()).find(v => v.startsWith(key + '='))?.slice(key.length + 1) || '';
 const send = (res: ServerResponse, status: number, data: unknown) => res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' }).end(JSON.stringify(data));
-const loginPage = `<!doctype html><html lang="th"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>เข้าสู่ระบบ · CBot</title><style>body{font:17px system-ui;background:#eef4f8;color:#163249;margin:0;padding:12vh 6%}main{max-width:480px;margin:auto;padding:32px;background:white;border:1px solid #dce6ef;border-radius:16px}a{display:inline-block;background:#176e65;color:white;padding:12px 20px;border-radius:8px;text-decoration:none}</style><main><h1>CBot · Care Center</h1><h2>เข้าสู่ระบบเจ้าหน้าที่</h2><p>ใช้บัญชี Google ที่ผู้ดูแลระบบอนุมัติไว้ บัญชีลูกค้า LINE ไม่ใช่บัญชีเจ้าหน้าที่</p><a href="/auth/google/start">เข้าสู่ระบบด้วย Google</a></main></html>`;
+const loginPage = `<!doctype html><html lang="th"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>เข้าสู่ระบบ · AI-Powered LINE Support System</title>${adminFavicon}<style>body{font:17px system-ui;background:#eef4f8;color:#163249;margin:0;padding:12vh 6%}main{max-width:480px;margin:auto;padding:32px;background:white;border:1px solid #dce6ef;border-radius:16px}a{display:inline-block;background:#176e65;color:white;padding:12px 20px;border-radius:8px;text-decoration:none}</style><main><h1>AI-Powered LINE Support System</h1><h2>เข้าสู่ระบบเจ้าหน้าที่</h2><p>ใช้บัญชี Google ที่ผู้ดูแลระบบอนุมัติไว้ บัญชีลูกค้า LINE ไม่ใช่บัญชีเจ้าหน้าที่</p><a href="/auth/google/start">เข้าสู่ระบบด้วย Google</a></main></html>`;
 export function routePermission(path: string, method: string, action?: unknown): Permission | undefined {
   if(path.startsWith('/api/browse/')){
     if(method!=='GET')return;
-    const aliases:Record<string,string>={customers:'/api/customers',conversations:'/api/conversations',requests:'/api/requests',news:'/api/news','news-deliveries':'/api/news','news-recipients':'/api/news','news-history':'/api/news',rooms:'/api/line-groups',pending:'/api/line-pending-users',grants:'/api/line-pending-users',staff:'/api/staff','staff-history':'/api/staff',membership:'/api/customers',options:'/api/customers'};
+    const aliases:Record<string,string>={customers:'/api/customers',conversations:'/api/conversations',requests:'/api/requests',news:'/api/news','news-deliveries':'/api/news','news-recipients':'/api/news','news-history':'/api/news',rooms:'/api/line-groups','room-profiles':'/api/line-groups',pending:'/api/line-pending-users',grants:'/api/line-pending-users',staff:'/api/staff','staff-history':'/api/staff',membership:'/api/customers',options:'/api/customers'};
     const resource=path.slice('/api/browse/'.length);
     if(['knowledge','knowledge-changes','knowledge-history','knowledge-versions','knowledge-version'].includes(resource))return 'knowledge.draft';
     const alias=aliases[resource];return alias?routePermission(alias,'GET'):undefined;
   }
   if (path === '/api/staff') return 'staff.manage';
+  if (path === '/api/bot-profile') return method === 'POST' ? 'bot.manage' : undefined;
+  if (path === '/api/bot-line') return 'line.connection.manage';
   if (path === '/api/response-settings') return 'ai.manage';
   if (path === '/api/system-status' || path === '/api/system-status/check') return 'system.inspect';
   if (path === '/api/line-pending-users') return 'line.approve';
@@ -32,7 +35,8 @@ export function routePermission(path: string, method: string, action?: unknown):
   }
   if (path === '/api/conversations') return method === 'GET' ? 'work.read' : ['take','release','send'].includes(String(action)) ? 'conversation.takeover' : undefined;
   if (['/api/overview','/api/monitor'].includes(path)) return method === 'GET' ? 'work.read' : undefined;
-  if (path === '/api/line-groups' && method === 'POST' && action === 'set-reply-mode') return 'ai.manage';
+  if (path === '/api/line-groups' && method === 'POST' && ['set-reply-mode', 'save-profile'].includes(String(action))) return 'room.manage';
+  if (path === '/api/line-groups' && method === 'POST' && action === 'send-staff') return 'conversation.takeover';
   if (['/api/customers','/api/requests','/api/line-groups'].includes(path)) return method === 'GET' ? 'work.read' : 'work.write';
 }
 export class StaffAuth {

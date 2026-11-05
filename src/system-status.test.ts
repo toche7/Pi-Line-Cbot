@@ -55,7 +55,7 @@ test('status API protects external check with same-origin/CSRF and rejects write
  assert.equal((await call()).status,200);assert.equal((await call('/api/system-status','POST')).status,405);assert.equal((await call('/api/system-status/check','GET')).status,405);assert.equal((await call('/api/system-status/check','POST')).status,403);assert.equal(f.calls.length,0);
  assert.equal((await call('/api/system-status/check','POST',{host:'127.0.0.1:3001',origin:'http://127.0.0.1:3001','x-customer-token':'csrf-fixture','sec-fetch-site':'cross-site'})).status,403);assert.equal(f.calls.length,0);
  assert.equal((await call('/api/system-status/check','POST',{host:'127.0.0.1:3001',origin:'http://127.0.0.1:3001','x-customer-token':'csrf-fixture'})).status,200);assert.equal(f.calls.length,3);
- const html=adminPage();assert.ok(html.indexOf('id="overview-system"')<html.indexOf('id="overview-metrics"'));new Function(html.match(/<script>([\s\S]*?)<\/script>/)![1]);
+ const html=adminPage();assert.match(html, /id="settings-panel-system"[^>]*><div id="settings-system"><section id="overview-system"/);assert.match(html, /href="#settings-system"/);new Function(html.match(/<script>([\s\S]*?)<\/script>/)![1]);
 });
 
 test('model evidence is recorded only by actual conversation attempts and excludes prompts/raw errors',async()=>{

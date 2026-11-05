@@ -70,16 +70,18 @@ export class StaffStore {
       const owner = s.accounts.find(a => a.subject === actor.subject);
       if (!owner?.enabled || owner.role !== 'admin') throw new StaffError(403, 'เฉพาะผู้ดูแลระบบ');
       if (!input || !['invite', 'update'].includes(input.action) || input.revision !== s.revision) throw new StaffError(409, 'โหลดรายชื่อเจ้าหน้าที่ล่าสุดก่อนบันทึก');
-      if (!staffRoles.includes(input.role) || typeof input.enabled !== 'boolean' || !Array.isArray(input.extras)
-        || input.extras.some((p: any) => !extraPermissions.includes(p)) || new Set(input.extras).size !== input.extras.length
-        || input.role === 'staff' && input.extras.includes('knowledge.publish')) throw new StaffError(400, 'บทบาทหรือสิทธิ์ไม่ถูกต้อง');
+      if (!staffRoles.includes(input.role) || typeof input.enabled !== 'boolean') throw new StaffError(400, 'บทบาทหรือสิทธิ์ไม่ถูกต้อง');
+      const extras = input.extras;
+      if (extras !== undefined && (!Array.isArray(extras)
+        || extras.some(p => !extraPermissions.includes(p)) || new Set(extras).size !== extras.length
+        || input.role === 'staff' && extras.includes('knowledge.publish'))) throw new StaffError(400, 'บทบาทหรือสิทธิ์ไม่ถูกต้อง');
       let target: Account;
       if (input.action === 'invite') {
         if (!validEmail(input.email) || s.accounts.length >= 1000 || s.accounts.some(a => a.email === input.email.toLowerCase())) throw new StaffError(400, 'อีเมลไม่ถูกต้อง ซ้ำ หรือรายชื่อเต็ม');
-        target = { id: randomUUID(), email: input.email.toLowerCase(), role: input.role, enabled: input.enabled, extras: input.extras }; s.accounts.push(target);
+        target = { id: randomUUID(), email: input.email.toLowerCase(), role: input.role, enabled: input.enabled, extras: extras ?? [] }; s.accounts.push(target);
       } else {
         const found = s.accounts.find(a => a.id === input.id); if (!found) throw new StaffError(404, 'ไม่พบบัญชี'); target = found;
-        Object.assign(target, { role: input.role, enabled: input.enabled, extras: input.extras });
+        Object.assign(target, { role: input.role, enabled: input.enabled, extras: extras ?? target.extras });
       }
       if (!s.accounts.some(a => a.role === 'admin' && a.enabled && a.subject)) throw new StaffError(400, 'ต้องเหลือผู้ดูแลระบบที่ผูก Google และเปิดใช้งานอย่างน้อยหนึ่งคน');
       s.history.push({ at: new Date().toISOString(), actor: actor.subject, event: input.action, target: target.id });

@@ -5,7 +5,7 @@ import { modelConnection } from './model-connection.js';
 const displayTime = (at: number | string) => new Date(at).toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' }) + ' (เวลาไทย)';
 type State = 'ok' | 'warning' | 'error' | 'unknown';
 export type ConnectionCard = { id: string; title: string; state: State; summary: string; details: string[]; checkedAt: string | null };
-type ExternalResult = { line: ConnectionCard; external: ConnectionCard; at: number };
+type ExternalResult = { account: { displayName: string; basicId: string } | null; line: ConnectionCard; external: ConnectionCard; at: number };
 export type SystemStatusOptions = {
   startedAt: number; webhookPort: number; adminPort: number; listeners: () => { webhook: boolean; admin: boolean };
   token: string; channelConfigured: boolean; secretConfigured: boolean; dryRun: boolean; publicBase: string;
@@ -60,7 +60,7 @@ export class SystemStatusService {
       'Worker: '+(!worker?'ไม่ทราบสถานะ':worker.suspended?'พักเพราะข้อผิดพลาด':worker.running?worker.busy?'ทำงาน · มีรอบกำลังประมวลผล':'ทำงาน':'หยุดอยู่'),
       'ตรวจอ่านเท่านั้น ไม่ทดลองเขียนหรือลบข้อมูล ไม่ยืนยันว่าการเขียนครั้งถัดไปจะสำเร็จ'
     ]));
-    return { generatedAt: new Date(at).toISOString(), cards, checking: !!this.checking, externalCheckedAt: this.external ? new Date(this.external.at).toISOString() : null };
+    return { generatedAt: new Date(at).toISOString(), cards, lineAccount: this.external?.account ?? null, checking: !!this.checking, externalCheckedAt: this.external ? new Date(this.external.at).toISOString() : null };
   }
   async checkExternal() {
     if (this.checking) await this.checking;
@@ -87,11 +87,12 @@ export class SystemStatusService {
     let reachable=false;
     if(base) { try { reachable=(await this.json(base+'/health')).ok===true; } catch { /* unknown reason: TLS/network/server */ } }
     const results=await linePromise, bot=results?.[0], webhook=results?.[1], endpoint=webhook?.status==='fulfilled'?webhook.value:null;
-    const botOk=bot?.status==='fulfilled'&&typeof bot.value.displayName==='string';
+    const botInfo = bot?.status === 'fulfilled' ? bot.value : null;
+    const botOk = typeof botInfo?.displayName === 'string';
     const validEndpoint=endpoint&&typeof endpoint.endpoint==='string'&&typeof endpoint.active==='boolean';
     const endpointMatches=!!base&&validEndpoint&&endpoint.endpoint===base+'/webhook/line';
     const line=this.card('line','LINE',!botOk?'error':!o.channelConfigured||!o.secretConfigured||o.dryRun?'warning':'ok',botOk?'LINE API ตอบกลับ'+(o.dryRun?' · dry run':''):'ตรวจ LINE API ไม่สำเร็จ',[
-      ...(botOk?['OA: '+bot.value.displayName.slice(0,100)]:['ตรวจ credentials หรือเครือข่ายจากเครื่องนี้']),
+      ...(botOk?['OA: '+botInfo.displayName.slice(0,100)]:['ตรวจ credentials หรือเครือข่ายจากเครื่องนี้']),
       o.dryRun?'โหมด dry run: ไม่ตอบ LINE จริง':'โหมดตอบจริงตามสิทธิ์เดิม', 'ค่าบัญชีและ secret: '+(o.channelConfigured&&o.secretConfigured?'ตั้งไว้แล้ว (ไม่ได้ตรวจความตรงกับ OA)':'ยังไม่ครบ'),
       'ตรวจข้อมูล OA ด้วย GET ไม่ส่งข้อความ ไม่ทดสอบการส่งจริง'
     ]);
@@ -101,7 +102,10 @@ export class SystemStatusService {
       'LINE webhook: '+(!validEndpoint?'อ่านค่าไม่ได้':(endpoint.active?'เปิด':'ปิด')+' · '+(base?endpointMatches?'URL ตรง':'URL ไม่ตรง':'ยังเทียบ URL ไม่ได้')),
       'ตรวจจากเครื่อง server นี้ ไม่ใช่หลักฐานว่า LINE ส่ง event ถึงจริง ไม่เปลี่ยน webhook หรือเริ่ม ngrok'
     ]);
-    this.external={line,external,at:this.now()};
+    const basicId = botOk ? botInfo.basicId : undefined;
+    const account = typeof basicId === 'string' && /^@[A-Za-z0-9._-]{1,100}$/.test(basicId)
+      ? { displayName: botInfo.displayName.slice(0, 100), basicId } : null;
+    this.external={account,line,external,at:this.now()};
   }
 }
 export function systemStatusHandler(service: SystemStatusService | undefined, token: string) {

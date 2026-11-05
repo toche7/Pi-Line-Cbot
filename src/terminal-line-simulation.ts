@@ -35,7 +35,7 @@ export function createTerminalLineSimulation(options: {
   rooms.observe({ groupId, type: 'join', at: new Date().toISOString() }); rooms.enableCallWord(groupId);
   let currentReply: ((text: string) => void) | undefined;
   const reply = async (_token: string, text: string) => { currentReply?.(text); };
-  const groupReplies = new LineGroupReplies(rooms, group, account, false, reply);
+  const groupReplies = new LineGroupReplies(rooms, group, account, false, reply, undefined, () => 'CBOT');
   const adapter = new LineAdapter({ account, secret, allowedUsers: new Set([user]), dryRun: false,
     core: direct, control, groupReplies, reply, observeGroup: event => rooms.observe(event) });
   const directClient = direct.client({ channel: 'line', scope: account + ':direct', user });

@@ -1,17 +1,19 @@
+import { defaultBotName } from './bot-profile.js';
 import type { CustomerCore } from './core.js';
 import type { LineGroupStore } from './line-groups.js';
 import { lineFailureReply, neutralFailureReply } from './diagnostics.js';
 
-export function groupCallWordPrompt(event: any): string | undefined {
+export function groupCallWordPrompt(event: any, botName = defaultBotName): string | undefined {
   if (event?.type !== 'message' || event.mode === 'standby' || event.source?.type !== 'group'
     || !/^C[0-9a-f]{32}$/i.test(event.source.groupId ?? '') || !/^U[0-9a-f]{32}$/i.test(event.source.userId ?? '')
     || event.message?.type !== 'text' || typeof event.message.text !== 'string'
     || typeof event.replyToken !== 'string' || !event.replyToken || typeof event.webhookEventId !== 'string'
     || !event.webhookEventId || event.webhookEventId.length > 128) return;
   // A deliberate leading call word, not a substring or a forged LINE mention.
-  const text = event.message.text.trim();
-  if (!/^CBOT/i.test(text)) return;
-  return text.slice(4).replace(/^[\s:：,]+/, '').trim();
+  const text = event.message.text.trim().normalize();
+  const name = botName.normalize();
+  if (!name || text.slice(0, name.length).toLowerCase() !== name.toLowerCase()) return;
+  return text.slice(name.length).replace(/^[\s:：,]+/, '').trim();
 }
 
 // LINE-provided mention metadata is authoritative; typing a display name or
@@ -42,14 +44,17 @@ export class LineGroupReplies {
   private tail: Promise<void> = Promise.resolve();
   private closed = false;
   constructor(private store: LineGroupStore, private core: Pick<CustomerCore, 'client'> & Partial<Pick<CustomerCore, 'faqWithoutModel' | 'neutralFallback'>>, private account: string,
-    private dryRun: boolean, private reply: (replyToken: string, text: string) => Promise<void>, private log: (record: object) => void = () => {}) {}
+    private dryRun: boolean, private reply: (replyToken: string, text: string) => Promise<void>, private log: (record: object) => void = () => {}, private botName = () => defaultBotName) {}
   accept(event: any, destination: unknown): boolean {
     const mode = event?.source?.groupId ? this.store.replyMode(event.source.groupId) : undefined;
-    // Existing CBOT rooms accept either trigger. Prefer the real mention so its
+    // Call-word rooms accept either trigger. Prefer the real mention so its
     // display-name token is removed, and resolve one prompt for one reply only.
     const mentionedPrompt = groupMentionPrompt(event, destination);
-    const prompt = mentionedPrompt ?? (mode === 'cbot' ? groupCallWordPrompt(event) : undefined);
-    if (prompt === undefined || this.closed || this.dryRun || !this.store.mentionsEnabled(event.source.groupId)) return true;
+    if (this.closed || this.dryRun || (mentionedPrompt === undefined && mode !== 'cbot')
+      || !this.store.mentionsEnabled(event.source.groupId)) return true;
+    const name = this.botName();
+    const prompt = mentionedPrompt ?? (mode === 'cbot' ? groupCallWordPrompt(event, name) : undefined);
+    if (prompt === undefined) return true;
     if (this.tasks.size >= 16) return false;
     if (!this.store.reserveReply(event.source.groupId, event.webhookEventId)) return true;
     const revision = this.store.modeRevision(event.source.groupId);
@@ -58,8 +63,8 @@ export class LineGroupReplies {
     const task = this.tail.then(async () => {
       if (this.closed || Date.now() - receivedAt > 20000 || !this.store.mentionsEnabled(groupId) || this.store.modeRevision(groupId) !== revision) { finish('', 'cancelled'); return; }
       let text = '';
-      if (!prompt) text = mode === 'cbot' ? 'เรียกซีบอตแล้วครับ พิมพ์ CBOT หรือแท็กบัญชีบอต แล้วตามด้วยคำถามได้เลยครับ' : 'เรียกซีบอตแล้วครับ พิมพ์คำถามต่อท้ายแท็กได้เลยครับ';
-      else if (prompt.startsWith('/')) text = 'คำสั่งจัดการความจำและคำขอ กรุณาใช้แชตส่วนตัวกับซีบอตครับ ในกลุ่มให้แท็กพร้อมคำถามได้เลย';
+      if (!prompt) text = mode === 'cbot' ? `เรียก${name}แล้วครับ พิมพ์ชื่อบอตหรือแท็กบัญชีบอต แล้วตามด้วยคำถามได้เลยครับ` : `เรียก${name}แล้วครับ พิมพ์คำถามต่อท้ายแท็กได้เลยครับ`;
+      else if (prompt.startsWith('/')) text = `คำสั่งจัดการความจำและคำขอ กรุณาใช้แชตส่วนตัวกับ${name}ครับ ในกลุ่มให้แท็กพร้อมคำถามได้เลย`;
       else {
         try {
           // Per-room AND per-sender identity; dedicated core/store cannot see

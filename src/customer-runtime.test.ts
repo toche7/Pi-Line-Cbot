@@ -290,7 +290,7 @@ test('group runtime shares semantic capability routing, refers private services,
   let sequence = 0;
   const send = async (text: string) => {
     adapter.accept({ type: 'message', webhookEventId: 'cap-' + sequence++, replyToken: 'fake-only',
-      source: { type: 'group', groupId, userId }, message: { type: 'text', text: 'CBOT ' + text } }, undefined);
+      source: { type: 'group', groupId, userId }, message: { type: 'text', text: 'ซีบอต ' + text } }, undefined);
     await adapter.drain(); return replies.at(-1)!;
   };
   try {

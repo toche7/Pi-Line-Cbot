@@ -39,14 +39,41 @@ test('staff changes prevent removing last admin, reject stale revisions, unautho
   writeFileSync(join(f.root,'staff','accounts.json'),'{bad');assert.throws(()=>f.store.identity('owner-sub'),/ปฏิเสธ/);
  }finally{f.clean()}
 });
-test('role-aware admin page omits unauthorized data loaders and shows four settings only for admin',()=>{
+test('staff form updates preserve omitted extras while explicit API updates still replace them',()=>{
+ const f=storeFixture();try{
+  const owner=f.store.identity('owner-sub','owner@example.test')!;
+  const mutate=(input:object)=>f.store.mutate(owner,{...input,revision:f.store.snapshot().revision});
+  const email='person@example.test',extras=['news.send','line.approve','knowledge.publish'];
+  mutate({action:'invite',email,role:'content',enabled:true,extras});
+  const id=f.store.snapshot().accounts.find(a=>a.email===email)!.id;
+  mutate({action:'update',id,role:'staff',enabled:false});
+  assert.deepEqual(f.store.snapshot().accounts.find(a=>a.id===id)?.extras,extras);
+  mutate({action:'update',id,role:'staff',enabled:true});
+  assert.deepEqual(f.store.identity('person-sub',email)?.extras,extras);
+  mutate({action:'update',id,role:'staff',enabled:true,extras:[]});
+  assert.deepEqual(f.store.identity('person-sub')?.extras,[]);
+  mutate({action:'invite',email:'new@example.test',role:'staff',enabled:true});
+  assert.deepEqual(f.store.identity('new-sub','new@example.test')?.extras,[]);
+ }finally{f.clean()}
+});
+test('role-aware admin page omits unauthorized data loaders and shows Manager work and hides admin controls',()=>{
  for(const role of ['staff','content','admin'] as const){
   const p:StaffPrincipal={subject:'fixture',email:'fixture@example.test',role,enabled:true,extras:[]},page=adminPage('fixture-csrf',{principal:p,csrf:'staff-fixture'});
   for(const match of page.matchAll(/<script>([\s\S]*?)<\/script>/g))assert.doesNotThrow(()=>new Script(match[1]));
   assert.ok(page.includes('ออกจากระบบ'));
+  if(role==='admin')assert.match(page, /id="staff-extras"[\s\S]*?id="staff-extra-news"[\s\S]*?id="staff-extra-line"/);
+  else assert.doesNotMatch(page, /id="staff-extra-(?:news|line)"/);
   if(role==='staff'){assert.ok(!page.includes('id="settings-users"'));assert.ok(!page.includes('id="km-form"'));assert.ok(!page.includes('id="rs-form"'));assert.ok(!page.includes("'/api/knowledge'"));assert.ok(!page.includes("'/api/response-settings'"));assert.ok(!page.includes("'/api/line-pending-users'"));}
-  if(role==='content'){assert.ok(page.includes('id="km-form"'));assert.ok(!page.includes('id="rs-form"'));assert.ok(!page.includes('id="staff-form"'));}
-  if(role==='admin')for(const s of ['knowledge','ai','system','users'])assert.ok(page.includes('id="settings-'+s+'"'));
+  if(role==='content'){
+    assert.match(page, /fixture@example.test · ผู้จัดการ/);
+    for(const id of ['km-form','km-publish','km-versions','settings-system','pending-line-reload']) {
+      assert.ok(page.includes('id="'+id+'"'), id);
+    }
+    for(const id of ['rs-form','staff-form','settings-profile','bot-profile-form','settings-line','bot-line-check']) assert.ok(!page.includes('id="'+id+'"'), id);
+    assert.ok(page.includes("'/api/news'"));
+    assert.doesNotMatch(page, /['"]\/api\/bot-(?:profile|line)['"]/);
+  }
+  if(role==='admin')for(const s of ['profile','line','knowledge','ai','system','users'])assert.ok(page.includes('id="settings-'+s+'"'));
  }
 });
 test('HTTP Google flow, API role/CSRF gates, replayed bodies, actor context, revocation and logout (fixtures only)',async()=>{
@@ -76,6 +103,8 @@ test('HTTP Google flow, API role/CSRF gates, replayed bodies, actor context, rev
   const headers={Cookie:ownerCookie,Origin:base,'X-Staff-Token':me.csrf,'Content-Type':'application/json'};
   let r=await fetch(base+'/api/customers',{method:'POST',headers,body:JSON.stringify({action:'fixture',role:'forged'})});assert.equal(r.status,200);const d=await r.json() as any;assert.equal(d.body.action,'fixture');assert.equal(d.actor,'staff:owner-sub');
   assert.equal((await fetch(base+'/api/customers',{method:'POST',headers:{...headers,'X-Staff-Token':'wrong'},body:'{}'})).status,403);
+  assert.equal((await fetch(base+'/api/bot-profile',{method:'POST',headers,body:JSON.stringify({name:'Test bot'})})).status,200);
+  assert.equal((await fetch(base+'/api/bot-line',{headers})).status,200);
   assert.equal((await fetch(base+'/api/customers?bypass=1',{headers:{Cookie:ownerCookie}})).status,404);
   assert.equal((await fetch(base+'/api/unknown',{headers:{Cookie:ownerCookie}})).status,403);
   f.store.mutate(owner,{action:'invite',revision:f.store.snapshot().revision,email:'staff@example.test',role:'staff',enabled:true,extras:[]});
@@ -87,8 +116,24 @@ test('HTTP Google flow, API role/CSRF gates, replayed bodies, actor context, rev
   assert.equal((await fetch(base+'/api/response-settings',{method:'POST',headers:sh,body:JSON.stringify({action:'apply',role:'admin'})})).status,403);
   const staff=f.store.snapshot().accounts.find(a=>a.subject==='staff-sub')!;
   f.store.mutate(owner,{action:'update',revision:f.store.snapshot().revision,id:staff.id,role:'content',enabled:true,extras:[]});
-  assert.equal((await fetch(base+'/api/knowledge',{headers:sh})).status,200);
-  assert.equal((await fetch(base+'/api/knowledge',{method:'POST',headers:sh,body:JSON.stringify({action:'publish'})})).status,403);
+  for(const path of ['/api/conversations','/api/customers','/api/requests','/api/news','/api/knowledge','/api/system-status',
+    '/api/line-pending-users','/api/browse/rooms','/api/browse/room-profiles','/api/browse/grants','/api/browse/knowledge-versions']){
+    assert.equal((await fetch(base+path,{headers:sh})).status,200,path);
+  }
+  const postAsManager=(path:string,action:string)=>fetch(base+path,{method:'POST',headers:sh,body:JSON.stringify({action,role:'admin'})});
+  for(const [path,actions] of [
+    ['/api/conversations',['take','send','release']], ['/api/customers',['save']], ['/api/requests',['update']],
+    ['/api/news',['create','review','confirm','cancel']], ['/api/knowledge',['save','review','try','publish','restore']],
+    ['/api/line-pending-users',['allow']], ['/api/line-groups',['set-reply-mode','save-profile','send-staff']],
+    ['/api/system-status/check',['check']],
+  ] as const) for(const action of actions) assert.equal((await postAsManager(path,action)).status,200,path+' '+action);
+  for(const path of ['/api/staff','/api/browse/staff','/api/browse/staff-history','/api/response-settings','/api/bot-line']){
+    assert.equal((await fetch(base+path,{headers:sh})).status,403,path);
+  }
+  for(const [path,actions] of [
+    ['/api/staff',['invite','update']], ['/api/response-settings',['save','try','apply']], ['/api/bot-line',['check']],
+    ['/api/bot-profile',['save']],
+  ] as const) for(const action of actions) assert.equal((await postAsManager(path,action)).status,403,path+' '+action);
   f.store.mutate(owner,{action:'update',revision:f.store.snapshot().revision,id:staff.id,role:'content',enabled:false,extras:[]});
   assert.equal((await fetch(base+'/api/customers',{headers:sh})).status,401);
   assert.equal((await fetch(base+'/auth/logout',{method:'POST',headers})).status,200);

@@ -41,7 +41,7 @@ export class ConversationMonitor {
   }
 }
 
-export function monitorHandler(monitor: ConversationMonitor, html = monitorPage) {
+export function monitorHandler(monitor: ConversationMonitor, html: string | (() => string) = monitorPage) {
   return (req: IncomingMessage, res: ServerResponse) => {
     const headers = { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff', 'Content-Security-Policy': "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; frame-ancestors 'none'" };
     // The monitor has its own loopback listener. Reject DNS rebinding and cross-origin requests.
@@ -51,7 +51,7 @@ export function monitorHandler(monitor: ConversationMonitor, html = monitorPage)
     if (req.method !== 'GET') { res.writeHead(405, headers).end(); return; }
     if (req.url === '/api/monitor') { res.writeHead(200, { ...headers, 'Content-Type': 'application/json' }).end(JSON.stringify(monitor.snapshot())); return; }
     if (req.url !== '/') { res.writeHead(404, headers).end(); return; }
-    res.writeHead(200, { ...headers, 'Content-Type': 'text/html; charset=utf-8' }).end(html);
+    res.writeHead(200, { ...headers, 'Content-Type': 'text/html; charset=utf-8' }).end(typeof html === 'function' ? html() : html);
   };
 }
 export const monitorPage = `<!doctype html><html lang="th"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ซีบอต · ติดตามบทสนทนา</title>

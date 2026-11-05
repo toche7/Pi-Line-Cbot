@@ -123,10 +123,12 @@ test('persistent memory: >20 turns, Pi compaction, next-day restart, isolation, 
 
 test('sensitive data never reaches persisted memory; questions cannot overwrite profile; failed summary/429 preserve facts', async () => {
   const dir = mkdtempSync(join(tmpdir(), 'cbot-safe-memory-'));
-  const store = new MemoryStore(dir);
+  // Keep the timestamp from accidentally matching the provider error marker 429.
+  const now = () => 1800000000000;
+  const store = new MemoryStore(dir, now);
   const contexts: string[] = [], sessions: AgentSession[] = [];
   let limited = false;
-  const core = new CustomerCore(fakeFactory(contexts, sessions, () => limited), 1000, undefined, undefined, store, () => ({ notes: 'malformed' } as any));
+  const core = new CustomerCore(fakeFactory(contexts, sessions, () => limited), 1000, undefined, now, store, () => ({ notes: 'malformed' } as any));
   try {
     const client = core.client(a);
     await client.send('ฉันชื่อ Safe-73', output);

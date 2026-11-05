@@ -19,12 +19,21 @@ try{
  await new Promise(r=>server.listen(0,'127.0.0.1',r));browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true});
  const context=await browser.newContext({viewport:{width:1440,height:1000},permissions:['clipboard-read','clipboard-write']}),page=await context.newPage(),errors=[];
  page.on('pageerror',e=>errors.push(e.message));
- await page.goto('http://127.0.0.1:'+server.address().port+'/#customers');await page.locator('#pending-line-users > summary').click();
+ await page.goto('http://127.0.0.1:'+server.address().port+'/#customers');
+ const panel=page.locator('#pending-line-users'),count=page.locator('#pending-line-count');
+ await count.getByText('· 1 คน',{exact:true}).waitFor();
+ assert.equal(await panel.getAttribute('open'),null);
+ for(const tab of ['#customers-groups-tab','#customers-room-profiles-tab']){
+  await page.locator(tab).click();await panel.waitFor({state:'hidden'});
+  await page.locator('#customers-list-tab').click();await panel.waitFor({state:'visible'});
+ }
+ await page.locator('#pending-line-users > summary').click();
  await page.locator('#pending-line-rows code').waitFor();assert.equal(await page.locator('#pending-line-rows code').textContent(),id);
  assert.equal(await page.locator('#pending-line-rows tbody tr').count(),1);assert.ok((await page.locator('#pending-line-rows').textContent()).includes('ยังไม่ได้รับอนุญาต'));
  await page.getByRole('button',{name:'คัดลอกรหัส',exact:true}).click();await page.waitForFunction(()=>document.getElementById('pending-line-status').textContent.startsWith('คัดลอกรหัสแล้ว'));
  assert.equal(await page.evaluate(()=>navigator.clipboard.readText()),id);assert.equal(allowedUsers.has(id),false);
  await page.getByLabel('ค้นหารหัสผู้ส่ง',{exact:true}).fill('not-found');await page.locator('#pending-line-rows').getByText('ไม่พบรหัสที่ตรงกับคำค้น',{exact:true}).waitFor();
+ assert.equal((await count.textContent()).trim(),'· 1 คน');
  await page.getByLabel('ค้นหารหัสผู้ส่ง',{exact:true}).fill('');
  await page.setViewportSize({width:390,height:844});
  const overflow=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,items:[...document.querySelectorAll('body *')].filter(n=>n.getBoundingClientRect().right>innerWidth+1&&n.getBoundingClientRect().width>0).slice(0,14).map(n=>({tag:n.tagName,id:n.id,class:n.className,width:n.getBoundingClientRect().width,right:n.getBoundingClientRect().right}))}));
@@ -34,9 +43,10 @@ try{
  page.once('dialog',dialog=>{assert.ok(dialog.message().includes(id));dialog.accept()});
  await page.getByRole('button',{name:'เพิ่มสิทธิ์ให้คุยกับบอต',exact:true}).click();
  await page.waitForFunction(()=>document.getElementById('pending-line-status').textContent.startsWith('เพิ่มสิทธิ์แล้ว'));
+ assert.equal((await count.textContent()).trim(),'· 0 คน');
  assert.equal(allowedUsers.has(id),true);assert.equal(access.snapshot().grants.length,1);
  await page.locator('#pending-line-rows').getByText('ยังไม่มีผู้ทักใหม่ที่รออนุญาต',{exact:true}).waitFor();
- await page.getByText('ประวัติเพิ่มสิทธิ์ผ่านหน้านี้',{exact:true}).click();assert.ok((await page.locator('#pending-line-history').textContent()).includes(id));
+ await page.getByText('ประวัติเพิ่มสิทธิ์ผ่านหน้านี้',{exact:true}).click();await page.locator('#pending-line-history').getByText(id,{exact:false}).waitFor();
  await page.reload();await page.locator('#pending-line-users > summary').first().click();
  await page.locator('#pending-line-rows').getByText('ยังไม่มีผู้ทักใหม่ที่รออนุญาต',{exact:true}).waitFor();
  assert.equal(customers.snapshot({events:[],requests:[]}).customers.length,0);assert.equal(monitor.snapshot().events.length,0);assert.equal(requests.list().length,0);assert.deepEqual(errors,[]);

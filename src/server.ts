@@ -1,3 +1,4 @@
+import { BotProfile } from './bot-profile.js';
 import { runningVersion } from './program-version.js';
 import { existsSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -83,11 +84,12 @@ async function start() {
   const newsMedia = new NewsMediaStore(dataPath('runtime/news-images'),imageBase);
   const news = new NewsService(new NewsStore(dataPath('runtime/news')), customerStore, process.env.LINE_CHANNEL_ID || '', dryRun ? undefined : newsLineTransport(token), undefined, false, groupStore, newsMedia);
   const newsWorker = new NewsWorker(news, () => log({ event: 'news_worker_suspended', reason: 'storage_or_dispatch_error' }), lockRoot ? join(lockRoot, 'news') : undefined);
-  const lineGroups = new LineGroupService(groupStore, token, fetch, () => Date.now(), { name: (process.env.SERVER_NAME || process.env.RAILWAY_SERVICE_NAME || 'ซีบอต').slice(0,100), environment: deployment.cloud ? 'cloud'+(process.env.RAILWAY_ENVIRONMENT_NAME ? ' · '+process.env.RAILWAY_ENVIRONMENT_NAME.slice(0,80) : '') : 'local' });
+  const lineGroups = new LineGroupService(groupStore, token, fetch, () => Date.now(), { name: (process.env.SERVER_NAME || process.env.RAILWAY_SERVICE_NAME || 'ซีบอต').slice(0,100), environment: deployment.cloud ? 'cloud'+(process.env.RAILWAY_ENVIRONMENT_NAME ? ' · '+process.env.RAILWAY_ENVIRONMENT_NAME.slice(0,80) : '') : 'local' }, !dryRun && token ? linePush(token) : undefined);
   const groupMemory = new MemoryStore(dataPath('runtime/line-group-memory'), undefined, lockRoot ? join(lockRoot, 'group') : undefined);
   const groupCore = createCustomerCore({ timeoutMs: timeout, log, store: groupMemory,
     privateChatCapabilities: { requests: true, commands: true, humanSupport: true } });
-  const groupReplies = new LineGroupReplies(groupStore, groupCore, process.env.LINE_CHANNEL_ID || '', dryRun, lineReply(token), log);
+  const botProfile = new BotProfile(dataPath('runtime/bot-profile.json'));
+  const groupReplies = new LineGroupReplies(groupStore, groupCore, process.env.LINE_CHANNEL_ID || '', dryRun, lineReply(token), log, () => botProfile.name());
   const pendingLineUsers = new PendingLineUsers(dataPath('runtime/line-pending-users'));
   const statusWork = new RequestWorkStore(dataPath('runtime/request-work'), requestStore);
   const systemStatus = new SystemStatusService({
@@ -106,7 +108,7 @@ async function start() {
   if (!cloud && loginConfig && new URL(loginConfig.redirectUri).port !== String(monitorPort)) throw new Error('Google callback port must match admin port');
   if (!loginConfig && existsSync(dataPath('runtime/staff/accounts.json'))) throw new Error('Google login config missing for existing staff registry');
   const staffAuth = loginConfig ? new StaffAuth(new StaffStore(dataPath('runtime/staff'), process.env.ADMIN_BOOTSTRAP_EMAIL || ''), loginConfig) : undefined;
-  const admin = adminHandler(monitor, requestStore, customerStore, profiles, conversationService, news, knowledge, responseSettings, lineGroups, { store: pendingLineUsers, account: process.env.LINE_CHANNEL_ID || '', allowedUsers, access: lineAccess }, systemStatus, staffAuth);
+  const admin = adminHandler(monitor, requestStore, customerStore, profiles, conversationService, news, knowledge, responseSettings, lineGroups, { store: pendingLineUsers, account: process.env.LINE_CHANNEL_ID || '', allowedUsers, access: lineAccess }, systemStatus, staffAuth, botProfile);
   const monitorServer = createServer(admin);
   monitorServer.requestTimeout = 10000;
   monitorServer.headersTimeout = 10000;
